@@ -1,0 +1,137 @@
+# ==========================================
+# Unity 기본 (Official)
+# ==========================================
+
+.utmp/
+
+/[Ll]ibrary/
+/[Tt]emp/
+/[Oo]bj/
+/[Bb]uild/
+/[Bb]uilds/
+/[Ll]ogs/
+/[Uu]ser[Ss]ettings/
+
+*.log
+
+# ==========================================
+# Blender
+# ==========================================
+*.blend1
+*.blend1.meta
+
+# ==========================================
+# Memory / Recording
+# ==========================================
+/[Mm]emoryCaptures/
+/[Rr]ecordings/
+
+# ==========================================
+# Rider / IDE
+# ==========================================
+/[Aa]ssets/Plugins/Editor/JetBrains*
+*.DotSettings.user
+
+.vs/
+.gradle/
+.idea/
+.Rider/
+
+ExportedObj/
+.consulo/
+
+*.csproj
+*.unityproj
+*.sln
+*.suo
+*.tmp
+*.user
+*.userprefs
+*.pidb
+*.booproj
+*.svd
+*.pdb
+*.mdb
+*.opendb
+*.VC.db
+
+# Unity generated meta (특정 파일만)
+*.pidb.meta
+*.pdb.meta
+*.mdb.meta
+
+# ==========================================
+# Crash / Debug
+# ==========================================
+sysinfo.txt
+mono_crash.*
+
+# ==========================================
+# Build 결과물
+# ==========================================
+*.apk
+*.aab
+*.app
+*.exe
+*.ipa
+
+# DLL 정책 (중요)
+*.dll
+!Assets/Plugins/**/*.dll
+
+# ==========================================
+# Addressables
+# ==========================================
+/ServerData
+/[Aa]ssets/StreamingAssets/aa*
+/[Aa]ssets/AddressableAssetsData/link.xml*
+/[Aa]ssets/Addressables_Temp*
+/[Aa]ssets/AddressableAssetsData/*/*.bin*
+
+# ==========================================
+# Visual Scripting
+# ==========================================
+/[Aa]ssets/Unity.VisualScripting.Generated/VisualScripting.Flow/UnitOptions.db
+/[Aa]ssets/Unity.VisualScripting.Generated/VisualScripting.Flow/UnitOptions.db.meta
+/[Aa]ssets/Unity.VisualScripting.Generated/VisualScripting.Core/Property Providers
+/[Aa]ssets/Unity.VisualScripting.Generated/VisualScripting.Core/Property Providers.meta
+
+# ==========================================
+# Test / Auto Scenes
+# ==========================================
+InitTestScene*.unity*
+/[Aa]ssets/[Ii]nit[Tt]est[Ss]cene*.unity*
+
+# ==========================================
+# Unity 6 Cache
+# ==========================================
+[Dd]erivedDataCache/
+[Uu]nityPackageManager/ProjectCache/
+[Uu]nityPackageManager/Config/
+
+# ==========================================
+# OS Files
+# ==========================================
+.DS_Store
+.DS_Store?
+._*
+.Spotlight-V100
+.Trashes
+ehthumbs.db
+Thumbs.db
+
+# ==========================================
+# Security
+# ==========================================
+*.keystore
+*.jks
+*.sig
+.env
+secrets.json
+credentials.xml
+*.local
+
+# ==========================================
+# (선택) UnityPackage meta는 관리 권장
+# ==========================================
+# *.unitypackage.meta  ← 제거함 (meta는 추적 권장)

@@ -1,0 +1,118 @@
+# ==========================================
+# [O.U.D] Unity 6 + 2D + URP — .gitattributes
+# Yachu Battle (캡스톤디자인 2026)
+# ==========================================
+
+# =========================
+# 0. Global Default (반드시 최상단)
+# =========================
+# 기본값을 먼저 설정하고, 이후 구체적 규칙이 오버라이드한다.
+# gitattributes는 동일 속성에 대해 마지막 매칭 라인이 우선하므로,
+# 이 줄이 아래 규칙들보다 뒤에 있으면 LFS -text 등이 덮어씌워진다.
+* text=auto eol=lf
+
+# =========================
+# 1. Image & Texture Assets (LFS)
+# =========================
+*.psd filter=lfs diff=lfs merge=lfs -text
+*.psb filter=lfs diff=lfs merge=lfs -text
+*.png filter=lfs diff=lfs merge=lfs -text
+*.jpg filter=lfs diff=lfs merge=lfs -text
+*.jpeg filter=lfs diff=lfs merge=lfs -text
+*.tga filter=lfs diff=lfs merge=lfs -text
+*.tif filter=lfs diff=lfs merge=lfs -text
+*.tiff filter=lfs diff=lfs merge=lfs -text
+*.exr filter=lfs diff=lfs merge=lfs -text
+
+# =========================
+# 2. Audio Assets (LFS)
+# =========================
+*.wav filter=lfs diff=lfs merge=lfs -text
+*.mp3 filter=lfs diff=lfs merge=lfs -text
+*.ogg filter=lfs diff=lfs merge=lfs -text
+*.aiff filter=lfs diff=lfs merge=lfs -text
+
+# =========================
+# 3. Video Assets (LFS)
+# =========================
+*.mp4 filter=lfs diff=lfs merge=lfs -text
+*.mov filter=lfs diff=lfs merge=lfs -text
+*.avi filter=lfs diff=lfs merge=lfs -text
+
+# =========================
+# 4. Fonts (LFS)
+# =========================
+*.ttf filter=lfs diff=lfs merge=lfs -text
+*.otf filter=lfs diff=lfs merge=lfs -text
+
+# =========================
+# 5. 3D / External Tools (LFS)
+# =========================
+*.fbx filter=lfs diff=lfs merge=lfs -text
+*.blend filter=lfs diff=lfs merge=lfs -text
+*.obj filter=lfs diff=lfs merge=lfs -text
+*.ai filter=lfs diff=lfs merge=lfs -text
+
+# =========================
+# 6. Unity Pure Binary Data (LFS)
+# =========================
+*.lighting filter=lfs diff=lfs merge=lfs -text
+*.navmesh filter=lfs diff=lfs merge=lfs -text
+*.bundle filter=lfs diff=lfs merge=lfs -text
+*.unitypackage filter=lfs diff=lfs merge=lfs -text
+*.dll filter=lfs diff=lfs merge=lfs -text
+*.scenetemplate filter=lfs diff=lfs merge=lfs -text
+
+# =========================
+# 7. URP / Shader / VFX (LFS)
+# =========================
+*.shadergraph filter=lfs diff=lfs merge=lfs -text
+*.shadersubgraph filter=lfs diff=lfs merge=lfs -text
+*.vfx filter=lfs diff=lfs merge=lfs -text
+
+# =========================
+# 8. Text Serialization (Code)
+# =========================
+*.cs diff=csharp
+*.shader diff
+*.compute diff
+*.hlsl diff
+*.cginc diff
+*.meta text eol=lf
+
+# =========================
+# 9. Unity YAML Merge 전략 (충돌 방지 핵심 — LFS 절대 금지)
+# =========================
+*.unity text merge=unityyamlmerge eol=lf
+*.prefab text merge=unityyamlmerge eol=lf
+*.asset text merge=unityyamlmerge eol=lf
+*.mat text merge=unityyamlmerge eol=lf
+*.anim text merge=unityyamlmerge eol=lf
+*.controller text merge=unityyamlmerge eol=lf
+*.overrideController text merge=unityyamlmerge eol=lf
+*.physicMaterial text merge=unityyamlmerge eol=lf
+*.physicsMaterial2D text merge=unityyamlmerge eol=lf
+*.mixer text merge=unityyamlmerge eol=lf
+*.preset text merge=unityyamlmerge eol=lf
+
+# =========================
+# 10. 2D Data & UI Toolkit (Yachu Battle Project)
+# =========================
+# 카드/몬스터/주사위 기획 데이터 파일
+*.json text diff eol=lf
+*.csv text eol=lf
+*.xml text diff eol=lf
+*.txt text eol=lf
+
+# 2D 스프라이트 아틀라스 (YAML 병합 대상)
+*.spriteatlas text merge=unityyamlmerge eol=lf
+*.spriteatlasv2 text merge=unityyamlmerge eol=lf
+
+# Unity Input System
+*.inputactions text eol=lf
+
+# Unity 6 UI Toolkit 및 엔진 캡슐화 파일
+*.uxml text eol=lf
+*.uss text eol=lf
+*.asmdef text eol=lf
+*.asmref text eol=lf
