@@ -135,3 +135,9 @@ credentials.xml
 # (선택) UnityPackage meta는 관리 권장
 # ==========================================
 # *.unitypackage.meta  ← 제거함 (meta는 추적 권장)
+
+# [Branch Isolation] docs 브랜치 자산 차단
+/Documents/
+/Manuals/
+*.pdf
+*.docx
