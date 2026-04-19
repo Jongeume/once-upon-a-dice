@@ -1,0 +1,6 @@
+# Claude Code 개인 설정 (팀원마다 다를 수 있어 공유 안 함)
+CLAUDE.md
+.claude/
+
+# 별도 git 저장소 (nested repo)
+oud-docs/
