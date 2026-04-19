@@ -1,0 +1,17 @@
+# 로컬 전용 — dev 브랜치에서 docs/ 추적 방지
+docs/
+
+# Claude IDE 개인 설정 (팀원마다 다르게 생성됨)
+.claude/
+OUD/.claude/
+
+# 로컬 개발 도구
+TestRunner/
+
+# 임시 파일 / 백업
+OUD/Assets/Screenshots/
+OUD/Assets/_Recovery/
+
+# 로컬 전용 문서
+oud-docs/
+기획의도.md
