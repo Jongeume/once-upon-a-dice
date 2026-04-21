@@ -23,6 +23,15 @@ namespace OUD.Unity.Battle.View
             if (_executeButton) _executeButton.onClick.AddListener(() => OnExecuteClicked?.Invoke());
         }
 
+        public void ShowSlots(SkillCardData[] slotCards)
+        {
+            _slotView?.ClearAll();
+            if (slotCards == null) return;
+            for (int i = 0; i < slotCards.Length; i++)
+                if (slotCards[i] != null)
+                    _slotView?.SetSlot(i, slotCards[i]);
+        }
+
         public void HighlightSlot(int slotIndex) => _slotView?.HighlightSlot(slotIndex);
 
         public void ShowTargetLink(int slotIndex, int enemyIndex)
