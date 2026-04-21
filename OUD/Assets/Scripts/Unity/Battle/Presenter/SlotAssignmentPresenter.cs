@@ -37,22 +37,32 @@ namespace OUD.Unity.Battle.Presenter
             _onUseSkillClicked = onUseSkillClicked;
         }
 
+        /// <summary>새 플레이어 턴 시작 시 1회 호출. 슬롯/족보 상태 완전 초기화.</summary>
+        public void ResetForNewTurn()
+        {
+            _slots       = new SkillData[SlotManager.MAX_SLOTS];
+            _usedHands   = new HashSet<HandType>();
+            _filledCount = 0;
+            _view.ClearSlots();
+        }
+
+        /// <summary>
+        /// 초기 롤 또는 리롤 후 사용 가능한 스킬 목록을 갱신한다.
+        /// 슬롯 상태는 보존된다 — ResetForNewTurn()이 초기화를 담당.
+        /// </summary>
         public void Begin(
             List<SkillData>            usableSkills,
             List<MonsterInstance>      aliveEnemies,
             Action<List<SlotAssignment>> onComplete)
         {
-            _usableSkills  = usableSkills;
-            _aliveEnemies  = aliveEnemies;
-            _onComplete    = onComplete;
-            _slots         = new SkillData[SlotManager.MAX_SLOTS];
-            _usedHands     = new HashSet<HandType>();
-            _filledCount   = 0;
+            _usableSkills = usableSkills;
+            _aliveEnemies = aliveEnemies;
+            _onComplete   = onComplete;
 
-            _view.ClearSlots();
             RebuildSkillList();
-            _view.SetRerollButtonActive(true, 2);
-            _view.SetUseSkillButtonActive(false);
+            int rerollsLeft = _dicePresenter?.RerollsLeft ?? 0;
+            _view.SetRerollButtonActive(rerollsLeft > 0, rerollsLeft);
+            _view.SetUseSkillButtonActive(rerollsLeft == 0 || _filledCount >= SlotManager.MAX_SLOTS);
         }
 
         public void OnSkillClicked(string skillId)

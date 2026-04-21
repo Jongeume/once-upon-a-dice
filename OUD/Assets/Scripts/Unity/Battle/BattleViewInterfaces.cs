@@ -49,6 +49,7 @@ namespace OUD.Unity.Battle
 
     public interface ITargetSelectionView
     {
+        void ShowSlots(SkillCardData[] slotCards);
         void HighlightSlot(int slotIndex);
         void ShowTargetLink(int slotIndex, int enemyIndex);
         void ClearTargetLinks();
