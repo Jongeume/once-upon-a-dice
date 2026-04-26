@@ -45,7 +45,7 @@ namespace OUD.Unity.Battle.Presenter
                 _entryViews.Add(view);
 
                 int idx = i;
-                // EnemyEntryView는 클릭 시 이 이벤트를 발행할 것을 알고 있다
+                view.OnClicked += () => NotifyEnemyClicked(idx);
             }
         }
 

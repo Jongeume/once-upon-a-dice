@@ -24,14 +24,18 @@ namespace OUD.Unity.Battle.View
 
         public void UpdateRerollInfo(int rerollsLeft, bool canReroll)
         {
-            if (_rerollButton)    _rerollButton.interactable   = canReroll;
-            if (_rerollCountText) _rerollCountText.text         = $"🔄 리롤 {rerollsLeft}/2";
+            if (_rerollButton)
+            {
+                _rerollButton.gameObject.SetActive(rerollsLeft > 0); // 리롤 남아있을 때만 표시
+                _rerollButton.interactable = canReroll;
+            }
+            if (_rerollCountText) _rerollCountText.text = $"리롤 {rerollsLeft}/2";
         }
 
         public void SetConfirmButtonActive(bool active)
         {
+            // 리롤 버튼 상태는 UpdateRerollInfo가 관리 — 여기선 UseSkill(확정) 버튼만 제어
             if (_useSkillButton) _useSkillButton.gameObject.SetActive(active);
-            if (_rerollButton)   _rerollButton.gameObject.SetActive(!active);
         }
 
         public void SetVisible(bool visible) => gameObject.SetActive(visible);

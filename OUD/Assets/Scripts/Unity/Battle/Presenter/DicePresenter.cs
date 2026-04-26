@@ -56,6 +56,7 @@ namespace OUD.Unity.Battle.Presenter
             _onRerollRequested?.Invoke(_keepMask);
         }
 
+        public int    RerollsLeft   => _rerollsLeft;
         public bool[] GetKeepMask() => _keepMask;
 
         public void ResetKeep()

@@ -17,11 +17,16 @@ namespace OUD.Unity.Battle.View
         [SerializeField] private List<LineRenderer> _targetLines;
 
         public event System.Action OnExecuteClicked;
+        public event System.Action<int> OnSlotClicked;
 
         private void Awake()
         {
             if (_executeButton) _executeButton.onClick.AddListener(() => OnExecuteClicked?.Invoke());
+            if (_slotView != null)
+                _slotView.OnSlotClicked += idx => OnSlotClicked?.Invoke(idx);
         }
+
+        public void SetSlotClickable(bool clickable) => _slotView?.SetSlotClickable(clickable);
 
         public void ShowSlots(SkillCardData[] slotCards)
         {

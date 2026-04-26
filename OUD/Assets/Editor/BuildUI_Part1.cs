@@ -123,7 +123,7 @@ public static class BuildUI_Part1
             // 인텐트
             var intGO = GO("IntentText", eGO.transform);
             Anchor(RT(intGO), 0, 0.82f, 1, 1, 4, 0, -4, -4);
-            Txt(intGO, "⚔ 6", 17, cAtk);
+            Txt(intGO, "ATK 6", 17, cAtk);
 
             // 이름
             var nmGO = GO("NameText", eGO.transform);
@@ -237,7 +237,7 @@ public static class BuildUI_Part1
         Img(etBtn, cAtk);
         Btn(etBtn);
         var etTxt = GO("Text", etBtn.transform); Fill(RT(etTxt));
-        Txt(etTxt, "⚔ 턴 종료", 17, Color.white);
+        Txt(etTxt, "턴 종료", 17, Color.white);
 
         EditorUtility.SetDirty(cGO);
         EditorSceneManager.MarkSceneDirty(SceneManager.GetActiveScene());
