@@ -68,9 +68,10 @@ namespace OUD.Unity.Battle.View
             if (_intentText == null) return;
             _intentText.text = intent switch
             {
-                IntentType.Attack       => $"⚔ {value}",
-                IntentType.StrongAttack => $"⚔⚔ {value}",
-                IntentType.Shield       => $"🛡 {value}",
+                IntentType.Attack       => $"ATK {value}",
+                IntentType.StrongAttack => $"ATK!! {value}",
+                IntentType.Shield       => $"DEF {value}",
+                IntentType.RageWarning  => $"RAGE {value}",
                 _                       => "?"
             };
         }
