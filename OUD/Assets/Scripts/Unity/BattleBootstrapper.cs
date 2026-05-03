@@ -7,6 +7,7 @@ using UnityEngine.UI;
 using OUD.BattleEngine.Core;
 using OUD.BattleEngine.Combat;
 using OUD.BattleEngine.Dice;
+using OUD.BattleEngine.Run;
 using OUD.BattleEngine.Unit;
 using OUD.Unity.Adapter;
 
@@ -51,8 +52,11 @@ namespace OUD.Unity
             _state       = new BattleState(player, enemies, diceHand);
             _turnManager = new TurnManager(_state, _adapter);
 
-            // BattleUIAdapter에 TurnManager 역참조 주입 (리롤 콜백 연결)
-            _adapter.Initialize(_turnManager);
+            // 보상 시스템 (F-11 Phase A) — Adapter가 OnBattleWon 시점에 호출
+            RewardSystem rewardSystem = new RewardSystem(random);
+
+            // BattleUIAdapter에 TurnManager + RewardSystem 주입 (리롤 콜백 + 보상 처리 연결)
+            _adapter.Initialize(_turnManager, rewardSystem);
 
             // Roll Dice 버튼 onClick 연결 (Screen A → Screen B 전환)
             if (_rollDiceButton != null)

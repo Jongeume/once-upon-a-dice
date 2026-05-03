@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using UnityEngine;
 using OUD.BattleEngine.Combat;
 using OUD.BattleEngine.Core;
+using OUD.BattleEngine.Run;
 using OUD.BattleEngine.Skill;
 using OUD.BattleEngine.Unit;
 using OUD.Unity.Battle;
@@ -27,6 +28,7 @@ namespace OUD.Unity.Adapter
         [SerializeField] private SlotAssignmentView   _slotAssignmentView;
         [SerializeField] private TargetSelectionView  _targetSelectionView;
         [SerializeField] private BattleLogView        _battleLogView;
+        [SerializeField] private RewardView           _rewardView;
 
         [Header("화면 관리")]
         [SerializeField] private UIManager            _uiManager;
@@ -54,6 +56,9 @@ namespace OUD.Unity.Adapter
         // ── TurnManager 역참조 (Initialize 후 유효) ───────────────────────────
         private TurnManager _turnManager;
 
+        // ── 보상 시스템 (Initialize 후 유효) ─────────────────────────────────
+        private RewardSystem _rewardSystem;
+
         // ── 사용 가능한 기술 존재 여부 ────────────────────────────────────────
         // true = RequestSlotAssignment 호출됨(기술 있음) / false = 잡패(기술 없음)
         private bool _hasUsableSkills = false;
@@ -67,13 +72,23 @@ namespace OUD.Unity.Adapter
         }
 
         /// <summary>
-        /// BattleBootstrapper가 TurnManager 생성 후 호출.
-        /// 리롤 콜백과 주사위 확정 콜백을 TurnManager에 연결한다.
+        /// BattleBootstrapper가 TurnManager + RewardSystem 생성 후 호출.
+        /// 리롤 콜백 / 보상 시스템 / RewardView 이벤트를 연결한다.
         /// </summary>
-        public void Initialize(TurnManager turnManager)
+        public void Initialize(TurnManager turnManager, RewardSystem rewardSystem)
         {
-            _turnManager = turnManager;
+            _turnManager       = turnManager;
+            _rewardSystem      = rewardSystem;
             _onRerollRequested = keepMask => turnManager.RequestReroll(keepMask);
+
+            // 보상 화면 [계속] 버튼 → 화면 닫기 (다음 전투/씬 전환은 Phase D RunManager 통합 시)
+            if (_rewardView != null)
+                _rewardView.OnContinueClicked += HandleRewardContinueClicked;
+        }
+
+        private void HandleRewardContinueClicked()
+        {
+            if (_rewardView != null) _rewardView.Hide();
         }
 
         private void BuildPresenters()
@@ -257,7 +272,36 @@ namespace OUD.Unity.Adapter
             _enemyPresenter.RefreshAllShields();
         }
 
-        public void OnBattleWon()  => _battleLogPresenter.ShowBattleWon();
+        public void OnBattleWon()
+        {
+            _battleLogPresenter.ShowBattleWon();
+            GrantReward();
+        }
+
         public void OnBattleLost() => _battleLogPresenter.ShowBattleLost();
+
+        // ── 보상 처리 (F-13 Phase B) ──────────────────────────────────────────
+        // IBattleUI에 보상 콜백을 추가하지 않고 BattleUIAdapter 내부에서 처리.
+        // 근거: Phase A에서 "보상 계산은 외부 책임" 결정 — BattleEngine은 OnBattleWon만 알린다.
+
+        private void GrantReward()
+        {
+            if (_rewardSystem == null) return;            // Initialize 미호출 방어
+            if (_playerPresenter == null) return;
+            PlayerState player = _playerPresenter.Player;
+            if (player == null) return;
+
+            RewardResult reward = _rewardSystem.CalculateReward();
+            player.AddXp(reward.Xp);
+            player.AddGold(reward.Gold);
+
+            if (_rewardView != null)
+            {
+                _rewardView.SetReward(reward.Xp, reward.Gold, player.Xp, player.Gold);
+                _rewardView.Show();
+            }
+
+            _playerPresenter.SyncView();
+        }
     }
 }
