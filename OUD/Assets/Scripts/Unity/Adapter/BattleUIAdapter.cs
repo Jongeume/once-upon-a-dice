@@ -1,5 +1,6 @@
 using System;
 using System.Collections.Generic;
+using TMPro;
 using UnityEngine;
 using OUD.BattleEngine.Combat;
 using OUD.BattleEngine.Core;
@@ -38,6 +39,10 @@ namespace OUD.Unity.Adapter
 
         [Header("주사위 Entry Views (5개)")]
         [SerializeField] private List<DiceEntryView>  _diceEntries;
+
+        [Header("상단 정보 바 (선택)")]
+        [SerializeField] private string   _playerName = "Alice";
+        [SerializeField] private TMP_Text _topBarText;
 
         // ── Presenter 인스턴스 ───────────────────────────────────────────────
 
@@ -220,6 +225,7 @@ namespace OUD.Unity.Adapter
                 _playerView.transform,
                 BuildEnemyTransforms());
             _uiManager.ShowScreen(UIManager.BattleScreen.A_BattleBasic);
+            RefreshTopBar();
         }
 
         public void OnPlayerTurnStarted()
@@ -257,6 +263,7 @@ namespace OUD.Unity.Adapter
             _battleLogPresenter.ShowSlotResult(slotIndex, result);
             _playerPresenter.SyncView();
             _enemyPresenter.RefreshAll();
+            RefreshTopBar();
         }
 
         public void OnEnemyAction(int enemyIndex, IntentType intent, int value)
@@ -264,12 +271,14 @@ namespace OUD.Unity.Adapter
             _enemyPresenter.ShowAction(enemyIndex, intent, value);
             _battleLogPresenter.ShowEnemyAction(enemyIndex, intent, value);
             _playerPresenter.SyncView();
+            RefreshTopBar();
         }
 
         public void OnShieldsReset()
         {
             _playerPresenter.SyncShield();
             _enemyPresenter.RefreshAllShields();
+            RefreshTopBar();
         }
 
         public void OnBattleWon()
@@ -302,6 +311,22 @@ namespace OUD.Unity.Adapter
             }
 
             _playerPresenter.SyncView();
+            RefreshTopBar();
+        }
+
+        // ── 상단 정보 바 갱신 ─────────────────────────────────────────────────
+        // 씬에 정적 텍스트로 박혀있던 PlayerInfo 라벨을 PlayerState 변동에 맞춰 갱신.
+        // _topBarText 미바인딩 시 호출 무시 (선택 표시).
+
+        private void RefreshTopBar()
+        {
+            if (_topBarText == null) return;
+            if (_playerPresenter == null) return;
+            PlayerState player = _playerPresenter.Player;
+            if (player == null) return;
+
+            _topBarText.text =
+                $"{_playerName}   HP: {player.Hp}/{player.MaxHp}   돈 {player.Gold}   XP {player.Xp}";
         }
     }
 }
