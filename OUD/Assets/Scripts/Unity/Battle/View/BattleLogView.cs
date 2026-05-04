@@ -57,6 +57,16 @@ namespace OUD.Unity.Battle.View
             if (_loseScreen) _loseScreen.SetActive(true);
         }
 
+        /// <summary>
+        /// 결과 화면(승/패)을 모두 숨긴다. 다음 전투 시작 시 호출해
+        /// 이전 라운드의 "전투 승리" 라벨이 그대로 남는 것을 방지.
+        /// </summary>
+        public void HideResultScreens()
+        {
+            if (_winScreen)  _winScreen.SetActive(false);
+            if (_loseScreen) _loseScreen.SetActive(false);
+        }
+
         private DamagePopup GetPooled()
         {
             for (int i = 0; i < POOL_SIZE; i++)

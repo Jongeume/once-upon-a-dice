@@ -1,5 +1,5 @@
 // RunStateTests.cs
-// feature-spec F-11 RunState 동작 테스트.
+// feature-spec F-11 RunState 동작 테스트 (sprint MVP — 3전투, 보스 제거).
 using NUnit.Framework;
 using OUD.BattleEngine.Core;
 using OUD.BattleEngine.Run;
@@ -21,15 +21,15 @@ namespace OUD.Tests
             var sut = new RunState(NewPlayer());
 
             Assert.AreEqual(0,  sut.CurrentNodeIndex);
-            Assert.IsFalse(sut.IsBossNode);
+            Assert.IsFalse(sut.IsLastNode);
             Assert.IsFalse(sut.IsRunComplete);
         }
 
         [Test]
-        public void TotalNodes_Is7()
+        public void TotalNodes_Is3()
         {
-            Assert.AreEqual(7, RunState.TOTAL_NODES);
-            Assert.AreEqual(6, RunState.BOSS_NODE);
+            Assert.AreEqual(3, RunState.TOTAL_NODES);
+            Assert.AreEqual(2, RunState.LAST_NODE);
         }
 
         // ── Advance ──────────────────────────────────────────────────────────
@@ -46,17 +46,18 @@ namespace OUD.Tests
         }
 
         [Test]
-        public void Advance_AcrossAll7Nodes_EndsAtBossComplete()
+        public void Advance_AcrossAll3Nodes_EndsAtLastComplete()
         {
             var sut = new RunState(NewPlayer());
 
-            // 0 → 1 → 2 → 3 → 4 → 5 → 6 (보스)
-            for (int i = 0; i < 6; i++) sut.Advance();
-            Assert.AreEqual(6, sut.CurrentNodeIndex);
-            Assert.IsTrue(sut.IsBossNode);
+            // 0 → 1 → 2 (마지막)
+            sut.Advance();
+            sut.Advance();
+            Assert.AreEqual(2, sut.CurrentNodeIndex);
+            Assert.IsTrue(sut.IsLastNode);
             Assert.IsFalse(sut.IsRunComplete);
 
-            // 보스 종료
+            // 마지막 노드 종료
             sut.Advance();
             Assert.IsTrue(sut.IsRunComplete);
         }
@@ -65,7 +66,7 @@ namespace OUD.Tests
         public void Advance_AfterRunComplete_DoesNothing()
         {
             var sut = new RunState(NewPlayer());
-            for (int i = 0; i <= 6; i++) sut.Advance(); // 보스까지 완료
+            for (int i = 0; i < 3; i++) sut.Advance(); // 마지막까지 완료
 
             int idxBefore = sut.CurrentNodeIndex;
             sut.Advance();
@@ -80,7 +81,7 @@ namespace OUD.Tests
         public void Reset_RestoresInitialState_WithNewPlayer()
         {
             var sut = new RunState(NewPlayer());
-            for (int i = 0; i <= 6; i++) sut.Advance();
+            for (int i = 0; i < 3; i++) sut.Advance();
             Assert.IsTrue(sut.IsRunComplete);
 
             var newPlayer = NewPlayer();
@@ -89,7 +90,7 @@ namespace OUD.Tests
             Assert.AreSame(newPlayer, sut.Player);
             Assert.AreEqual(0, sut.CurrentNodeIndex);
             Assert.IsFalse(sut.IsRunComplete);
-            Assert.IsFalse(sut.IsBossNode);
+            Assert.IsFalse(sut.IsLastNode);
         }
     }
 }

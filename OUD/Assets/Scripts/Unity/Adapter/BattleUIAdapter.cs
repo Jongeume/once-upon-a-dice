@@ -64,6 +64,15 @@ namespace OUD.Unity.Adapter
         // ── 보상 시스템 (Initialize 후 유효) ─────────────────────────────────
         private RewardSystem _rewardSystem;
 
+        // ── 런 매니저 (Phase D-1) — OnBattleWon 시 노드 진행 ──────────────────
+        private RunManager _runManager;
+
+        // ── 보상 [계속] 클릭 시 외부에 통보할 콜백 (Bootstrapper에서 등록) ────
+        private Action _onContinueRequested;
+
+        // ── RewardView 이벤트 등록 1회 가드 (Initialize 매번 호출 대비) ───────
+        private bool _rewardContinueWired;
+
         // ── 사용 가능한 기술 존재 여부 ────────────────────────────────────────
         // true = RequestSlotAssignment 호출됨(기술 있음) / false = 잡패(기술 없음)
         private bool _hasUsableSkills = false;
@@ -77,23 +86,34 @@ namespace OUD.Unity.Adapter
         }
 
         /// <summary>
-        /// BattleBootstrapper가 TurnManager + RewardSystem 생성 후 호출.
-        /// 리롤 콜백 / 보상 시스템 / RewardView 이벤트를 연결한다.
+        /// BattleBootstrapper가 TurnManager + RewardSystem + RunManager 생성 후 호출.
+        /// 매 전투 시작 시 새 TurnManager로 호출되어 리롤 콜백을 갱신한다.
+        /// onContinueRequested: 보상 화면 [계속] 클릭 시 호출 — 다음 전투 또는 클리어 처리는 외부 책임.
+        /// RewardView 이벤트 등록은 1회만 (중복 누적 방지).
         /// </summary>
-        public void Initialize(TurnManager turnManager, RewardSystem rewardSystem)
+        public void Initialize(
+            TurnManager  turnManager,
+            RewardSystem rewardSystem,
+            RunManager   runManager,
+            Action       onContinueRequested)
         {
-            _turnManager       = turnManager;
-            _rewardSystem      = rewardSystem;
-            _onRerollRequested = keepMask => turnManager.RequestReroll(keepMask);
+            _turnManager         = turnManager;
+            _rewardSystem        = rewardSystem;
+            _runManager          = runManager;
+            _onContinueRequested = onContinueRequested;
+            _onRerollRequested   = keepMask => turnManager.RequestReroll(keepMask);
 
-            // 보상 화면 [계속] 버튼 → 화면 닫기 (다음 전투/씬 전환은 Phase D RunManager 통합 시)
-            if (_rewardView != null)
+            if (_rewardView != null && !_rewardContinueWired)
+            {
                 _rewardView.OnContinueClicked += HandleRewardContinueClicked;
+                _rewardContinueWired = true;
+            }
         }
 
         private void HandleRewardContinueClicked()
         {
             if (_rewardView != null) _rewardView.Hide();
+            _onContinueRequested?.Invoke();
         }
 
         private void BuildPresenters()
@@ -217,6 +237,9 @@ namespace OUD.Unity.Adapter
 
         public void OnBattleStart(PlayerState player, List<MonsterInstance> enemies)
         {
+            // 이전 라운드 결과 화면 잔존 방지 (Phase D-1: 다음 전투 자동 진행)
+            if (_battleLogView != null) _battleLogView.HideResultScreens();
+
             _playerPresenter.Init(player);
             _enemyPresenter.Init(enemies);
             // 적 Entry 생성 후 BattleLogPresenter에 올바른 Transform 배열 전달
@@ -285,6 +308,8 @@ namespace OUD.Unity.Adapter
         {
             _battleLogPresenter.ShowBattleWon();
             GrantReward();
+            // 노드 진행 — 마지막 노드면 RunState.IsRunComplete=true 전환 (Bootstrapper가 [계속] 후 분기)
+            _runManager?.AdvanceNode();
         }
 
         public void OnBattleLost() => _battleLogPresenter.ShowBattleLost();
