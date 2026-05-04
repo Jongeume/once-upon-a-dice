@@ -147,11 +147,10 @@ namespace OUD.Unity.Adapter
 
         private Transform[] BuildEnemyTransforms()
         {
-            if (_enemyView == null) return Array.Empty<Transform>();
-            var list = new List<Transform>();
-            foreach (Transform child in _enemyView.Container)
-                list.Add(child);
-            return list.ToArray();
+            // EnemyPresenter._entryViews 기반으로 transform 추출.
+            // Container.children 직접 사용 시 Destroy 마킹된 이전 entry가 포함되어
+            // 다음 프레임에 destroyed reference가 됨 (다음 노드 시작 시점 버그).
+            return _enemyPresenter?.GetEntryTransforms() ?? Array.Empty<Transform>();
         }
 
         private void WireViewEvents()

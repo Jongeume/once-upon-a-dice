@@ -96,5 +96,22 @@ namespace OUD.Unity.Battle.Presenter
         }
 
         public void NotifyEnemyClicked(int index) => OnEnemyClicked?.Invoke(index);
+
+        /// <summary>
+        /// 현재 살아있는 entry view들의 Transform 배열.
+        /// BattleLogPresenter의 데미지 팝업 위치 계산에 사용.
+        /// EnemyView.Container의 자식을 직접 잡으면 Destroy 마킹된 이전 entry까지 포함되어
+        /// MissingReferenceException 발생 — Init이 정리한 _entryViews 기반으로 잡는다.
+        /// </summary>
+        public Transform[] GetEntryTransforms()
+        {
+            var transforms = new Transform[_entryViews.Count];
+            for (int i = 0; i < _entryViews.Count; i++)
+            {
+                if (_entryViews[i] is MonoBehaviour mb && mb != null)
+                    transforms[i] = mb.transform;
+            }
+            return transforms;
+        }
     }
 }
