@@ -1,8 +1,11 @@
 // EncounterTable.cs
-// 노드 인덱스(0~2)별 적 구성을 결정한다.
+// MapNode(layer + NodeType)별 적 구성 결정.
 // IRandom은 생성자 주입 (Dice/DiceHand/RewardSystem 패턴 일관).
-// Phase D-1 (sprint MVP 데모): 3전투 압축, 보스 제거.
-// feature-spec F-11 (sprint MVP 갱신), game-design-v2.2 §5.1
+// Phase D-2 (sprint MVP — 노드맵 UI 도입): 1-2-1 구조 + Boss 합류 (StoneGolem 부활).
+//   - layer 0 Combat: 시작 — Slime 1~2체
+//   - layer 1 Combat: 분기 — Slime/Skeleton 풀 1~2체
+//   - layer 2 Boss  : 클라이맥스 — StoneGolem 1체
+// feature-spec F-11 (Phase D-2 갱신), game-design-v2.2 §5.1
 using System;
 using System.Collections.Generic;
 using OUD.BattleEngine.Core;
@@ -11,33 +14,25 @@ using OUD.BattleEngine.Unit;
 namespace OUD.BattleEngine.Run
 {
     /// <summary>
-    /// 노드 인덱스별 적 구성 생성.
-    /// sprint MVP 데모 매핑 (0-based):
-    ///   0: 초반 — Slime 풀, 1~2체
-    ///   1: 중반 — Slime/Skeleton 풀, 1~2체
-    ///   2: 후반 — Skeleton/Goblin 풀, 2~3체
-    /// 보스(StoneGolem)는 sprint MVP 범위 외 — 노드맵 UI 도입 시 별도 메커니즘으로 추가.
-    /// 균등 확률로 풀에서 몬스터를 뽑고 수량을 결정한다.
+    /// MapNode 기반 적 구성 생성기.
+    /// 결정 순서: NodeType → Boss는 StoneGolem 1체. Combat은 Layer로 풀 결정.
     /// </summary>
     public class EncounterTable
     {
-        // ── 노드별 몬스터 풀 ──────────────────────────────────────────────────
-        private static readonly string[] EARLY_POOL = { MonsterDatabase.ID_SLIME };
-        private static readonly string[] MID_POOL   = { MonsterDatabase.ID_SLIME, MonsterDatabase.ID_SKELETON };
-        private static readonly string[] LATE_POOL  = { MonsterDatabase.ID_SKELETON, MonsterDatabase.ID_GOBLIN };
+        // ── Layer별 Combat 풀 / 수량 (sprint MVP 1-2-1 구조) ─────────────────
+        private static readonly string[] LAYER0_POOL = { MonsterDatabase.ID_SLIME };
+        private static readonly string[] LAYER1_POOL = { MonsterDatabase.ID_SLIME, MonsterDatabase.ID_SKELETON };
 
-        // ── 노드 인덱스 매핑 (0-based, sprint MVP 3전투 압축) ────────────────
-        private const int EARLY_NODE = 0;
-        private const int MID_NODE   = 1;
-        private const int LATE_NODE  = 2;
+        private const int LAYER0_COUNT_MIN = 1;
+        private const int LAYER0_COUNT_MAX = 2;   // 양 끝 포함
+        private const int LAYER1_COUNT_MIN = 1;
+        private const int LAYER1_COUNT_MAX = 2;   // 양 끝 포함
 
-        // ── 수량 범위 ────────────────────────────────────────────────────────
-        private const int EARLY_COUNT_MIN = 1;
-        private const int EARLY_COUNT_MAX = 2;  // 양 끝 포함
-        private const int MID_COUNT_MIN   = 1;
-        private const int MID_COUNT_MAX   = 2;  // 양 끝 포함
-        private const int LATE_COUNT_MIN  = 2;
-        private const int LATE_COUNT_MAX  = 3;  // 양 끝 포함
+        private const int LAYER0 = 0;
+        private const int LAYER1 = 1;
+
+        // ── Boss 구성 ────────────────────────────────────────────────────────
+        private const string BOSS_ID = MonsterDatabase.ID_STONE_GOLEM;
 
         private readonly IRandom _random;
 
@@ -47,26 +42,26 @@ namespace OUD.BattleEngine.Run
         }
 
         /// <summary>
-        /// nodeIndex(0~2)에 해당하는 적 MonsterData 목록 생성.
+        /// MapNode에 해당하는 적 MonsterData 목록 생성.
+        /// Boss 노드: StoneGolem 1체 고정.
+        /// Combat 노드: layer별 풀에서 균등 랜덤, 수량 균등 랜덤.
         /// </summary>
-        public List<MonsterData> GenerateEncounter(int nodeIndex)
+        public List<MonsterData> GenerateEncounter(MapNode node)
         {
-            if (nodeIndex < 0 || nodeIndex >= RunState.TOTAL_NODES)
-                throw new ArgumentOutOfRangeException(
-                    nameof(nodeIndex),
-                    $"nodeIndex must be in [0, {RunState.TOTAL_NODES - 1}]. got: {nodeIndex}");
+            if (node.Type == NodeType.Boss)
+                return new List<MonsterData> { MonsterDatabase.Get(BOSS_ID) };
 
+            // Combat
             string[] pool;
             int countMin, countMax;
-
-            switch (nodeIndex)
+            switch (node.Layer)
             {
-                case EARLY_NODE: pool = EARLY_POOL; countMin = EARLY_COUNT_MIN; countMax = EARLY_COUNT_MAX; break;
-                case MID_NODE:   pool = MID_POOL;   countMin = MID_COUNT_MIN;   countMax = MID_COUNT_MAX;   break;
-                case LATE_NODE:  pool = LATE_POOL;  countMin = LATE_COUNT_MIN;  countMax = LATE_COUNT_MAX;  break;
+                case LAYER0: pool = LAYER0_POOL; countMin = LAYER0_COUNT_MIN; countMax = LAYER0_COUNT_MAX; break;
+                case LAYER1: pool = LAYER1_POOL; countMin = LAYER1_COUNT_MIN; countMax = LAYER1_COUNT_MAX; break;
                 default:
-                    // TOTAL_NODES 범위 검증을 통과했으므로 여기 도달 불가 — 방어용
-                    throw new InvalidOperationException($"unmapped nodeIndex: {nodeIndex}");
+                    throw new ArgumentOutOfRangeException(
+                        nameof(node),
+                        $"Combat 노드는 layer 0 또는 1만 허용. got: layer={node.Layer}, type={node.Type}");
             }
 
             // IRandom.Next(min, max)는 max exclusive이므로 +1
