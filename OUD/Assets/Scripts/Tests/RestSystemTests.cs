@@ -2,6 +2,7 @@
 // feature-spec F-10 휴식 시스템 테스트.
 using System;
 using NUnit.Framework;
+using OUD.BattleEngine.Core;
 using OUD.BattleEngine.Run;
 using OUD.BattleEngine.Unit;
 
