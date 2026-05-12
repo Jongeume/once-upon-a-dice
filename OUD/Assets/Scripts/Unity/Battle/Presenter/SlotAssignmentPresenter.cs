@@ -43,7 +43,12 @@ namespace OUD.Unity.Battle.Presenter
             _slots       = new SkillData[SlotManager.MAX_SLOTS];
             _usedHands   = new HashSet<HandType>();
             _filledCount = 0;
+            _usableSkills = null;
             _view.ClearSlots();
+            // 잡패가 다음 턴에 나와 RebuildSkillList가 호출되지 않을 경우 대비해 기술 목록도 즉시 비운다.
+            _view.ShowSkillList(new List<SkillCardData>(), new List<SkillCardData>());
+            // 이전 턴 끝물에 활성화된 "기술 사용" 버튼이 새 턴까지 남아있지 않도록 비활성으로 강제.
+            _view.SetUseSkillButtonActive(false);
         }
 
         /// <summary>

@@ -1,5 +1,6 @@
 using System.Collections.Generic;
 using UnityEngine;
+using UnityEngine.InputSystem;
 using UnityEngine.UI;
 using OUD.BattleEngine.Core;
 using OUD.BattleEngine.Combat;
@@ -33,6 +34,20 @@ namespace OUD.Unity
         private void Start()
         {
             InitRun();
+        }
+
+        /// <summary>[DEBUG] 개발 중 빠른 스테이지 검증용 단축키.
+        /// C — 현재 스테이지 즉시 승리 (모든 적 사망 + OnBattleWon).</summary>
+        private void Update()
+        {
+            if (_turnManager == null) return;
+            if (Keyboard.current == null) return;
+
+            if (Keyboard.current.cKey.wasPressedThisFrame)
+            {
+                Debug.Log("[Debug] C 키 입력 — 현재 스테이지 강제 승리 처리");
+                _turnManager.ForceWin();
+            }
         }
 
         private void InitRun()
@@ -75,6 +90,9 @@ namespace OUD.Unity
             }
 
             MapNode node = _runManager.GetCurrentNode();
+
+            // 노드 타입에 맞춰 전투 배경 전환 (Elite 제외 → 숲 배경, Elite → 별도/단색)
+            _adapter.SetBattleBackground(node.Type);
 
             if (node.Type == NodeType.Shop)
             {
@@ -122,6 +140,16 @@ namespace OUD.Unity
         private void OnRollDiceClicked()
         {
             if (_turnManager == null) return;
+
+            // 이미 플레이어 턴이 진행 중(뒤로가기로 Screen A로 빠져나온 상태)이면
+            // 상태를 리셋하지 않고 주사위 패널만 다시 표시한다 — 패널 토글 동작.
+            BattlePhase phase = _turnManager.CurrentPhase;
+            if (phase == BattlePhase.DiceRoll || phase == BattlePhase.SlotAssignment)
+            {
+                _adapter.ShowDicePanel();
+                return;
+            }
+
             _turnManager.StartPlayerTurn();
         }
     }

@@ -96,6 +96,15 @@ namespace OUD.Unity.Battle.View
             int previewHeal = (_investGold / HP_UNIT) * HP_PER_UNIT;
             int previewHp = Math.Min(_currentHp + previewHeal, _maxHp);
 
+            // HP 만피 시 HP 회복 영역 전체 숨김 — 만피에 회복 불필요라 UI 노출도 안 함.
+            bool hpFull = _currentHp >= _maxHp;
+            if (_hpText != null)     _hpText.gameObject.SetActive(!hpFull);
+            if (_goldText != null)   _goldText.gameObject.SetActive(!hpFull);
+            if (_investText != null) _investText.gameObject.SetActive(!hpFull);
+            if (_minusButton != null) _minusButton.gameObject.SetActive(!hpFull);
+            if (_plusButton != null)  _plusButton.gameObject.SetActive(!hpFull);
+            if (_healButton != null)  _healButton.gameObject.SetActive(!hpFull);
+
             if (_hpText != null)
                 _hpText.text = $"HP: {_currentHp}/{_maxHp} → {previewHp}";
             if (_goldText != null)

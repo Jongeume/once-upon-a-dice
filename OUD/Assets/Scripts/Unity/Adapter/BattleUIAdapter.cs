@@ -49,6 +49,12 @@ namespace OUD.Unity.Adapter
         [SerializeField] private string   _playerName = "Alice";
         [SerializeField] private TMP_Text _topBarText;
 
+        [Header("전투 배경")]
+        [SerializeField] private UnityEngine.UI.Image _battleBackgroundImage;
+        [SerializeField] private Sprite               _combatBackgroundSprite;
+        [SerializeField] private Sprite               _eliteBackgroundSprite;
+        [SerializeField] private Color                _eliteFallbackColor = new Color(0.05f, 0.03f, 0.02f, 1f);
+
         private PlayerPresenter           _playerPresenter;
         private EnemyPresenter            _enemyPresenter;
         private DicePresenter             _dicePresenter;
@@ -134,6 +140,10 @@ namespace OUD.Unity.Adapter
             PlayerState player = _runManager.State.Player;
             if (_shopView != null)
             {
+                // 상점 진입 시 BattlePanel/DiceTablePanel/Targeting 모두 비활성 — 뒤에 적/플레이어가 비치지 않도록.
+                if (_uiManager != null) _uiManager.ShowScreen(UIManager.BattleScreen.D_Shop);
+                // 직전 전투의 "전투 승리/패배" 결과 화면도 정리.
+                if (_battleLogView != null) _battleLogView.HideResultScreens();
                 _shopView.Bind(player.Hp, player.MaxHp, player.Gold, player.Xp);
                 _shopView.Show();
             }
@@ -487,6 +497,87 @@ namespace OUD.Unity.Adapter
             _enemyPresenter.OnEnemyClicked += _targetSelectionPresenter.OnEnemyClicked;
             _targetSelectionView.OnSlotClicked += _targetSelectionPresenter.OnSlotClicked;
             _targetSelectionView.OnExecuteClicked += HandleExecuteClicked;
+
+            WireBackButton();
+        }
+
+        /// <summary>
+        /// Screen B(DiceTablePanel)의 뒤로가기 버튼을 Screen A(진행 중 배틀 화면)로 전환하도록 연결.
+        /// 상태 리셋 없이 패널 가시성만 토글한다 — Roll Dice 버튼이 재진입 시 상태 유지 분기 처리.
+        /// BuildUI_Part2에서 생성된 "ActionButtons/BackButton" 경로를 따라 런타임에 찾는다.
+        /// </summary>
+        private void WireBackButton()
+        {
+            if (_diceView == null || _uiManager == null) return;
+            Transform backBtnT = _diceView.transform.Find("ActionButtons/BackButton");
+            if (backBtnT == null) return;
+            var btn = backBtnT.GetComponent<UnityEngine.UI.Button>();
+            if (btn == null) return;
+            btn.onClick.AddListener(HandleBackClicked);
+        }
+
+        private void HandleBackClicked()
+        {
+            // Screen B에서 배정한 슬롯을 Screen A의 슬롯 패널에 미러링 후 전환.
+            MirrorAssignedSlotsToScreenA();
+            _uiManager.ShowScreen(UIManager.BattleScreen.A_BattleBasic);
+        }
+
+        /// <summary>SlotAssignmentPresenter가 보유한 현재 슬롯을 Screen A 슬롯 뷰(slotViewA)에 복사한다.</summary>
+        private void MirrorAssignedSlotsToScreenA()
+        {
+            if (_slotAssignmentPresenter == null || _targetSelectionView == null) return;
+            SkillData[] slots = _slotAssignmentPresenter.GetSlots();
+            if (slots == null) return;
+
+            var cards = new SkillCardData[slots.Length];
+            for (int i = 0; i < slots.Length; i++)
+            {
+                if (slots[i] == null) continue;
+                cards[i] = new SkillCardData
+                {
+                    SkillId      = slots[i].Id,
+                    DisplayName  = slots[i].Name,
+                    RequiredHand = slots[i].Hand,
+                    Category     = slots[i].Category,
+                    IsEnabled    = true
+                };
+            }
+            _targetSelectionView.ShowSlots(cards);
+        }
+
+        /// <summary>진행 중인 턴 상태를 그대로 유지하면서 주사위 패널(Screen B)을 다시 표시.</summary>
+        public void ShowDicePanel()
+        {
+            if (_uiManager != null)
+                _uiManager.ShowScreen(UIManager.BattleScreen.B_DiceTable);
+        }
+
+        /// <summary>현재 노드 타입에 맞춰 전투 배경 스프라이트/색을 적용.
+        /// Combat / Boss / Shop → 숲 배경 (Combat sprite).
+        /// Elite → 별도 sprite 있으면 사용, 없으면 어두운 단색.</summary>
+        public void SetBattleBackground(NodeType nodeType)
+        {
+            if (_battleBackgroundImage == null) return;
+
+            if (nodeType == NodeType.Elite)
+            {
+                if (_eliteBackgroundSprite != null)
+                {
+                    _battleBackgroundImage.sprite = _eliteBackgroundSprite;
+                    _battleBackgroundImage.color  = Color.white;
+                }
+                else
+                {
+                    _battleBackgroundImage.sprite = null;
+                    _battleBackgroundImage.color  = _eliteFallbackColor;
+                }
+            }
+            else
+            {
+                _battleBackgroundImage.sprite = _combatBackgroundSprite;
+                _battleBackgroundImage.color  = _combatBackgroundSprite != null ? Color.white : _eliteFallbackColor;
+            }
         }
 
         private void OnUseSkillButtonClicked()
@@ -520,6 +611,12 @@ namespace OUD.Unity.Adapter
             var targetIndices = _targetSelectionPresenter.GetTargetIndices();
             if (targetIndices != null)
                 _slotAssignmentPresenter.Confirm(targetIndices);
+
+            // 기술 실행 직후 슬롯을 빈 상태로 표시 — 다음 Roll Dice 전 Screen A에서 사용된 스킬이 잔류하지 않도록.
+            _slotAssignmentPresenter.ResetForNewTurn();
+            _targetSelectionPresenter?.ResetForNewTurn();
+            if (_targetSelectionView != null) _targetSelectionView.ResetForNewTurn();
+
             _uiManager.ShowScreen(UIManager.BattleScreen.A_BattleBasic);
         }
 
@@ -535,6 +632,14 @@ namespace OUD.Unity.Adapter
                 _battleLogView,
                 _playerView.transform,
                 BuildEnemyTransforms());
+
+            // 이전 전투의 슬롯 / 주사위 keep / 기술 카드가 새 스테이지에 남지 않도록 초기화.
+            _slotAssignmentPresenter.ResetForNewTurn();
+            _dicePresenter.ResetKeep();
+            _targetSelectionPresenter?.ResetForNewTurn();
+            if (_targetSelectionView != null) _targetSelectionView.ResetForNewTurn();
+            _hasUsableSkills = false;
+
             _uiManager.ShowScreen(UIManager.BattleScreen.A_BattleBasic);
             RefreshTopBar();
         }
@@ -542,6 +647,10 @@ namespace OUD.Unity.Adapter
         public void OnPlayerTurnStarted()
         {
             _slotAssignmentPresenter.ResetForNewTurn();
+            _dicePresenter.ResetKeep();
+            _targetSelectionPresenter?.ResetForNewTurn();
+            if (_targetSelectionView != null) _targetSelectionView.ResetForNewTurn();
+            _hasUsableSkills = false;
         }
 
         public void OnDiceRolled(int[] values, int rerollsLeft)
