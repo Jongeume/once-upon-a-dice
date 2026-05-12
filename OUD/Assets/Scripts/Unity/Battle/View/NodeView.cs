@@ -37,7 +37,7 @@ namespace OUD.Unity.Battle.View
         [Header("라벨 (중앙) — Combat='전투' / Boss='보스' / Locked='?'")]
         [SerializeField] private TMP_Text _labelText;
 
-        [Header("클리어 오버레이 (우상단 ✓)")]
+        [Header("클리어 오버레이")]
         [SerializeField] private TMP_Text _clearedOverlay;
 
         [Header("클릭 (Available 상태에서만 활성)")]
@@ -46,15 +46,19 @@ namespace OUD.Unity.Battle.View
         // ── 상수 (CLAUDE.md hard rule: 매직 넘버 금지) ─────────────────────
 
         // 시각 색상 ─ 이미지 참고 (시안 글로우 + 다크 블루 베이스)
-        private static readonly Color FRAME_COLOR_COMBAT  = new Color(0.20f, 0.30f, 0.50f, 1f); // 어두운 청회색
-        private static readonly Color FRAME_COLOR_BOSS    = new Color(0.55f, 0.10f, 0.10f, 1f); // 진한 빨강
+        private static readonly Color FRAME_COLOR_COMBAT  = new Color(0.20f, 0.30f, 0.50f, 1f);
+        private static readonly Color FRAME_COLOR_BOSS    = new Color(0.55f, 0.10f, 0.10f, 1f);
+        private static readonly Color FRAME_COLOR_SHOP    = new Color(0.10f, 0.45f, 0.20f, 1f);
+        private static readonly Color FRAME_COLOR_ELITE   = new Color(0.60f, 0.15f, 0.15f, 1f);
         private static readonly Color OUTLINE_AVAILABLE   = new Color(0.00f, 0.85f, 1.00f, 1f); // 밝은 시안 (#00D8FF)
         private static readonly Color OUTLINE_CURRENT     = new Color(1.00f, 1.00f, 1.00f, 1f); // 흰색
         private static readonly Color OUTLINE_CLEARED     = new Color(0.40f, 0.40f, 0.40f, 1f); // 회색
         private static readonly Color OUTLINE_LOCKED      = new Color(0.15f, 0.15f, 0.20f, 1f); // 어두움
 
         private static readonly Color LABEL_COLOR_COMBAT = Color.white;
-        private static readonly Color LABEL_COLOR_BOSS   = new Color(1.00f, 0.85f, 0.20f, 1f); // 보스: 노란빛 (붉은 프레임 위에서 가독성)
+        private static readonly Color LABEL_COLOR_BOSS   = new Color(1.00f, 0.85f, 0.20f, 1f);
+        private static readonly Color LABEL_COLOR_SHOP   = new Color(0.40f, 1.00f, 0.50f, 1f);
+        private static readonly Color LABEL_COLOR_ELITE  = new Color(1.00f, 0.40f, 0.40f, 1f);
 
         // Outline 두께 (px) ─ Available 시 두껍게 강조
         private static readonly Vector2 OUTLINE_THICK = new Vector2(5f, 5f);
@@ -68,8 +72,10 @@ namespace OUD.Unity.Battle.View
         // 라벨 텍스트
         private const string LABEL_COMBAT = "전투";
         private const string LABEL_BOSS   = "보스";
+        private const string LABEL_SHOP   = "상점";
+        private const string LABEL_ELITE  = "엘리트";
         private const string LABEL_LOCKED = "?";
-        private const string OVERLAY_CHECK = "✓";
+        private const string OVERLAY_CHECK = "●";
 
         // ── 상태 ─────────────────────────────────────────────────────────────
 
@@ -92,20 +98,51 @@ namespace OUD.Unity.Battle.View
         {
             NodeId = node.Id;
 
-            if (_frameImage != null)
-                _frameImage.color = (node.Type == NodeType.Boss) ? FRAME_COLOR_BOSS : FRAME_COLOR_COMBAT;
+            Color frameColor;
+            string label;
+            Color labelColor;
+            bool bold;
 
+            switch (node.Type)
+            {
+                case NodeType.Boss:
+                    frameColor = FRAME_COLOR_BOSS;
+                    label = LABEL_BOSS;
+                    labelColor = LABEL_COLOR_BOSS;
+                    bold = true;
+                    break;
+                case NodeType.Shop:
+                    frameColor = FRAME_COLOR_SHOP;
+                    label = LABEL_SHOP;
+                    labelColor = LABEL_COLOR_SHOP;
+                    bold = false;
+                    break;
+                case NodeType.Elite:
+                    frameColor = FRAME_COLOR_ELITE;
+                    label = LABEL_ELITE;
+                    labelColor = LABEL_COLOR_ELITE;
+                    bold = true;
+                    break;
+                default:
+                    frameColor = FRAME_COLOR_COMBAT;
+                    label = LABEL_COMBAT;
+                    labelColor = LABEL_COLOR_COMBAT;
+                    bold = false;
+                    break;
+            }
+
+            if (_frameImage != null) _frameImage.color = frameColor;
             if (_labelText != null)
             {
-                _labelText.text = (node.Type == NodeType.Boss) ? LABEL_BOSS : LABEL_COMBAT;
-                _labelText.color = (node.Type == NodeType.Boss) ? LABEL_COLOR_BOSS : LABEL_COLOR_COMBAT;
-                _labelText.fontStyle = (node.Type == NodeType.Boss) ? FontStyles.Bold : FontStyles.Normal;
+                _labelText.text = label;
+                _labelText.color = labelColor;
+                _labelText.fontStyle = bold ? FontStyles.Bold : FontStyles.Normal;
             }
 
             if (_clearedOverlay != null)
             {
                 _clearedOverlay.text = OVERLAY_CHECK;
-                _clearedOverlay.gameObject.SetActive(false);  // SetState에서 토글
+                _clearedOverlay.gameObject.SetActive(false);
             }
         }
 
@@ -128,7 +165,7 @@ namespace OUD.Unity.Battle.View
                     ApplyAlpha(ALPHA_FULL);
                     SetOutline(OUTLINE_CURRENT, OUTLINE_NORM);
                     SetClickable(false);
-                    SetClearedOverlay(true);  // 방금 클리어한 노드는 ✓ 표시
+                    SetClearedOverlay(true);
                     SetLabelTextOverride(null);
                     break;
 

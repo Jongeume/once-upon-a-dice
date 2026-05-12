@@ -8,10 +8,6 @@ using OUD.BattleEngine.Core;
 
 namespace OUD.BattleEngine.Run
 {
-    /// <summary>
-    /// 1회 전투 승리 보상 결과.
-    /// 호출자(추후 RunManager / BattleUIAdapter)가 PlayerState.AddXp/AddGold 호출에 사용한다.
-    /// </summary>
     public readonly struct RewardResult
     {
         public int Xp   { get; }
@@ -24,18 +20,15 @@ namespace OUD.BattleEngine.Run
         }
     }
 
-    /// <summary>
-    /// 기본 보상 시스템 구현. IRandom은 생성자 주입 (Dice/DiceHand 패턴).
-    /// 규칙 (feature-spec F-11, game-design-v2.2 §5.1):
-    ///   - XP: 전투당 +1 고정
-    ///   - 골드: GOLD_MIN ~ GOLD_MAX 범위 (양 끝 포함) 균등 랜덤
-    ///   - 보스전(7번째)은 호출 자체를 생략 (RunManager 책임)
-    /// </summary>
     public class RewardSystem
     {
         public const int XP_PER_BATTLE = 1;
-        public const int GOLD_MIN      = 8;   // 양 끝 포함
-        public const int GOLD_MAX      = 12;  // 양 끝 포함
+        public const int GOLD_MIN      = 8;
+        public const int GOLD_MAX      = 12;
+
+        public const int ELITE_XP       = 2;
+        public const int ELITE_GOLD_MIN = 18;
+        public const int ELITE_GOLD_MAX = 24;
 
         private readonly IRandom _random;
 
@@ -44,11 +37,17 @@ namespace OUD.BattleEngine.Run
             _random = random ?? throw new ArgumentNullException(nameof(random));
         }
 
-        public RewardResult CalculateReward()
+        public RewardResult CalculateReward(NodeType nodeType = NodeType.Combat)
         {
-            // IRandom.Next(min, max)는 max exclusive이므로 GOLD_MAX 포함시키려면 +1
-            int gold = _random.Next(GOLD_MIN, GOLD_MAX + 1);
-            return new RewardResult(XP_PER_BATTLE, gold);
+            switch (nodeType)
+            {
+                case NodeType.Elite:
+                    int eliteGold = _random.Next(ELITE_GOLD_MIN, ELITE_GOLD_MAX + 1);
+                    return new RewardResult(ELITE_XP, eliteGold);
+                default:
+                    int gold = _random.Next(GOLD_MIN, GOLD_MAX + 1);
+                    return new RewardResult(XP_PER_BATTLE, gold);
+            }
         }
     }
 }
