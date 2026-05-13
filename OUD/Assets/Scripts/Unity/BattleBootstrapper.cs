@@ -1,9 +1,6 @@
-// BattleBootstrapper.cs
-// BattleEngine 전체 흐름을 BattleUIAdapter에 연결하는 진입점 MonoBehaviour.
-// Phase D-1: RunManager 통합 — 3전투 자동 진행. 보상 [계속] → 다음 전투 또는 런 클리어.
-// 노드맵 UI / 분기 선택은 후속 작업 (Phase D-2).
 using System.Collections.Generic;
 using UnityEngine;
+using UnityEngine.InputSystem;
 using UnityEngine.UI;
 using OUD.BattleEngine.Core;
 using OUD.BattleEngine.Combat;
@@ -14,12 +11,6 @@ using OUD.Unity.Adapter;
 
 namespace OUD.Unity
 {
-    /// <summary>
-    /// 런 + 전투 진입점.
-    /// 책임: RunManager + EncounterTable + RewardSystem 인스턴스 보유,
-    ///       매 전투마다 BattleState/TurnManager 재생성,
-    ///       보상 [계속] 클릭 시 다음 전투 또는 런 클리어 분기.
-    /// </summary>
     public class BattleBootstrapper : MonoBehaviour
     {
         [Header("BattleUIAdapter (씬 내 BattleCanvas 오브젝트)")]
@@ -28,85 +19,105 @@ namespace OUD.Unity
         [Header("Roll Dice 버튼 (BattlePanel/ActionButtonA)")]
         [SerializeField] private Button _rollDiceButton;
 
-        // ── BattleEngine 코어 인스턴스 ────────────────────────────────────────
         private IRandom          _random;
         private RewardSystem     _rewardSystem;
         private EncounterTable   _encounterTable;
         private RunManager       _runManager;
         private LevelUpSystem    _levelUpSystem;
         private SkillPointSystem _skillPointSystem;
-        private RestSystem       _restSystem;
+        private ShopSystem       _shopSystem;
 
-        // ── 매 전투마다 재생성 ────────────────────────────────────────────────
         private TurnManager _turnManager;
         private BattleState _state;
+        private bool _rollDiceWired;
 
         private void Start()
         {
             InitRun();
         }
 
-        // ── 런 초기화 ─────────────────────────────────────────────────────────
+        /// <summary>[DEBUG] 개발 중 빠른 스테이지 검증용 단축키.
+        /// C — 현재 스테이지 즉시 승리 (모든 적 사망 + OnBattleWon).</summary>
+        private void Update()
+        {
+            if (_turnManager == null) return;
+            if (Keyboard.current == null) return;
+
+            if (Keyboard.current.cKey.wasPressedThisFrame)
+            {
+                Debug.Log("[Debug] C 키 입력 — 현재 스테이지 강제 승리 처리");
+                _turnManager.ForceWin();
+            }
+        }
 
         private void InitRun()
         {
             if (_adapter == null)
             {
-                Debug.LogError("[BattleBootstrapper] BattleUIAdapter가 바인딩되지 않았습니다! Inspector를 확인하세요.");
+                Debug.LogError("[BattleBootstrapper] BattleUIAdapter가 바인딩되지 않았습니다!");
                 return;
             }
 
-            // 코어 인스턴스 1회 생성
-            _random          = new UnityRandom();
-            _rewardSystem    = new RewardSystem(_random);
-            _encounterTable  = new EncounterTable(_random);
-            _runManager      = new RunManager(_encounterTable, _random);
-            _levelUpSystem   = new LevelUpSystem();
+            _random           = new UnityRandom();
+            _rewardSystem     = new RewardSystem(_random);
+            _encounterTable   = new EncounterTable(_random);
+            _runManager       = new RunManager(_encounterTable, _random);
+            _levelUpSystem    = new LevelUpSystem();
             _skillPointSystem = new SkillPointSystem();
-            _restSystem      = new RestSystem();
+            _shopSystem       = new ShopSystem();
 
-            // 새 PlayerState로 런 시작 (Phase D-1: 패배 재시작 미구현)
             PlayerState player = new PlayerState(new PlayerStats(maxHp: 60, atk: 6, def: 5));
             _runManager.StartRun(player);
 
-            // Roll Dice 버튼 onClick 등록 (1회)
-            if (_rollDiceButton != null)
+            if (_rollDiceButton != null && !_rollDiceWired)
+            {
                 _rollDiceButton.onClick.AddListener(OnRollDiceClicked);
-            else
-                Debug.LogWarning("[BattleBootstrapper] Roll Dice 버튼이 바인딩되지 않았습니다.");
+                _rollDiceWired = true;
+            }
 
-            Debug.Log("[BattleBootstrapper] 런 초기화 완료 — 3전투 진행 (sprint MVP 데모)");
+            Debug.Log("[BattleBootstrapper] 런 초기화 완료 — 8노드 선형 구조");
             Debug.Log($"  플레이어: HP:{player.MaxHp} ATK:{player.Atk} DEF:{player.Def}");
 
-            StartNextBattle();
+            StartNextNode();
         }
 
-        // ── 전투 진입 (RunManager가 결정한 적 구성으로 새 BattleState/TurnManager 생성) ─
-
-        private void StartNextBattle()
+        private void StartNextNode()
         {
             if (_runManager.IsRunComplete())
             {
-                Debug.LogWarning("[BattleBootstrapper] StartNextBattle 호출됐지만 런이 이미 완료됨 — 무시.");
+                Debug.LogWarning("[BattleBootstrapper] StartNextNode 호출됐지만 런이 이미 완료됨 — 무시.");
                 return;
             }
 
-            // RunManager에서 적 구성 받아 MonsterInstance로 변환
+            MapNode node = _runManager.GetCurrentNode();
+
+            // 노드 타입에 맞춰 전투 배경 전환 (Elite 제외 → 숲 배경, Elite → 별도/단색)
+            _adapter.SetBattleBackground(node.Type);
+
+            if (node.Type == NodeType.Shop)
+            {
+                _adapter.Initialize(
+                    _turnManager, _rewardSystem, _runManager,
+                    _levelUpSystem, _skillPointSystem, _shopSystem,
+                    OnContinueAfterNode);
+
+                _adapter.ShowShop();
+                return;
+            }
+
             List<MonsterData>     enemyData     = _runManager.GetNextBattle();
             List<MonsterInstance> enemyInstances = new List<MonsterInstance>(enemyData.Count);
             foreach (MonsterData d in enemyData)
                 enemyInstances.Add(new MonsterInstance(d));
 
-            // 매 전투마다 새 BattleState + TurnManager (DiceHand는 IRandom 공유)
             DiceHand diceHand = new DiceHand(_random);
             _state       = new BattleState(_runManager.State.Player, enemyInstances, diceHand);
             _turnManager = new TurnManager(_state, _adapter);
 
-            // Adapter 갱신 (TurnManager 새로 주입, 기타 시스템/콜백은 동일)
             _adapter.Initialize(
                 _turnManager, _rewardSystem, _runManager,
-                _levelUpSystem, _skillPointSystem, _restSystem,
-                OnContinueAfterReward);
+                _levelUpSystem, _skillPointSystem, _shopSystem,
+                OnContinueAfterNode);
 
             int nodeIndex = _runManager.State.CurrentNodeIndex;
             string enemyNames = string.Join(", ", enemyInstances.ConvertAll(e => e.Data.Name));
@@ -115,27 +126,30 @@ namespace OUD.Unity
             _turnManager.StartBattle();
         }
 
-        // ── 보상 [계속] 클릭 시 호출 — 다음 전투 또는 런 클리어 ────────────────
-
-        private void OnContinueAfterReward()
+        private void OnContinueAfterNode()
         {
             if (_runManager.IsRunComplete())
             {
                 Debug.Log("[BattleBootstrapper] === 런 클리어! 모든 전투 종료 ===");
-                // Phase D-1 한정: 클리어 화면 미구현 — 콘솔 로그만.
-                // 후속 작업(F-14)에서 클리어 UI 추가 예정.
                 return;
             }
 
-            StartNextBattle();
+            StartNextNode();
         }
 
-        // ── 버튼 핸들러 ───────────────────────────────────────────────────────
-
-        /// <summary>Screen A의 Roll Dice 버튼 클릭 — 현재 턴의 플레이어 페이즈 시작.</summary>
         private void OnRollDiceClicked()
         {
             if (_turnManager == null) return;
+
+            // 이미 플레이어 턴이 진행 중(뒤로가기로 Screen A로 빠져나온 상태)이면
+            // 상태를 리셋하지 않고 주사위 패널만 다시 표시한다 — 패널 토글 동작.
+            BattlePhase phase = _turnManager.CurrentPhase;
+            if (phase == BattlePhase.DiceRoll || phase == BattlePhase.SlotAssignment)
+            {
+                _adapter.ShowDicePanel();
+                return;
+            }
+
             _turnManager.StartPlayerTurn();
         }
     }
