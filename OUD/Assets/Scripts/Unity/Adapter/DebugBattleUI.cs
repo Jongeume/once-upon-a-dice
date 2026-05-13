@@ -62,11 +62,12 @@ namespace OUD.Unity.Adapter
 
         public void RequestSlotAssignment(
             List<SkillData> usableSkills,
+            List<SkillData> allLearnedSkills,
             List<MonsterInstance> aliveEnemies,
             Action<List<SlotAssignment>> onComplete)
         {
             var enemyInfo = string.Join(", ", aliveEnemies.ConvertAll(e => $"{e.Data.Name}(HP:{e.Hp})"));
-            Debug.Log($"[슬롯 배분 대기] 스킬 {usableSkills.Count}개  생존 적: {enemyInfo}");
+            Debug.Log($"[슬롯 배분 대기] 사용가능 {usableSkills.Count}개 / 배운 전체 {allLearnedSkills?.Count ?? 0}개  생존 적: {enemyInfo}");
             PendingSkills   = usableSkills;
             PendingEnemies  = aliveEnemies;
             PendingCallback = onComplete;
