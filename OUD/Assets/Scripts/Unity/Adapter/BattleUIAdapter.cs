@@ -693,6 +693,11 @@ namespace OUD.Unity.Adapter
             RefreshTopBar();
         }
 
+        public void OnIntentUpdated(int enemyIndex, IntentType intent, int value)
+        {
+            _enemyPresenter.ShowAction(enemyIndex, intent, value);
+        }
+
         public void OnShieldsReset()
         {
             _playerPresenter.SyncShield();
