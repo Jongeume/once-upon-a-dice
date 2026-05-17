@@ -69,6 +69,9 @@ namespace OUD.BattleEngine.Combat
         /// <param name="value">데미지 또는 실드 수치</param>
         void OnEnemyAction(int enemyIndex, IntentType intent, int value);
 
+        /// <summary>적의 다음 턴 의도 갱신 (배틀로그 기록 없음).</summary>
+        void OnIntentUpdated(int enemyIndex, IntentType intent, int value);
+
         // ── 실드 초기화 ───────────────────────────────────────────────────────
 
         /// <summary>

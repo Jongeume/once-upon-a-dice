@@ -265,7 +265,15 @@ namespace OUD.BattleEngine.Combat
                 enemy.AdvancePattern();
             }
 
-            // 8: 플레이어 실드 초기화 (적 턴 종료)
+            // 적 턴 행동 완료 후 — 다음 턴 의도 UI 갱신
+            for (int i = 0; i < _state.Enemies.Count; i++)
+            {
+                MonsterInstance enemy = _state.Enemies[i];
+                if (enemy.IsDead) continue;
+                _ui.OnIntentUpdated(i, enemy.GetCurrentIntent(), enemy.GetIntentValue());
+            }
+
+            // 8: 플레이어 실드 초기화 (적 �� 종료)
             _state.Player.ResetShield();
             _ui.OnShieldsReset();
 
