@@ -18,13 +18,16 @@ namespace OUD.Unity.Battle.View
 
         [Header("XP Purchase")]
         [SerializeField] private TMP_Text _xpInfoText;
+        [SerializeField] private TMP_Text _xpInvestText;
+        [SerializeField] private Button   _xpMinusButton;
+        [SerializeField] private Button   _xpPlusButton;
         [SerializeField] private Button _buyXpButton;
 
         [Header("Skip")]
         [SerializeField] private Button _skipButton;
 
         public event Action<int> OnHpRecoveryConfirmed;
-        public event Action OnXpPurchased;
+        public event Action<int> OnXpPurchased;
         public event Action OnShopSkipped;
 
         private int _investGold;
@@ -33,6 +36,7 @@ namespace OUD.Unity.Battle.View
         private int _maxHp;
         private int _totalGold;
         private int _currentXp;
+        private int _xpBuyCount;
 
         private const int HP_UNIT = 10;
         private const int HP_PER_UNIT = 5;
@@ -46,8 +50,12 @@ namespace OUD.Unity.Battle.View
                 _plusButton.onClick.AddListener(OnPlusClicked);
             if (_healButton != null)
                 _healButton.onClick.AddListener(() => OnHpRecoveryConfirmed?.Invoke(_investGold));
+            if (_xpMinusButton != null)
+                _xpMinusButton.onClick.AddListener(OnXpMinusClicked);
+            if (_xpPlusButton != null)
+                _xpPlusButton.onClick.AddListener(OnXpPlusClicked);
             if (_buyXpButton != null)
-                _buyXpButton.onClick.AddListener(() => OnXpPurchased?.Invoke());
+                _buyXpButton.onClick.AddListener(() => OnXpPurchased?.Invoke(_xpBuyCount));
             if (_skipButton != null)
                 _skipButton.onClick.AddListener(() => OnShopSkipped?.Invoke());
         }
@@ -60,6 +68,7 @@ namespace OUD.Unity.Battle.View
             _currentXp = xp;
             _maxGold = (gold / HP_UNIT) * HP_UNIT;
             _investGold = 0;
+            _xpBuyCount = 0;
             RefreshUI();
         }
 
@@ -70,6 +79,7 @@ namespace OUD.Unity.Battle.View
             _currentXp = newXp;
             _maxGold = (newGold / HP_UNIT) * HP_UNIT;
             _investGold = 0;
+            _xpBuyCount = 0;
             RefreshUI();
         }
 
@@ -84,42 +94,70 @@ namespace OUD.Unity.Battle.View
 
         private void OnPlusClicked()
         {
-            if (_investGold < _maxGold)
+            int remaining = _totalGold - _xpBuyCount * XP_COST;
+            int capByGold = (remaining / HP_UNIT) * HP_UNIT;
+            if (_investGold < capByGold)
             {
                 _investGold += HP_UNIT;
                 RefreshUI();
             }
         }
 
+        private void OnXpMinusClicked()
+        {
+            if (_xpBuyCount > 0)
+            {
+                _xpBuyCount--;
+                RefreshUI();
+            }
+        }
+
+        private void OnXpPlusClicked()
+        {
+            int remaining = _totalGold - _investGold;
+            int maxBuy = remaining / XP_COST;
+            if (_xpBuyCount < maxBuy)
+            {
+                _xpBuyCount++;
+                RefreshUI();
+            }
+        }
+
         private void RefreshUI()
         {
+            // ── HP 회복 영역 ──────────────────────────────────────────────
             int previewHeal = (_investGold / HP_UNIT) * HP_PER_UNIT;
             int previewHp = Math.Min(_currentHp + previewHeal, _maxHp);
-
-            // HP 만피 시 HP 회복 영역 전체 숨김 — 만피에 회복 불필요라 UI 노출도 안 함.
-            bool hpFull = _currentHp >= _maxHp;
-            if (_hpText != null)     _hpText.gameObject.SetActive(!hpFull);
-            if (_goldText != null)   _goldText.gameObject.SetActive(!hpFull);
-            if (_investText != null) _investText.gameObject.SetActive(!hpFull);
-            if (_minusButton != null) _minusButton.gameObject.SetActive(!hpFull);
-            if (_plusButton != null)  _plusButton.gameObject.SetActive(!hpFull);
-            if (_healButton != null)  _healButton.gameObject.SetActive(!hpFull);
 
             if (_hpText != null)
                 _hpText.text = $"HP: {_currentHp}/{_maxHp} → {previewHp}";
             if (_goldText != null)
-                _goldText.text = $"Gold: {_totalGold - _investGold}";
+                _goldText.text = $"Gold: {_totalGold - _investGold - _xpBuyCount * XP_COST}";
             if (_investText != null)
                 _investText.text = $"투자: {_investGold} Gold → +{previewHeal} HP";
 
-            if (_minusButton != null) _minusButton.interactable = _investGold > 0;
-            if (_plusButton != null) _plusButton.interactable = _investGold < _maxGold && _currentHp < _maxHp;
-            if (_healButton != null) _healButton.interactable = _investGold > 0;
+            // HP 만피 시 회복 패널은 시각적으로 유지하되 모든 버튼 클릭 비활성.
+            bool hpFull = _currentHp >= _maxHp;
+            int hpRemaining = _totalGold - _xpBuyCount * XP_COST;
+            int hpCapByGold = (hpRemaining / HP_UNIT) * HP_UNIT;
+            if (_minusButton != null) _minusButton.interactable = !hpFull && _investGold > 0;
+            if (_plusButton != null)  _plusButton.interactable  = !hpFull && _investGold < hpCapByGold;
+            if (_healButton != null)  _healButton.interactable  = !hpFull && _investGold > 0;
 
-            bool canBuyXp = _totalGold - _investGold >= XP_COST;
+            // ── XP 구매 영역 ──────────────────────────────────────────────
+            int xpCost = _xpBuyCount * XP_COST;
+            int xpPreview = _currentXp + _xpBuyCount;
+            int xpRemaining = _totalGold - _investGold - xpCost;
+            int xpCapByGold = xpRemaining / XP_COST;
+
             if (_xpInfoText != null)
-                _xpInfoText.text = $"XP: {_currentXp}  Gold: {_totalGold - _investGold}";
-            if (_buyXpButton != null) _buyXpButton.interactable = canBuyXp && _investGold == 0;
+                _xpInfoText.text = $"XP: {_currentXp} → {xpPreview}";
+            if (_xpInvestText != null)
+                _xpInvestText.text = $"투자: {xpCost} Gold → +{_xpBuyCount} XP";
+
+            if (_xpMinusButton != null) _xpMinusButton.interactable = _xpBuyCount > 0;
+            if (_xpPlusButton != null)  _xpPlusButton.interactable  = xpCapByGold > 0;
+            if (_buyXpButton != null)   _buyXpButton.interactable   = _xpBuyCount > 0;
         }
     }
 }

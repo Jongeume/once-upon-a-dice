@@ -77,8 +77,10 @@
 4. 사용자에게 "토큰 한계 도달, 인수인계 완료" 보고
 
 ## Git Rules
-- **push 금지** — "푸시" 명시 시만 실행 (토큰 90% 룰 예외)
-- 브랜치: `main` 단일 운영
+- **push 금지** — "푸시" 명시 시만 실행 (토큰 80% 룰 예외)
+- 브랜치 운영
+  - **oud-docs**: `main` 단일 운영 (직접 push)
+  - **Unity repo**: `dev`가 통합 브랜치, **모든 변경은 feature branch + PR로 머지** (dev 직접 push 금지)
 - `oud-docs`와 Unity repo 커밋/푸시 반드시 분리
 - 커밋 prefix: `feat` / `fix` / `refactor` / `docs` / `chore` / `style`
 - **Unity `.meta` 동반 커밋 필수** — Unity 에셋 파일을 `git add` 할 때 반드시 동일 경로의 `.meta` 파일도 함께 add
@@ -86,6 +88,32 @@
   - 예: `git add OUD/Assets/Scripts/.../Foo.cs OUD/Assets/Scripts/.../Foo.cs.meta`
   - 새 파일 add 전 `git status`에서 untracked `.meta` 동반 여부 확인 후 staging
   - `.meta` 누락 시 다른 팀원이 pull 후 GUID 불일치 → Missing (Mono Script) 에러로 씬/프리팹 손상 위험 (실제 발생 사례: ShopView, DefeatView, LevelUpStatView, LevelUpSkillView)
+
+### Unity repo PR 워크플로 (2026-05-13~ 적용)
+1. **작업 시작**: `git checkout dev && git pull origin dev && git checkout -b <prefix>/<주제>`
+2. **브랜치 명명**: `feat/<기능명>`, `fix/<이슈명>`, `refactor/<영역>`, `docs/<주제>`, `chore/<주제>`
+3. **작업 + 커밋**: 평소처럼 commit, `.meta` 동반 규칙 준수
+4. **푸시**: `git push -u origin <branch>` (사용자 "푸시" 명시 또는 토큰 80% 룰)
+5. **PR 생성**: `gh pr create --base dev --head <branch> --title "<prefix>: <요약>" --body "<상세>"`
+6. **사용자 승인 후 머지**: `gh pr merge <PR번호> --merge --delete-branch` 또는 GitHub 웹에서
+7. **로컬 정리**: `git checkout dev && git pull origin dev && git branch -d <branch>`
+
+- PR 제목/본문은 commit 메시지와 동일 톤 (한국어 + prefix 사용)
+- 머지 후 로컬 feature branch 삭제
+- 토큰 80% 자동 정리 시점에도 PR 생성 → 사용자 승인 대기 (직접 머지 금지)
+
+### PR 템플릿 (`.github/pull_request_template.md`)
+GitHub은 PR 생성 시 자동으로 이 템플릿을 PR 본문에 채워준다. **PR 본문 작성 시 모든 섹션을 빠짐없이 채울 것**:
+
+1. **요약** — 1~2줄로 PR 핵심 변경 요약
+2. **변경 내역** — bullet 항목별 구체적 변경 (코드/씬/에셋 명시)
+3. **영향 범위** — 변경 파일 목록 + 영향받는 시스템 + 부작용 가능성
+4. **테스트 계획** — 체크박스로 검증 절차 (Play 모드 / 기능 동작 / 회귀)
+5. **스크린샷/GIF** (선택) — UI 변경 시 Before/After
+6. **참고** — 결정사항/함정/의존성/후속 작업
+7. **체크리스트** — prefix 규칙 / `.meta` 동반 / tasks.md 갱신 / 빌드 통과
+
+`gh pr create --body`로 PR 만들 때도 위 7개 섹션 형식을 그대로 따른다. 빈 섹션도 `_없음_` 등으로 명시.
 
 ## Session Protocol
 1. 이 파일 읽기 → `oud-docs/tasks.md` 변경분만 확인 (`git diff HEAD~1 -- tasks.md`), 변경 섹션만 Read → 필요 시 `oud-docs/sprint.yaml`, `oud-docs/workflow.yaml` 읽기

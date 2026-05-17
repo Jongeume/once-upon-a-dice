@@ -130,9 +130,11 @@ namespace OUD.BattleEngine.Combat
             if (usableSkills.Count > 0)
             {
                 // phase는 DiceRoll 유지 → 리롤 여전히 가능
-                // RequestSlotAssignment로 기술 목록 즉시 표시 + ExecuteSlots 콜백 등록
+                // 배운 모든 스킬은 항상 카드로 표시(비활성 포함), usable은 현재 활성화 대상.
+                var allLearned = SkillDatabase.GetSkillsByUnlockedHands(_state.Player.UnlockedHands);
                 _ui.RequestSlotAssignment(
                     usableSkills,
+                    allLearned,
                     _state.AliveEnemies,
                     ExecuteSlots);
             }

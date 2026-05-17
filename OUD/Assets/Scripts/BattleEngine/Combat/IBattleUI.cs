@@ -46,11 +46,13 @@ namespace OUD.BattleEngine.Combat
         /// 플레이어가 [실행]을 누르면 onComplete 콜백으로 결과를 돌려준다.
         /// 빈 슬롯 허용: slots 리스트 크기는 0~3.
         /// </summary>
-        /// <param name="usableSkills">배분 가능한 스킬 목록</param>
+        /// <param name="usableSkills">현재 턴 사용 가능한 스킬 (활성으로 표시)</param>
+        /// <param name="allLearnedSkills">플레이어가 해금한 모든 스킬 (배운 전체 목록 표시용; 사용 불가도 카드는 보이고 비활성 처리)</param>
         /// <param name="aliveEnemies">살아있는 적 목록 (대상 지정용)</param>
         /// <param name="onComplete">슬롯 배분 완료 콜백</param>
         void RequestSlotAssignment(
             List<SkillData>          usableSkills,
+            List<SkillData>          allLearnedSkills,
             List<MonsterInstance>    aliveEnemies,
             Action<List<SlotAssignment>> onComplete);
 

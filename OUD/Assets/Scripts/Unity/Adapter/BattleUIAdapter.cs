@@ -2,6 +2,7 @@ using System;
 using System.Collections.Generic;
 using TMPro;
 using UnityEngine;
+using UnityEngine.InputSystem;
 using UnityEngine.SceneManagement;
 using OUD.BattleEngine.Combat;
 using OUD.BattleEngine.Core;
@@ -163,10 +164,12 @@ namespace OUD.Unity.Adapter
             _shopView.RefreshGold(player.Gold, player.Hp, player.Xp);
         }
 
-        private void HandleXpPurchased()
+        private void HandleXpPurchased(int count)
         {
+            if (count <= 0) return;
             PlayerState player = _runManager.State.Player;
-            _shopSystem.BuyXp(player);
+            for (int i = 0; i < count; i++)
+                _shopSystem.BuyXp(player);
             _playerPresenter.SyncView();
             RefreshTopBar();
 
@@ -665,12 +668,13 @@ namespace OUD.Unity.Adapter
 
         public void RequestSlotAssignment(
             List<SkillData>            usableSkills,
+            List<SkillData>            allLearnedSkills,
             List<MonsterInstance>      aliveEnemies,
             Action<List<SlotAssignment>> onComplete)
         {
             _hasUsableSkills     = true;
             _pendingSlotCallback = onComplete;
-            _slotAssignmentPresenter.Begin(usableSkills, aliveEnemies, onComplete);
+            _slotAssignmentPresenter.Begin(usableSkills, allLearnedSkills, aliveEnemies, onComplete);
         }
 
         public void OnSlotExecuted(int slotIndex, SkillResult result)
@@ -698,7 +702,57 @@ namespace OUD.Unity.Adapter
 
         public void OnBattleWon()
         {
+            // VICTORY 화면 표시 → 사용자가 화면 클릭 또는 일정 시간 경과 시 보상 화면으로 전환.
             _battleLogPresenter.ShowBattleWon();
+            _winRewardTransitioned = false;
+            if (_battleLogView != null)
+            {
+                _battleLogView.OnWinScreenClicked -= HandleWinScreenClicked;
+                _battleLogView.OnWinScreenClicked += HandleWinScreenClicked;
+            }
+            StartCoroutine(ShowRewardAfterWinScreen());
+        }
+
+        private const float WIN_SCREEN_DURATION = 3.0f;
+        private bool _winRewardTransitioned;
+
+        private void HandleWinScreenClicked()
+        {
+            TransitionToReward();
+        }
+
+        private System.Collections.IEnumerator ShowRewardAfterWinScreen()
+        {
+            // WinScreen 표시 중에는 화면 어디든 마우스 클릭하면 즉시 보상 화면으로 넘어간다.
+            // UI Button 한 개에만 의존하면 다른 패널이 raycast를 가로챌 때 동작하지 않으므로
+            // 글로벌 Mouse 입력을 폴링하여 처리한다.
+            float elapsed = 0f;
+            // VICTORY 화면 진입 직후 직전 클릭이 잔류해 즉시 닫히는 것 방지용 1프레임 대기.
+            yield return null;
+            while (elapsed < WIN_SCREEN_DURATION)
+            {
+                if (_winRewardTransitioned) yield break;
+                var mouse = Mouse.current;
+                if (mouse != null && mouse.leftButton.wasPressedThisFrame)
+                {
+                    TransitionToReward();
+                    yield break;
+                }
+                elapsed += Time.deltaTime;
+                yield return null;
+            }
+            TransitionToReward();
+        }
+
+        private void TransitionToReward()
+        {
+            if (_winRewardTransitioned) return;
+            _winRewardTransitioned = true;
+            if (_battleLogView != null)
+            {
+                _battleLogView.OnWinScreenClicked -= HandleWinScreenClicked;
+                _battleLogView.HideResultScreens();
+            }
             GrantReward();
         }
 
