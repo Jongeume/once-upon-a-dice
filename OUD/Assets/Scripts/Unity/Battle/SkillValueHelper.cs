@@ -19,7 +19,7 @@ namespace OUD.Unity.Battle
                     return $"ATK {dmg}+{splash}";
                 }
                 if (s.Target == TargetType.AllEnemies)
-                    return $"ATK {dmg} 전체";
+                    return $"ATK {dmg} ALL";
                 return $"ATK {dmg}";
             }
             else
