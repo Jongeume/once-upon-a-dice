@@ -42,7 +42,7 @@ namespace OUD.Unity.Battle.View
         {
             _skillId = card.SkillId;
             if (_nameText) _nameText.text = card.DisplayName;
-            if (_handText) _handText.text = $"({card.RequiredHand})";
+            if (_handText) _handText.text = card.ValueText ?? $"({card.RequiredHand})";
             SetEnabled(card.IsEnabled);
             if (_button) _button.onClick.AddListener(() => onClick?.Invoke(_skillId));
         }

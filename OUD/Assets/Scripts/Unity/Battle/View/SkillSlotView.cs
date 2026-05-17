@@ -94,7 +94,7 @@ namespace OUD.Unity.Battle.View
             Init();
             _isEmpty = false;
             if (_nameText) _nameText.text = card.DisplayName;
-            if (_handText) _handText.text = card.RequiredHand.ToString();
+            if (_handText) _handText.text = card.ValueText ?? card.RequiredHand.ToString();
             _baseColor = card.Category == SkillCategory.Attack
                 ? ResolveColor(_atkColor, FallbackAttack)
                 : ResolveColor(_defColor, FallbackDefense);
