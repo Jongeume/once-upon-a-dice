@@ -534,15 +534,24 @@ namespace OUD.Unity.Adapter
             if (slots == null) return;
 
             var cards = new SkillCardData[slots.Length];
+            PlayerState player = _playerPresenter?.Player;
             for (int i = 0; i < slots.Length; i++)
             {
                 if (slots[i] == null) continue;
+                string valueText = null;
+                if (player != null)
+                {
+                    int enhLv = player.GetEnhanceLevel(slots[i].Hand);
+                    valueText = OUD.Unity.Battle.SkillValueHelper.BuildValueText(
+                        slots[i], player.Atk, player.Def, enhLv);
+                }
                 cards[i] = new SkillCardData
                 {
                     SkillId      = slots[i].Id,
                     DisplayName  = slots[i].Name,
                     RequiredHand = slots[i].Hand,
                     Category     = slots[i].Category,
+                    ValueText    = valueText,
                     IsEnabled    = true
                 };
             }
@@ -605,7 +614,8 @@ namespace OUD.Unity.Adapter
             _targetSelectionPresenter.Begin(
                 _slotAssignmentPresenter.GetSlots(),
                 _slotAssignmentPresenter.GetAliveEnemies(),
-                targetIndices => { });
+                targetIndices => { },
+                _playerPresenter.Player);
         }
 
         private void HandleExecuteClicked()
@@ -674,7 +684,7 @@ namespace OUD.Unity.Adapter
         {
             _hasUsableSkills     = true;
             _pendingSlotCallback = onComplete;
-            _slotAssignmentPresenter.Begin(usableSkills, allLearnedSkills, aliveEnemies, onComplete);
+            _slotAssignmentPresenter.Begin(usableSkills, allLearnedSkills, aliveEnemies, onComplete, _playerPresenter.Player);
         }
 
         public void OnSlotExecuted(int slotIndex, SkillResult result)

@@ -24,6 +24,7 @@ namespace OUD.Unity.Battle.View
 
         private string _skillId;
         private Outline _outline;
+        private TMP_Text _valueText;
 
         private void Awake()
         {
@@ -42,9 +43,49 @@ namespace OUD.Unity.Battle.View
         {
             _skillId = card.SkillId;
             if (_nameText) _nameText.text = card.DisplayName;
-            if (_handText) _handText.text = $"({card.RequiredHand})";
+            if (_handText)
+            {
+                _handText.text = $"({card.RequiredHand})";
+                _handText.alignment = TextAlignmentOptions.MidlineLeft;
+            }
+            SetValueText(card.ValueText);
             SetEnabled(card.IsEnabled);
             if (_button) _button.onClick.AddListener(() => onClick?.Invoke(_skillId));
+        }
+
+        private void SetValueText(string text)
+        {
+            if (_handText == null) return;
+            if (string.IsNullOrEmpty(text))
+            {
+                if (_valueText) _valueText.text = "";
+                return;
+            }
+            EnsureValueText();
+            if (_valueText) _valueText.text = text;
+        }
+
+        private void EnsureValueText()
+        {
+            if (_valueText) return;
+            if (_handText == null) return;
+
+            var go = new GameObject("ValueText");
+            go.transform.SetParent(_handText.transform, false);
+            _valueText = go.AddComponent<TextMeshProUGUI>();
+            _valueText.font = _handText.font;
+            _valueText.fontSharedMaterial = _handText.fontSharedMaterial;
+            _valueText.fontSize = _handText.fontSize;
+            _valueText.color = _handText.color;
+            _valueText.alignment = TextAlignmentOptions.MidlineRight;
+            _valueText.overflowMode = TextOverflowModes.Overflow;
+            _valueText.raycastTarget = false;
+
+            var rt = _valueText.rectTransform;
+            rt.anchorMin = Vector2.zero;
+            rt.anchorMax = Vector2.one;
+            rt.offsetMin = Vector2.zero;
+            rt.offsetMax = Vector2.zero;
         }
 
         public void SetEnabled(bool enabled)
