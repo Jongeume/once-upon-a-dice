@@ -49,6 +49,7 @@ namespace OUD.Unity.Adapter
         [Header("상단 정보 바 (선택)")]
         [SerializeField] private string   _playerName = "Alice";
         [SerializeField] private TMP_Text _topBarText;
+        [SerializeField] private UnityEngine.UI.Button _mapButton;     // 지도 버튼 — 노드맵 토글
 
         [Header("전투 배경")]
         [SerializeField] private UnityEngine.UI.Image _battleBackgroundImage;
@@ -77,6 +78,8 @@ namespace OUD.Unity.Adapter
 
         private bool _rewardContinueWired;
         private bool _nodeMapClickWired;
+        private bool _mapButtonWired;
+        private bool _mapPeekMode;
         private bool _growthViewsWired;
         private bool _endRunViewsWired;
         private bool _shopViewWired;
@@ -89,6 +92,40 @@ namespace OUD.Unity.Adapter
         {
             BuildPresenters();
             WireViewEvents();
+            WireMapButton();
+        }
+
+        private void WireMapButton()
+        {
+            if (_mapButton == null || _mapButtonWired) return;
+            _mapButton.onClick.AddListener(ToggleMapPeek);
+            _mapButtonWired = true;
+        }
+
+        /// <summary>지도 버튼 클릭 — 노드맵 peek 모드 토글. 노드 진행 없이 보기만.
+        /// peek 동안 노드 Button 컴포넌트는 비활성화 → 클릭 모션(하이라이트/눌림)까지 차단.
+        /// 닫을 땐 다시 지도 버튼 클릭.</summary>
+        public void ToggleMapPeek()
+        {
+            if (_runManager == null || _nodeMapView == null) return;
+
+            if (_nodeMapView.gameObject.activeSelf)
+            {
+                _nodeMapView.SetAllButtonsEnabled(true);  // 다음 정상 사용을 위해 복원
+                _nodeMapView.Hide();
+                _mapPeekMode = false;
+                return;
+            }
+
+            int currentNodeId = _runManager.State.CurrentNodeId;
+            IReadOnlyList<MapNode> nextCandidates = _runManager.GetAvailableNextNodes();
+            int[] nextIds = new int[nextCandidates.Count];
+            for (int i = 0; i < nextCandidates.Count; i++) nextIds[i] = nextCandidates[i].Id;
+
+            _nodeMapView.Bind(_runManager.Map, currentNodeId, nextIds);
+            _nodeMapView.Show();
+            _nodeMapView.SetAllButtonsEnabled(false);  // peek: 클릭 모션 차단
+            _mapPeekMode = true;
         }
 
         public void Initialize(
@@ -452,6 +489,14 @@ namespace OUD.Unity.Adapter
         private void HandleNodeMapClicked(int nodeId)
         {
             if (_runManager == null) return;
+
+            // Peek 모드(지도 버튼으로 열림): 노드 진행 없이 단순 닫기.
+            if (_mapPeekMode)
+            {
+                if (_nodeMapView != null) _nodeMapView.Hide();
+                _mapPeekMode = false;
+                return;
+            }
 
             int currentNodeId = _runManager.State.CurrentNodeId;
 
