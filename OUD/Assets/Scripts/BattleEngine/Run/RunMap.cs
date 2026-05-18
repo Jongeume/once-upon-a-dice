@@ -33,10 +33,10 @@ namespace OUD.BattleEngine.Run
 
     public class RunMap
     {
-        public const int TOTAL_LAYERS  = 8;
-        public const int LAST_LAYER    = 7;
+        public const int TOTAL_LAYERS  = 9;
+        public const int LAST_LAYER    = 8;
         public const int START_NODE_ID = 0;
-        public const int LAST_NODE_ID  = 7;
+        public const int LAST_NODE_ID  = 12;
 
         private readonly Dictionary<int, MapNode> _nodes;
 
@@ -50,22 +50,28 @@ namespace OUD.BattleEngine.Run
 
             _nodes = new Dictionary<int, MapNode>
             {
-                [0] = new MapNode(id: 0, type: NodeType.Combat, layer: 0, column: 0,
-                    nextNodeIds: new[] { 1 }),
-                [1] = new MapNode(id: 1, type: NodeType.Combat, layer: 1, column: 0,
-                    nextNodeIds: new[] { 2 }),
-                [2] = new MapNode(id: 2, type: NodeType.Shop,   layer: 2, column: 0,
-                    nextNodeIds: new[] { 3 }),
-                [3] = new MapNode(id: 3, type: NodeType.Combat, layer: 3, column: 0,
-                    nextNodeIds: new[] { 4 }),
-                [4] = new MapNode(id: 4, type: NodeType.Combat, layer: 4, column: 0,
-                    nextNodeIds: new[] { 5 }),
-                [5] = new MapNode(id: 5, type: NodeType.Elite,  layer: 5, column: 0,
-                    nextNodeIds: new[] { 6 }),
-                [6] = new MapNode(id: 6, type: NodeType.Shop,   layer: 6, column: 0,
-                    nextNodeIds: new[] { 7 }),
-                [7] = new MapNode(id: 7, type: NodeType.Boss,   layer: LAST_LAYER, column: 0,
-                    nextNodeIds: Array.Empty<int>()),
+                // Col 0: 시작 (단일)
+                [0]  = new MapNode(0,  NodeType.Combat, layer: 0, column: 0, new[] { 1, 2 }),
+                // Col 1: 1차 분기 (상/하) — 선택한 행 유지
+                [1]  = new MapNode(1,  NodeType.Combat, layer: 1, column: 0, new[] { 3 }),
+                [2]  = new MapNode(2,  NodeType.Combat, layer: 1, column: 1, new[] { 4 }),
+                // Col 2: 2연속 분기 (상/하)
+                [3]  = new MapNode(3,  NodeType.Combat, layer: 2, column: 0, new[] { 5 }),
+                [4]  = new MapNode(4,  NodeType.Combat, layer: 2, column: 1, new[] { 5 }),
+                // Col 3: 합류 (상점)
+                [5]  = new MapNode(5,  NodeType.Shop,   layer: 3, column: 0, new[] { 6, 7 }),
+                // Col 4: 3차 분기 (상/하) — 선택한 행 유지
+                [6]  = new MapNode(6,  NodeType.Combat, layer: 4, column: 0, new[] { 8 }),
+                [7]  = new MapNode(7,  NodeType.Combat, layer: 4, column: 1, new[] { 9 }),
+                // Col 5: 4연속 분기 (상/하)
+                [8]  = new MapNode(8,  NodeType.Combat, layer: 5, column: 0, new[] { 10 }),
+                [9]  = new MapNode(9,  NodeType.Combat, layer: 5, column: 1, new[] { 10 }),
+                // Col 6: 합류 (엘리트)
+                [10] = new MapNode(10, NodeType.Elite,  layer: 6, column: 0, new[] { 11 }),
+                // Col 7: 상점
+                [11] = new MapNode(11, NodeType.Shop,   layer: 7, column: 0, new[] { 12 }),
+                // Col 8: 보스
+                [12] = new MapNode(12, NodeType.Boss,   layer: LAST_LAYER, column: 0, Array.Empty<int>()),
             };
         }
 

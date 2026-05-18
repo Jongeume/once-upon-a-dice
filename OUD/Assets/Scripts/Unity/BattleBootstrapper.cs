@@ -75,10 +75,15 @@ namespace OUD.Unity
                 _rollDiceWired = true;
             }
 
-            Debug.Log("[BattleBootstrapper] 런 초기화 완료 — 8노드 선형 구조");
+            Debug.Log("[BattleBootstrapper] 런 초기화 완료 — 13노드 가로형 분기 구조");
             Debug.Log($"  플레이어: HP:{player.MaxHp} ATK:{player.Atk} DEF:{player.Def}");
 
-            StartNextNode();
+            // 게임 시작 시 노드맵을 먼저 표시. 노드 0 클릭 시 첫 전투 진입.
+            _adapter.Initialize(
+                null, _rewardSystem, _runManager,
+                _levelUpSystem, _skillPointSystem, _shopSystem,
+                OnContinueAfterNode);
+            _adapter.ShowInitialNodeMap();
         }
 
         private void StartNextNode()
