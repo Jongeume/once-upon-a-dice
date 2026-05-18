@@ -23,10 +23,10 @@ namespace OUD.Tests
         }
 
         [Test]
-        public void TotalNodes_Is8()
+        public void TotalNodes_Is13()
         {
-            Assert.AreEqual(8, RunState.TOTAL_NODES);
-            Assert.AreEqual(7, RunState.LAST_NODE);
+            Assert.AreEqual(13, RunState.TOTAL_NODES);
+            Assert.AreEqual(12, RunState.LAST_NODE);
         }
 
         [Test]
@@ -42,13 +42,14 @@ namespace OUD.Tests
         }
 
         [Test]
-        public void MoveTo_ToLastLayer_IsLastNodeTrue()
+        public void MoveTo_ToLastNode_IsLastNodeTrue()
         {
             var sut = new RunState(NewPlayer());
 
-            sut.MoveTo(nodeId: 7, layer: RunState.LAST_NODE);
+            sut.MoveTo(nodeId: 12, layer: 8);
 
-            Assert.AreEqual(RunState.LAST_NODE, sut.CurrentNodeIndex);
+            Assert.AreEqual(8,  sut.CurrentNodeIndex);
+            Assert.AreEqual(12, sut.CurrentNodeId);
             Assert.IsTrue(sut.IsLastNode);
             Assert.IsFalse(sut.IsRunComplete);
         }
@@ -57,7 +58,7 @@ namespace OUD.Tests
         public void MarkComplete_SetsIsRunComplete()
         {
             var sut = new RunState(NewPlayer());
-            sut.MoveTo(7, RunState.LAST_NODE);
+            sut.MoveTo(12, 8);
 
             sut.MarkComplete();
 
@@ -68,7 +69,7 @@ namespace OUD.Tests
         public void MoveTo_AfterMarkComplete_DoesNothing()
         {
             var sut = new RunState(NewPlayer());
-            sut.MoveTo(7, RunState.LAST_NODE);
+            sut.MoveTo(12, 8);
             sut.MarkComplete();
 
             int idBefore = sut.CurrentNodeId;
@@ -82,7 +83,7 @@ namespace OUD.Tests
         public void Reset_RestoresInitialState_WithNewPlayer()
         {
             var sut = new RunState(NewPlayer());
-            sut.MoveTo(7, RunState.LAST_NODE);
+            sut.MoveTo(12, 8);
             sut.MarkComplete();
 
             var newPlayer = NewPlayer();
