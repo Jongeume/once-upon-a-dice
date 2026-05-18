@@ -107,7 +107,7 @@ namespace OUD.Unity.Adapter
             _skillPointSystem    = skillPointSystem;
             _shopSystem          = shopSystem;
             _onContinueRequested = onContinueRequested;
-            _onRerollRequested   = keepMask => turnManager.RequestReroll(keepMask);
+            _onRerollRequested   = keepMask => turnManager?.RequestReroll(keepMask);
 
             if (_rewardView != null && !_rewardContinueWired)
             {
@@ -412,6 +412,23 @@ namespace OUD.Unity.Adapter
             }
         }
 
+        /// <summary>
+        /// 게임 시작 시 최초 노드맵 표시. currentNodeId=-1(아직 아무 노드도 진행 안 함),
+        /// availableIds={시작노드id}로 바인딩하여 시작 노드만 클릭 가능하게 한다.
+        /// </summary>
+        public void ShowInitialNodeMap()
+        {
+            if (_runManager == null) return;
+            if (_nodeMapView == null)
+            {
+                _onContinueRequested?.Invoke();
+                return;
+            }
+            int startId = _runManager.State.CurrentNodeId;
+            _nodeMapView.Bind(_runManager.Map, -1, new int[] { startId });
+            _nodeMapView.Show();
+        }
+
         private void ShowNodeMap()
         {
             if (_runManager == null) return;
@@ -435,6 +452,16 @@ namespace OUD.Unity.Adapter
         private void HandleNodeMapClicked(int nodeId)
         {
             if (_runManager == null) return;
+
+            int currentNodeId = _runManager.State.CurrentNodeId;
+
+            // 게임 시작 시 노드맵: 현재 상태가 start노드이고 그 노드를 클릭 → 첫 전투 진입
+            if (nodeId == currentNodeId)
+            {
+                if (_nodeMapView != null) _nodeMapView.Hide();
+                _onContinueRequested?.Invoke();
+                return;
+            }
 
             try
             {
