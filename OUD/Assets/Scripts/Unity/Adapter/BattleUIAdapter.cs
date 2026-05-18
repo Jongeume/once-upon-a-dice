@@ -455,7 +455,7 @@ namespace OUD.Unity.Adapter
             _playerPresenter = new PlayerPresenter(_playerView);
 
             _enemyPresenter = new EnemyPresenter(
-                () => _enemyView.SpawnEntry(),
+                tier => _enemyView.SpawnEntry(tier),
                 _spriteMap);
 
             var diceEntryInterfaces = new List<IDiceEntryView>();

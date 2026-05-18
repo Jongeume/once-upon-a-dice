@@ -16,6 +16,9 @@ namespace OUD.BattleEngine.Unit
         public string Id   { get; }
         public string Name { get; }
 
+        /// <summary>등급 (Normal/Elite/Boss). UI 카드틀 분기에 사용.</summary>
+        public MonsterTier Tier { get; }
+
         // ── 기본 스탯 ────────────────────────────────────────────────────────
         public int MaxHp       { get; }
         public int BaseAtk     { get; }
@@ -50,10 +53,12 @@ namespace OUD.BattleEngine.Unit
             int maxHp,
             int baseAtk,
             int shieldValue,
-            IntentType[] pattern)
+            IntentType[] pattern,
+            MonsterTier tier = MonsterTier.Normal)
         {
             Id                     = id;
             Name                   = name;
+            Tier                   = tier;
             MaxHp                  = maxHp;
             BaseAtk                = baseAtk;
             ShieldValue            = shieldValue;
@@ -76,10 +81,12 @@ namespace OUD.BattleEngine.Unit
             IntentType[] pattern,
             int rageHpThreshold,
             int rageAtkBonus,
-            IntentType[] ragePattern)
+            IntentType[] ragePattern,
+            MonsterTier tier = MonsterTier.Boss)
         {
             Id                     = id;
             Name                   = name;
+            Tier                   = tier;
             MaxHp                  = maxHp;
             BaseAtk                = baseAtk;
             ShieldValue            = shieldValue;

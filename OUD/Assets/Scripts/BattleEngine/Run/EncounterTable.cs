@@ -8,8 +8,9 @@ namespace OUD.BattleEngine.Run
     public class EncounterTable
     {
         private static readonly string[] POOL_SLIME            = { MonsterDatabase.ID_SLIME };
-        private static readonly string[] POOL_SLIME_SKELETON   = { MonsterDatabase.ID_SLIME, MonsterDatabase.ID_SKELETON };
-        private static readonly string[] POOL_SKELETON_GOBLIN  = { MonsterDatabase.ID_SKELETON, MonsterDatabase.ID_GOBLIN };
+        private static readonly string[] POOL_SPIDER_SNAKE     = { MonsterDatabase.ID_SPIDER, MonsterDatabase.ID_SNAKE };
+        private static readonly string[] POOL_SNAKE_BEAR       = { MonsterDatabase.ID_SNAKE, MonsterDatabase.ID_BEAR };
+        private static readonly string[] POOL_SPIDER           = { MonsterDatabase.ID_SPIDER };
 
         private const int COUNT_MIN = 1;
         private const int COUNT_MAX = 2;
@@ -49,10 +50,10 @@ namespace OUD.BattleEngine.Run
             string[] pool;
             switch (layer)
             {
-                case 0: pool = POOL_SLIME;           break;
-                case 1: pool = POOL_SLIME_SKELETON;  break;
-                case 3: pool = POOL_SKELETON_GOBLIN;  break;
-                case 4: pool = POOL_SKELETON_GOBLIN;  break;
+                case 0: pool = POOL_SPIDER;          break;  // 1스테이지: Spider
+                case 1: pool = POOL_SPIDER_SNAKE;    break;  // 2스테이지: Spider/Snake
+                case 3: pool = POOL_SNAKE_BEAR;      break;  // 3스테이지: Snake/Bear
+                case 4: pool = POOL_SNAKE_BEAR;      break;
                 default:
                     throw new ArgumentOutOfRangeException(
                         nameof(layer),

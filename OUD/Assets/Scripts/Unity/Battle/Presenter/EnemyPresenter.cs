@@ -13,14 +13,14 @@ namespace OUD.Unity.Battle.Presenter
     /// </summary>
     public class EnemyPresenter
     {
-        private readonly Func<IEnemyEntryView>   _entryFactory;
+        private readonly Func<MonsterTier, IEnemyEntryView> _entryFactory;
         private readonly MonsterSpriteMap        _spriteMap;
         private List<MonsterInstance>            _enemies;
         private List<IEnemyEntryView>            _entryViews = new();
 
         public event Action<int> OnEnemyClicked;
 
-        public EnemyPresenter(Func<IEnemyEntryView> entryFactory, MonsterSpriteMap spriteMap)
+        public EnemyPresenter(Func<MonsterTier, IEnemyEntryView> entryFactory, MonsterSpriteMap spriteMap)
         {
             _entryFactory = entryFactory;
             _spriteMap    = spriteMap;
@@ -36,8 +36,8 @@ namespace OUD.Unity.Battle.Presenter
 
             for (int i = 0; i < enemies.Count; i++)
             {
-                var view = _entryFactory();
                 var m = enemies[i];
+                var view = _entryFactory(m.Data.Tier);
                 Sprite sprite = _spriteMap?.GetSprite(m.Data.Id);
                 float fill = m.Data.MaxHp > 0 ? (float)m.Hp / m.Data.MaxHp : 0f;
                 view.Setup(m.Data.Name, sprite, fill, $"{m.Hp} / {m.Data.MaxHp}");

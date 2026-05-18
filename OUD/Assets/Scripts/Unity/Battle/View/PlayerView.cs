@@ -13,6 +13,12 @@ namespace OUD.Unity.Battle.View
         [SerializeField] private Image    _hpFill;
         [SerializeField] private TMP_Text _hpText;
 
+        [Header("Life Icon")]
+        [SerializeField] private Image  _lifeImage;
+        [SerializeField] private Sprite _lifeFull;     // 100~81%
+        [SerializeField] private Sprite _lifeMid;      // 80~51%
+        [SerializeField] private Sprite _lifeLow;      // 50~1%
+
         [Header("실드")]
         [SerializeField] private GameObject _shieldGroup;
         [SerializeField] private TMP_Text   _shieldText;
@@ -31,6 +37,17 @@ namespace OUD.Unity.Battle.View
         {
             if (_hpFill)  _hpFill.fillAmount = fillAmount;
             if (_hpText)  _hpText.text        = hpText;
+
+            // 체력 비율(0~1)에 따라 Life 아이콘 sprite 교체.
+            // 100~81%: Full / 80~51%: Mid / 50~1%: Low
+            if (_lifeImage != null)
+            {
+                Sprite next;
+                if (fillAmount > 0.80f)      next = _lifeFull;
+                else if (fillAmount > 0.50f) next = _lifeMid;
+                else                          next = _lifeLow;
+                if (next != null) _lifeImage.sprite = next;
+            }
         }
 
         public void UpdateShield(int shield, bool visible)

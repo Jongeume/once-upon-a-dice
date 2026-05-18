@@ -384,8 +384,8 @@ RectTransform:
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 0.05, y: 0.55}
   m_AnchorMax: {x: 0.95, y: 0.67}
-  m_AnchoredPosition: {x: 0.000030517578, y: -252.7}
-  m_SizeDelta: {x: 7.4275, y: -16.037}
+  m_AnchoredPosition: {x: -0.1468811, y: -238.66}
+  m_SizeDelta: {x: 7.4275, y: -22.1124}
   m_Pivot: {x: 0.5, y: 0.5}
 --- !u!222 &2244680337298582970
 CanvasRenderer:
@@ -747,8 +747,8 @@ RectTransform:
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 0, y: 0.82}
   m_AnchorMax: {x: 1, y: 1}
-  m_AnchoredPosition: {x: -96, y: 15.966}
-  m_SizeDelta: {x: -227.2431, y: -39.9311}
+  m_AnchoredPosition: {x: -96.3, y: 15.07}
+  m_SizeDelta: {x: -221.9539, y: -30.141}
   m_Pivot: {x: 0.5, y: 0.5}
 --- !u!222 &6495695018391684060
 CanvasRenderer:
@@ -787,8 +787,8 @@ MonoBehaviour:
   m_fontMaterials: []
   m_fontColor32:
     serializedVersion: 2
-    rgba: 4281352384
-  m_fontColor: {r: 0.7529412, g: 0.2509804, b: 0.1882353, a: 1}
+    rgba: 4278981183
+  m_fontColor: {r: 0.24528301, g: 0.0696254, b: 0.047668196, a: 1}
   m_enableVertexGradient: 0
   m_colorMode: 3
   m_fontColorGradient:
@@ -1089,15 +1089,15 @@ RectTransform:
   m_GameObject: {fileID: 7000000000000000001}
   m_LocalRotation: {x: -0, y: -0, z: -0, w: 1}
   m_LocalPosition: {x: 0, y: 0, z: 0}
-  m_LocalScale: {x: 1.08, y: 1, z: 1}
+  m_LocalScale: {x: 1.1, y: 1.02, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children: []
   m_Father: {fileID: 1410529399461642817}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
-  m_AnchorMin: {x: 0.38, y: 0.02}
-  m_AnchorMax: {x: 0.62, y: 0.15}
-  m_AnchoredPosition: {x: 0.000011444092, y: -5.600006}
-  m_SizeDelta: {x: 59.0946, y: 43.412}
+  m_AnchorMin: {x: 0.5, y: 0.5}
+  m_AnchorMax: {x: 0.5, y: 0.5}
+  m_AnchoredPosition: {x: -0.1469, y: -134.8751}
+  m_SizeDelta: {x: 117.9669, y: 86.4607}
   m_Pivot: {x: 0.5, y: 0.5}
 --- !u!222 &7000000000000000003
 CanvasRenderer:
@@ -1246,7 +1246,7 @@ RectTransform:
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 0, y: 0.67}
   m_AnchorMax: {x: 1, y: 0.82}
-  m_AnchoredPosition: {x: 0.0000076294, y: 68.798}
+  m_AnchoredPosition: {x: 0.0000076293945, y: 68.797}
   m_SizeDelta: {x: -8, y: -15.195}
   m_Pivot: {x: 0.5, y: 0.5}
 --- !u!222 &1993672528181854131
@@ -1362,7 +1362,7 @@ GameObject:
   - component: {fileID: 325895191645384488}
   - component: {fileID: 4314029892334448820}
   m_Layer: 0
-  m_Name: EnemyEntry
+  m_Name: BossEntry
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -1533,7 +1533,7 @@ MonoBehaviour:
   m_OnCullStateChanged:
     m_PersistentCalls:
       m_Calls: []
-  m_Sprite: {fileID: 21300000, guid: ab5915e3fe3024a4695a318939679118, type: 3}
+  m_Sprite: {fileID: 21300000, guid: 8e169c8b08607d347b69718ba0bf6fdf, type: 3}
   m_Type: 0
   m_PreserveAspect: 0
   m_FillCenter: 1
