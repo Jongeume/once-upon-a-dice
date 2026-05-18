@@ -73,6 +73,10 @@ namespace OUD.Unity.Battle.Presenter
             _entryViews[index].UpdateHp(fill, $"{m.Hp} / {m.Data.MaxHp}");
             _entryViews[index].UpdateShield(m.Shield, m.Shield > 0);
             _entryViews[index].SetRageActive(m.IsEnraged);
+
+            // 사망 시 GameObject 비활성화로 화면에서 제거. 이미 비활성이면 스킵(idempotent).
+            if (m.IsDead && _entryViews[index] is MonoBehaviour mb && mb != null && mb.gameObject.activeSelf)
+                HandleDeath(index);
         }
 
         public void ShowAction(int enemyIndex, IntentType intent, int value)
@@ -84,7 +88,11 @@ namespace OUD.Unity.Battle.Presenter
         public void HandleDeath(int enemyIndex)
         {
             if (enemyIndex < 0 || enemyIndex >= _entryViews.Count) return;
-            _entryViews[enemyIndex].PlayDeathEffect();
+            var view = _entryViews[enemyIndex];
+            view.PlayDeathEffect();
+            // 사망 시 GameObject 비활성화 — HorizontalLayoutGroup이 자동으로 살아있는 적만 정렬.
+            // _entryViews 리스트의 인덱스는 유지(클릭 콜백/참조 보존).
+            if (view is MonoBehaviour mb && mb != null) mb.gameObject.SetActive(false);
         }
 
         /// <summary>화면 C 타겟팅 활성화 여부 전파.</summary>

@@ -82,6 +82,8 @@ namespace OUD.Unity.Battle.View
         public int NodeId { get; private set; }
         public event Action<int> OnClicked;
 
+        private NodeType _currentNodeType;
+
         private void Awake()
         {
             if (_clickButton != null)
@@ -97,6 +99,7 @@ namespace OUD.Unity.Battle.View
         public void SetNode(MapNode node)
         {
             NodeId = node.Id;
+            _currentNodeType = node.Type;
 
             Color frameColor;
             string label;
@@ -174,7 +177,9 @@ namespace OUD.Unity.Battle.View
                     SetOutline(OUTLINE_AVAILABLE, OUTLINE_THICK);
                     SetClickable(true);
                     SetClearedOverlay(false);
-                    SetLabelTextOverride(null);
+                    // Combat Available 노드는 "?"로 가려서 다음이 전투인지 노출 방지.
+                    // Boss/Shop/Elite는 진행 계획상 라벨 유지.
+                    SetLabelTextOverride(_currentNodeType == NodeType.Combat ? LABEL_LOCKED : null);
                     break;
 
                 case NodeVisualState.Locked:
@@ -216,6 +221,15 @@ namespace OUD.Unity.Battle.View
         {
             if (_clickButton == null) return;
             _clickButton.interactable = clickable;
+        }
+
+        /// <summary>Button 컴포넌트 자체를 enable/disable.
+        /// peek 모드 등에서 클릭 모션(하이라이트/눌림)까지 완전 차단해야 할 때 사용.
+        /// 비활성 시 시각(이미지/외곽선)은 그대로 유지되며 클릭만 무시됨.</summary>
+        public void SetButtonEnabled(bool enabled)
+        {
+            if (_clickButton == null) return;
+            _clickButton.enabled = enabled;
         }
 
         private void SetClearedOverlay(bool show)
