@@ -50,10 +50,11 @@ namespace OUD.BattleEngine.Run
             string[] pool;
             switch (layer)
             {
-                case 0: pool = POOL_SPIDER;          break;  // 1스테이지: Spider
-                case 1: pool = POOL_SPIDER_SNAKE;    break;  // 2스테이지: Spider/Snake
-                case 3: pool = POOL_SNAKE_BEAR;      break;  // 3스테이지: Snake/Bear
-                case 4: pool = POOL_SNAKE_BEAR;      break;
+                case 0: pool = POOL_SPIDER;       break;  // Col 0: 시작
+                case 1: pool = POOL_SPIDER_SNAKE; break;  // Col 1: 1차 분기
+                case 2: pool = POOL_SPIDER_SNAKE; break;  // Col 2: 2연속 분기
+                case 4: pool = POOL_SNAKE_BEAR;   break;  // Col 4: 3차 분기
+                case 5: pool = POOL_SNAKE_BEAR;   break;  // Col 5: 4연속 분기
                 default:
                     throw new ArgumentOutOfRangeException(
                         nameof(layer),
