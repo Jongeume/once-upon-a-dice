@@ -18,7 +18,7 @@ namespace OUD.Unity.Battle.Presenter
         private bool[] _keepMask   = new bool[5];
         private int    _rerollsLeft;
 
-        public const int MAX_REROLLS = 2;
+        public const int MAX_REROLLS = 3;
         public const int DICE_COUNT  = 5;
 
         public DicePresenter(

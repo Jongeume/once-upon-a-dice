@@ -29,7 +29,7 @@ namespace OUD.Unity.Battle.View
                 _rerollButton.gameObject.SetActive(rerollsLeft > 0); // 리롤 남아있을 때만 표시
                 _rerollButton.interactable = canReroll;
             }
-            if (_rerollCountText) _rerollCountText.text = $"리롤 {rerollsLeft}/2";
+            if (_rerollCountText) _rerollCountText.text = $"리롤 {rerollsLeft}/3";
         }
 
         public void SetConfirmButtonActive(bool active)

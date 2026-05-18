@@ -116,29 +116,31 @@ namespace OUD.Tests
                 Assert.AreEqual(3, v, "잠긴 주사위 값은 변하지 않아야 한다.");
         }
 
-        // ── T-01-04: Reroll 2회 소진 후 3번째 시도 → false 반환 ──────────────
+        // ── T-01-04: Reroll 3회 소진 후 4번째 시도 → false 반환 ──────────────
         [Test]
         public void T_01_04_Reroll_AfterExhausted_ReturnsFalse()
         {
             // Arrange
             var random = new SequenceRandom(1, 1, 1, 1, 1,
                                             2, 2, 2, 2, 2,
-                                            3, 3, 3, 3, 3);
+                                            3, 3, 3, 3, 3,
+                                            4, 4, 4, 4, 4);
             var hand = new DiceHand(random);
             hand.RollAll();
 
             hand.Reroll(); // 1번째
-            hand.Reroll(); // 2번째 → RerollsLeft = 0
+            hand.Reroll(); // 2번째
+            hand.Reroll(); // 3번째 → RerollsLeft = 0
 
             // Act
-            bool thirdAttempt = hand.Reroll(); // 3번째
+            bool fourthAttempt = hand.Reroll(); // 4번째
 
             // Assert — E-02
-            Assert.IsFalse(thirdAttempt, "리롤 소진 후 시도는 false를 반환해야 한다.");
+            Assert.IsFalse(fourthAttempt, "리롤 소진 후 시도는 false를 반환해야 한다.");
             Assert.AreEqual(0, hand.RerollsLeft, "RerollsLeft가 0이어야 한다.");
         }
 
-        // ── T-01-05: ResetForNewTurn → RerollsLeft=2, IsKept 전부 false ──────
+        // ── T-01-05: ResetForNewTurn → RerollsLeft=3, IsKept 전부 false ──────
         [Test]
         public void T_01_05_ResetForNewTurn_RestoresStateCorrectly()
         {
@@ -147,8 +149,9 @@ namespace OUD.Tests
             var hand   = new DiceHand(random);
             hand.RollAll();
 
-            // 잠금하고 리롤 2회 소진
+            // 잠금하고 리롤 3회 소진
             hand.Dices[0].SetKept(true);
+            hand.Reroll();
             hand.Reroll();
             hand.Reroll();
 
@@ -156,7 +159,7 @@ namespace OUD.Tests
             hand.ResetForNewTurn();
 
             // Assert
-            Assert.AreEqual(2, hand.RerollsLeft, "RerollsLeft가 MAX_REROLLS(2)로 복구되어야 한다.");
+            Assert.AreEqual(3, hand.RerollsLeft, "RerollsLeft가 MAX_REROLLS(3)로 복구되어야 한다.");
             foreach (Dice d in hand.Dices)
                 Assert.IsFalse(d.IsKept, "모든 주사위의 IsKept가 false여야 한다.");
         }
@@ -203,7 +206,7 @@ namespace OUD.Tests
             // 리롤 없이 바로 GetValues()
             int[] values = hand.GetValues();
 
-            Assert.AreEqual(2, hand.RerollsLeft, "리롤 안 했으므로 RerollsLeft는 여전히 2여야 한다.");
+            Assert.AreEqual(3, hand.RerollsLeft, "리롤 안 했으므로 RerollsLeft는 여전히 3이어야 한다.");
             foreach (int v in values)
                 Assert.AreEqual(4, v);
         }

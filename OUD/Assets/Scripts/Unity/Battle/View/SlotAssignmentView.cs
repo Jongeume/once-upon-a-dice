@@ -64,7 +64,7 @@ namespace OUD.Unity.Battle.View
         public void SetRerollButtonActive(bool active, int rerollsLeft)
         {
             if (_rerollButton)    _rerollButton.gameObject.SetActive(active);
-            if (_rerollCountText) _rerollCountText.text = $"리롤 {rerollsLeft}/2";
+            if (_rerollCountText) _rerollCountText.text = $"리롤 {rerollsLeft}/3";
         }
 
         public void SetUseSkillButtonActive(bool active)
