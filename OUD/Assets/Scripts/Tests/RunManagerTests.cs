@@ -71,7 +71,7 @@ namespace OUD.Tests
         {
             var sut = NewManager();
             sut.StartRun(NewPlayer());
-            for (int i = 0; i < 8; i++) sut.AdvanceNode();
+            for (int i = 0; i < 9; i++) sut.AdvanceNode();
             Assert.IsTrue(sut.IsRunComplete());
 
             var newPlayer = NewPlayer();
@@ -83,7 +83,7 @@ namespace OUD.Tests
         }
 
         [Test]
-        public void GetNextBattle_AtStart_ReturnsSlimeOnly()
+        public void GetNextBattle_AtStart_ReturnsSpider()
         {
             var sut = NewManager();
             sut.StartRun(NewPlayer());
@@ -93,7 +93,7 @@ namespace OUD.Tests
             Assert.IsNotNull(result);
             Assert.GreaterOrEqual(result.Count, 1);
             foreach (var m in result)
-                Assert.AreEqual(MonsterDatabase.ID_SLIME, m.Id);
+                Assert.AreEqual(MonsterDatabase.ID_SPIDER, m.Id);
         }
 
         [Test]
@@ -101,8 +101,7 @@ namespace OUD.Tests
         {
             var sut = NewManager();
             sut.StartRun(NewPlayer());
-            // Advance to node 7 (Boss) — skip shops by advancing through all
-            for (int i = 0; i < 7; i++) sut.AdvanceNode();
+            for (int i = 0; i < 8; i++) sut.AdvanceNode();
 
             List<MonsterData> result = sut.GetNextBattle();
 
@@ -115,8 +114,7 @@ namespace OUD.Tests
         {
             var sut = NewManager();
             sut.StartRun(NewPlayer());
-            // Advance to node 5 (Elite)
-            for (int i = 0; i < 5; i++) sut.AdvanceNode();
+            for (int i = 0; i < 6; i++) sut.AdvanceNode();
 
             List<MonsterData> result = sut.GetNextBattle();
 
@@ -157,7 +155,7 @@ namespace OUD.Tests
             var player = NewPlayer();
             player.AddXp(99);
             sut.StartRun(player);
-            for (int i = 0; i < 7; i++) sut.AdvanceNode();
+            for (int i = 0; i < 8; i++) sut.AdvanceNode();
 
             PostBattleFlow flow = sut.GetPostBattleFlow();
 
@@ -178,15 +176,16 @@ namespace OUD.Tests
         }
 
         [Test]
-        public void GetAvailableNextNodes_Linear_HasOneNext()
+        public void GetAvailableNextNodes_FromStart_HasTwo()
         {
             var sut = NewManager();
             sut.StartRun(NewPlayer());
 
             IReadOnlyList<MapNode> next = sut.GetAvailableNextNodes();
 
-            Assert.AreEqual(1, next.Count);
+            Assert.AreEqual(2, next.Count);
             Assert.AreEqual(1, next[0].Id);
+            Assert.AreEqual(2, next[1].Id);
         }
 
         [Test]
@@ -194,7 +193,7 @@ namespace OUD.Tests
         {
             var sut = NewManager();
             sut.StartRun(NewPlayer());
-            for (int i = 0; i < 7; i++) sut.AdvanceNode();
+            for (int i = 0; i < 8; i++) sut.AdvanceNode();
 
             IReadOnlyList<MapNode> next = sut.GetAvailableNextNodes();
 
@@ -227,7 +226,7 @@ namespace OUD.Tests
         {
             var sut = NewManager();
             sut.StartRun(NewPlayer());
-            for (int i = 0; i < 8; i++) sut.AdvanceNode();
+            for (int i = 0; i < 9; i++) sut.AdvanceNode();
 
             Assert.Throws<InvalidOperationException>(() => sut.SelectNextNode(0));
         }
@@ -248,7 +247,7 @@ namespace OUD.Tests
         {
             var sut = NewManager();
             sut.StartRun(NewPlayer());
-            for (int i = 0; i < 7; i++) sut.AdvanceNode();
+            for (int i = 0; i < 8; i++) sut.AdvanceNode();
             Assert.IsFalse(sut.IsRunComplete());
 
             sut.AdvanceNode();
@@ -261,7 +260,7 @@ namespace OUD.Tests
         {
             var sut = NewManager();
             sut.StartRun(NewPlayer());
-            for (int i = 0; i < 8; i++) sut.AdvanceNode();
+            for (int i = 0; i < 9; i++) sut.AdvanceNode();
 
             sut.AdvanceNode();
             sut.AdvanceNode();
