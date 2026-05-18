@@ -48,19 +48,17 @@ namespace OUD.Tests
         }
 
         [Test]
-        public void Node1_And_Node2_CrossConnect_To_3_And_4()
+        public void Node1_GoesTo3_Node2_GoesTo4_NoXCross()
         {
             var map = NewMap();
             MapNode n1 = map.GetNode(1);
             MapNode n2 = map.GetNode(2);
 
-            Assert.AreEqual(2, n1.NextNodeIds.Count);
+            Assert.AreEqual(1, n1.NextNodeIds.Count);
             Assert.AreEqual(3, n1.NextNodeIds[0]);
-            Assert.AreEqual(4, n1.NextNodeIds[1]);
 
-            Assert.AreEqual(2, n2.NextNodeIds.Count);
-            Assert.AreEqual(3, n2.NextNodeIds[0]);
-            Assert.AreEqual(4, n2.NextNodeIds[1]);
+            Assert.AreEqual(1, n2.NextNodeIds.Count);
+            Assert.AreEqual(4, n2.NextNodeIds[0]);
         }
 
         [Test]
@@ -91,19 +89,17 @@ namespace OUD.Tests
         }
 
         [Test]
-        public void Node6_And_Node7_CrossConnect_To_8_And_9()
+        public void Node6_GoesTo8_Node7_GoesTo9_NoXCross()
         {
             var map = NewMap();
             MapNode n6 = map.GetNode(6);
             MapNode n7 = map.GetNode(7);
 
-            Assert.AreEqual(2, n6.NextNodeIds.Count);
+            Assert.AreEqual(1, n6.NextNodeIds.Count);
             Assert.AreEqual(8, n6.NextNodeIds[0]);
-            Assert.AreEqual(9, n6.NextNodeIds[1]);
 
-            Assert.AreEqual(2, n7.NextNodeIds.Count);
-            Assert.AreEqual(8, n7.NextNodeIds[0]);
-            Assert.AreEqual(9, n7.NextNodeIds[1]);
+            Assert.AreEqual(1, n7.NextNodeIds.Count);
+            Assert.AreEqual(9, n7.NextNodeIds[0]);
         }
 
         [Test]

@@ -52,18 +52,18 @@ namespace OUD.BattleEngine.Run
             {
                 // Col 0: 시작 (단일)
                 [0]  = new MapNode(0,  NodeType.Combat, layer: 0, column: 0, new[] { 1, 2 }),
-                // Col 1: 1차 분기 (상/하)
-                [1]  = new MapNode(1,  NodeType.Combat, layer: 1, column: 0, new[] { 3, 4 }),
-                [2]  = new MapNode(2,  NodeType.Combat, layer: 1, column: 1, new[] { 3, 4 }),
-                // Col 2: 2연속 분기 (상/하) — X자 교차
+                // Col 1: 1차 분기 (상/하) — 선택한 행 유지
+                [1]  = new MapNode(1,  NodeType.Combat, layer: 1, column: 0, new[] { 3 }),
+                [2]  = new MapNode(2,  NodeType.Combat, layer: 1, column: 1, new[] { 4 }),
+                // Col 2: 2연속 분기 (상/하)
                 [3]  = new MapNode(3,  NodeType.Combat, layer: 2, column: 0, new[] { 5 }),
                 [4]  = new MapNode(4,  NodeType.Combat, layer: 2, column: 1, new[] { 5 }),
                 // Col 3: 합류 (상점)
                 [5]  = new MapNode(5,  NodeType.Shop,   layer: 3, column: 0, new[] { 6, 7 }),
-                // Col 4: 3차 분기 (상/하)
-                [6]  = new MapNode(6,  NodeType.Combat, layer: 4, column: 0, new[] { 8, 9 }),
-                [7]  = new MapNode(7,  NodeType.Combat, layer: 4, column: 1, new[] { 8, 9 }),
-                // Col 5: 4연속 분기 (상/하) — X자 교차
+                // Col 4: 3차 분기 (상/하) — 선택한 행 유지
+                [6]  = new MapNode(6,  NodeType.Combat, layer: 4, column: 0, new[] { 8 }),
+                [7]  = new MapNode(7,  NodeType.Combat, layer: 4, column: 1, new[] { 9 }),
+                // Col 5: 4연속 분기 (상/하)
                 [8]  = new MapNode(8,  NodeType.Combat, layer: 5, column: 0, new[] { 10 }),
                 [9]  = new MapNode(9,  NodeType.Combat, layer: 5, column: 1, new[] { 10 }),
                 // Col 6: 합류 (엘리트)
