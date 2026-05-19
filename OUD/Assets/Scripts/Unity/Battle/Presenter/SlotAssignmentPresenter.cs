@@ -149,6 +149,20 @@ namespace OUD.Unity.Battle.Presenter
         public SkillData[] GetSlots() => _slots;
         public List<MonsterInstance> GetAliveEnemies() => _aliveEnemies;
 
+        public void ShowAllSkillsDisabled(List<SkillData> allLearnedSkills, PlayerState playerState)
+        {
+            if (playerState != null) _playerState = playerState;
+            var attack  = new List<SkillCardData>();
+            var defense = new List<SkillCardData>();
+            foreach (var s in allLearnedSkills)
+            {
+                var card = ToCardData(s, false);
+                if (s.Category == SkillCategory.Attack) attack.Add(card);
+                else                                      defense.Add(card);
+            }
+            _view.ShowSkillList(attack, defense);
+        }
+
         private void RebuildSkillList()
         {
             var attack  = new List<SkillCardData>();

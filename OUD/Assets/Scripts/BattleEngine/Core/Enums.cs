@@ -49,7 +49,8 @@ namespace OUD.BattleEngine.Core
         Attack,       // 칼 아이콘
         Shield,       // 방패 아이콘
         StrongAttack, // 강공격 (보스)
-        RageWarning   // 분노 예고 (보스 분노 예고 아이콘)
+        RageWarning,  // 분노 예고 (보스 분노 예고 아이콘)
+        Summon        // 분신 소환 (소환 보스)
     }
 
     /// <summary>
