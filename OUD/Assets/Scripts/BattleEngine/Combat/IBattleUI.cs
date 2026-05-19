@@ -72,6 +72,9 @@ namespace OUD.BattleEngine.Combat
         /// <summary>적의 다음 턴 의도 갱신 (배틀로그 기록 없음).</summary>
         void OnIntentUpdated(int enemyIndex, IntentType intent, int value);
 
+        /// <summary>전투 중 적 소환. UI에 새 적 엔트리 추가.</summary>
+        void OnEnemySummoned(int enemyIndex, MonsterInstance clone);
+
         // ── 실드 초기화 ───────────────────────────────────────────────────────
 
         /// <summary>
