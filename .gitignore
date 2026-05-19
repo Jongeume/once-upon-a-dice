@@ -11,6 +11,8 @@ TestRunner/
 # 임시 파일 / 백업
 OUD/Assets/Screenshots/
 OUD/Assets/_Recovery/
+*.bak
+*.bak.meta
 
 # 로컬 전용 문서
 oud-docs/
