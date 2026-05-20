@@ -38,31 +38,14 @@ namespace OUD.Unity.Battle.View
 
         public event Action<int> OnNodeClicked;
 
-        // 기준 크기 (Inspector 세팅값 기준)
-        private const float MAP_BASE_W = 700f;
-        private const float MAP_BASE_H = 520f;
-        // 화면 점유 비율 상한 (가로 92%, 세로 72%)
-        private const float MAP_FILL_W = 0.92f;
-        private const float MAP_FILL_H = 0.72f;
-
         private void Awake()
         {
-            FitToScreen();
             if (_nodes == null) return;
             foreach (NodeView node in _nodes)
             {
                 if (node == null) continue;
                 node.OnClicked += HandleNodeClicked;
             }
-        }
-
-        // 화면 해상도에 맞게 균등 스케일 자동 계산 (비율 유지 + 화면 넘침 방지)
-        private void FitToScreen()
-        {
-            float s = Mathf.Min(
-                Screen.width  * MAP_FILL_W / MAP_BASE_W,
-                Screen.height * MAP_FILL_H / MAP_BASE_H);
-            ((RectTransform)transform).localScale = new Vector3(s, s, 1f);
         }
 
         private void HandleNodeClicked(int nodeId)

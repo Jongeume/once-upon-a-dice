@@ -132,18 +132,8 @@ public static class SetupNodeMapSprites
             resized++;
         }
 
-        // ── 5. NodeMapPanel 가로 스케일 확장 ─────────────────────────────────
-        GameObject panel = GameObject.Find("NodeMapPanel");
-        if (panel != null)
-        {
-            RectTransform panelRt = panel.GetComponent<RectTransform>();
-            Undo.RecordObject(panelRt, "Scale NodeMapPanel");
-            panelRt.localScale = Vector3.one; // 런타임에 NodeMapView.FitToScreen()이 계산
-            EditorUtility.SetDirty(panelRt);
-        }
-
         UnityEditor.SceneManagement.EditorSceneManager.SaveOpenScenes();
-        Debug.Log($"[SetupNodeMapSprites] 완료! 생성:{created} 앵커조정:{resized}개. 패널 스케일(2.5,1.5) 적용.");
+        Debug.Log($"[SetupNodeMapSprites] 완료! 생성:{created} 앵커조정:{resized}개.");
     }
 
     private static Sprite LoadSprite(string name)
