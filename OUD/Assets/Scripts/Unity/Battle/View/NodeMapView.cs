@@ -18,6 +18,15 @@ namespace OUD.Unity.Battle.View
 
     public class NodeMapView : ViewBase
     {
+        [Header("맵 패널 배경")]
+        [SerializeField] private Image _panelBackground;
+
+        [Header("노드 타입별 아이콘 스프라이트")]
+        [SerializeField] private Sprite _combatNodeSprite;
+        [SerializeField] private Sprite _bossNodeSprite;
+        [SerializeField] private Sprite _shopNodeSprite;
+        [SerializeField] private Sprite _eliteNodeSprite;
+
         [Header("노드 (RunMap nodeId 0~12 순서로 바인딩 — 인덱스 = nodeId)")]
         [SerializeField] private List<NodeView> _nodes;
 
@@ -81,6 +90,7 @@ namespace OUD.Unity.Battle.View
                 MapNode mapNode = map.GetNode(i);
                 nv.gameObject.SetActive(true);
                 nv.SetNode(mapNode);
+                nv.SetIconSprite(GetNodeTypeSprite(mapNode.Type));
                 nv.SetState(ResolveState(mapNode, hasCurrentNode, currentNode, availableIds));
             }
 
@@ -136,6 +146,18 @@ namespace OUD.Unity.Battle.View
                 }
 
                 conn.LineImage.color = active ? LINE_ACTIVE : LINE_INACTIVE;
+            }
+        }
+
+        private Sprite GetNodeTypeSprite(NodeType type)
+        {
+            switch (type)
+            {
+                case NodeType.Combat: return _combatNodeSprite;
+                case NodeType.Boss:   return _bossNodeSprite;
+                case NodeType.Shop:   return _shopNodeSprite;
+                case NodeType.Elite:  return _eliteNodeSprite;
+                default:              return _combatNodeSprite;
             }
         }
 
