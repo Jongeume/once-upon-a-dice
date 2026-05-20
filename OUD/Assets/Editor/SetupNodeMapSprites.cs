@@ -117,7 +117,33 @@ public static class SetupNodeMapSprites
         }
 
         EditorUtility.SetDirty(mapView);
-        Debug.Log($"[SetupNodeMapSprites] 완료! NodeIcon 생성: {created}개. 스프라이트 4종 + 패널 배경 할당됨.");
+
+        // ── 4. 기존 NodeIcon 앵커를 노드 전체 영역으로 확장 ─────────────────
+        int resized = 0;
+        foreach (RectTransform rt in Object.FindObjectsOfType<RectTransform>(true))
+        {
+            if (rt.name != "NodeIcon") continue;
+            Undo.RecordObject(rt, "Expand NodeIcon");
+            rt.anchorMin = Vector2.zero;
+            rt.anchorMax = Vector2.one;
+            rt.offsetMin = Vector2.zero;
+            rt.offsetMax = Vector2.zero;
+            EditorUtility.SetDirty(rt);
+            resized++;
+        }
+
+        // ── 5. NodeMapPanel 가로 스케일 확장 ─────────────────────────────────
+        GameObject panel = GameObject.Find("NodeMapPanel");
+        if (panel != null)
+        {
+            RectTransform panelRt = panel.GetComponent<RectTransform>();
+            Undo.RecordObject(panelRt, "Scale NodeMapPanel");
+            panelRt.localScale = new Vector3(2.5f, 1.5f, 1.0f);
+            EditorUtility.SetDirty(panelRt);
+        }
+
+        UnityEditor.SceneManagement.EditorSceneManager.SaveOpenScenes();
+        Debug.Log($"[SetupNodeMapSprites] 완료! 생성:{created} 앵커조정:{resized}개. 패널 스케일(2.5,1.5) 적용.");
     }
 
     private static Sprite LoadSprite(string name)
