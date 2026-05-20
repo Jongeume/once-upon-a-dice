@@ -58,8 +58,8 @@ namespace OUD.Unity.Battle.View
 
         public void UpdateStats(int atk, int def)
         {
-            if (_atkText) _atkText.text = $"ATK {atk}";
-            if (_defText) _defText.text = $"DEF {def}";
+            if (_atkText) _atkText.text = $"{atk}";
+            if (_defText) _defText.text = $"{def}";
         }
 
         public void PlayDamageEffect()
