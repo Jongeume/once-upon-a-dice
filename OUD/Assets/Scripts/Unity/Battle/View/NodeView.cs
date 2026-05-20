@@ -91,6 +91,18 @@ namespace OUD.Unity.Battle.View
         {
             if (_clickButton != null)
                 _clickButton.onClick.AddListener(() => OnClicked?.Invoke(NodeId));
+
+            // Bind() 전 흰 박스/텍스트 방지: 프레임 투명, 아이콘·라벨 비활성
+            if (_frameImage != null)
+            {
+                Color c = _frameImage.color;
+                c.a = 0f;
+                _frameImage.color = c;
+            }
+            if (_iconImage != null)
+                _iconImage.enabled = false;
+            if (_labelText != null)
+                _labelText.enabled = false;
         }
 
         // ── 외부 API ─────────────────────────────────────────────────────────
@@ -193,11 +205,8 @@ namespace OUD.Unity.Battle.View
                     SetOutline(OUTLINE_AVAILABLE, OUTLINE_THICK);
                     SetClickable(true);
                     SetClearedOverlay(false);
-                    // Combat Available 노드는 "?"로 가려서 다음이 전투인지 노출 방지.
-                    // Boss/Shop/Elite는 진행 계획상 라벨 유지.
-                    bool isCombatFog = _currentNodeType == NodeType.Combat;
-                    SetLabelTextOverride(isCombatFog ? LABEL_LOCKED : null);
-                    SetIconVisible(!isCombatFog);
+                    SetLabelTextOverride(null);
+                    SetIconVisible(true);
                     break;
 
                 case NodeVisualState.Locked:
@@ -205,8 +214,8 @@ namespace OUD.Unity.Battle.View
                     SetOutline(OUTLINE_LOCKED, OUTLINE_NORM);
                     SetClickable(false);
                     SetClearedOverlay(false);
-                    SetLabelTextOverride(LABEL_LOCKED);  // ? 로 덮어쓰기
-                    SetIconVisible(false);
+                    SetLabelTextOverride(null);  // 아이콘 저알파로 잠금 상태 표현
+                    SetIconVisible(true);
                     break;
             }
         }
@@ -217,8 +226,10 @@ namespace OUD.Unity.Battle.View
         {
             if (_frameImage != null)
             {
+                // 프레임 배경은 투명하게 유지 (아이콘이 전체 영역을 커버)
+                // 외곽선은 useGraphicAlpha=false 로 독립 렌더됨
                 Color c = _frameImage.color;
-                c.a = alpha;
+                c.a = 0f;
                 _frameImage.color = c;
             }
             if (_iconImage != null)
@@ -265,7 +276,11 @@ namespace OUD.Unity.Battle.View
 
         private void SetIconVisible(bool visible)
         {
-            if (_iconImage != null) _iconImage.enabled = visible;
+            if (_iconImage != null)
+                _iconImage.enabled = visible && _iconImage.sprite != null;
+            // 아이콘 이미지로 타입 표현 → 라벨 텍스트 항상 숨김
+            if (_labelText != null)
+                _labelText.enabled = false;
         }
 
         /// <summary>Locked 상태에서 라벨을 "?"로 덮어쓰기. null이면 SetNode에서 설정한 원본 유지.</summary>
