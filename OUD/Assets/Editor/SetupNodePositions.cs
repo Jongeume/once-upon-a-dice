@@ -7,6 +7,9 @@ using UnityEngine;
 
 public static class SetupNodePositions
 {
+    // ── 노드 크기 ─────────────────────────────────────────────────────────────
+    private static readonly Vector2 NODE_SIZE = new Vector2(160f, 160f); // 80→160 (2배)
+
     // ── 노드 배치 (13개, 9레이어 좌→우, 보스 우측) ──────────────────────────
     // 패널 1920x1080, pivot=center. 내용 영역 ±780(x) ±180(y).
     private static readonly Vector2[] NODE_POS = new Vector2[]
@@ -45,6 +48,7 @@ public static class SetupNodePositions
             RectTransform rt = go.GetComponent<RectTransform>();
             Undo.RecordObject(rt, "Setup Node Position");
             rt.anchoredPosition = NODE_POS[i];
+            rt.sizeDelta        = NODE_SIZE;
             EditorUtility.SetDirty(rt);
         }
 
