@@ -2974,7 +2974,7 @@ GameObject:
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
-  m_IsActive: 1
+  m_IsActive: 0
 --- !u!224 &173532800
 RectTransform:
   m_ObjectHideFlags: 0
@@ -3034,10 +3034,10 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::OUD.Unity.Battle.View.NodeMapView
   _panelBackground: {fileID: 173532802}
-  _combatNodeSprite: {fileID: 21300000, guid: 450e80d5936cb3243bb502a7bafaa880, type: 3}
-  _bossNodeSprite: {fileID: 21300000, guid: b15096a1a6cf4574e84745f5e493f448, type: 3}
-  _shopNodeSprite: {fileID: 21300000, guid: d6fbd6fad4d913c42b9aed05e3c6a026, type: 3}
-  _eliteNodeSprite: {fileID: 21300000, guid: 8c57546d28910f041b1617a322295771, type: 3}
+  _combatNodeSprite: {fileID: -8937251759479734208, guid: 450e80d5936cb3243bb502a7bafaa880, type: 3}
+  _bossNodeSprite: {fileID: 4297843155708405748, guid: b15096a1a6cf4574e84745f5e493f448, type: 3}
+  _shopNodeSprite: {fileID: -466025469190927450, guid: d6fbd6fad4d913c42b9aed05e3c6a026, type: 3}
+  _eliteNodeSprite: {fileID: -4092766619178477819, guid: 2dce0e7711d796c47bf5ba59d9888f1b, type: 3}
   _nodes:
   - {fileID: 1431021925}
   - {fileID: 765535041}
@@ -17333,7 +17333,7 @@ RectTransform:
   m_AnchorMin: {x: 0.5, y: 0.5}
   m_AnchorMax: {x: 0.5, y: 0.5}
   m_AnchoredPosition: {x: -390, y: 180}
-  m_SizeDelta: {x: 110, y: 110}
+  m_SizeDelta: {x: 80, y: 80}
   m_Pivot: {x: 0.5, y: 0.5}
 --- !u!114 &1158121820
 MonoBehaviour:

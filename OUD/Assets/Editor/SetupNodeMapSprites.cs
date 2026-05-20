@@ -18,7 +18,7 @@ public static class SetupNodeMapSprites
         Sprite combatSprite = LoadSprite("Monster_Node");
         Sprite bossSprite   = LoadSprite("Boss_Node");
         Sprite shopSprite   = LoadSprite("Store_Node");
-        Sprite eliteSprite  = LoadSprite("Eilte_Node");  // 원본 파일명 오타 그대로 사용
+        Sprite eliteSprite  = LoadSprite("Elite_Node");
         Sprite panelSprite  = LoadSprite("Map Panel");
 
         if (combatSprite == null || bossSprite == null || shopSprite == null || eliteSprite == null)

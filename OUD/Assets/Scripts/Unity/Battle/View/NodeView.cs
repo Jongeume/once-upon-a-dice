@@ -92,7 +92,7 @@ namespace OUD.Unity.Battle.View
             if (_clickButton != null)
                 _clickButton.onClick.AddListener(() => OnClicked?.Invoke(NodeId));
 
-            // Bind() 전 흰 박스 방지: 프레임 투명, 아이콘 비활성
+            // Bind() 전 흰 박스/텍스트 방지: 프레임 투명, 아이콘·라벨 비활성
             if (_frameImage != null)
             {
                 Color c = _frameImage.color;
@@ -101,6 +101,8 @@ namespace OUD.Unity.Battle.View
             }
             if (_iconImage != null)
                 _iconImage.enabled = false;
+            if (_labelText != null)
+                _labelText.enabled = false;
         }
 
         // ── 외부 API ─────────────────────────────────────────────────────────
@@ -276,9 +278,9 @@ namespace OUD.Unity.Battle.View
         {
             if (_iconImage != null)
                 _iconImage.enabled = visible && _iconImage.sprite != null;
-            // 스프라이트가 없으면 라벨로 폴백
-            bool showLabel = !visible || (_iconImage != null && _iconImage.sprite == null);
-            if (_labelText != null) _labelText.enabled = showLabel;
+            // 아이콘 이미지로 타입 표현 → 라벨 텍스트 항상 숨김
+            if (_labelText != null)
+                _labelText.enabled = false;
         }
 
         /// <summary>Locked 상태에서 라벨을 "?"로 덮어쓰기. null이면 SetNode에서 설정한 원본 유지.</summary>
