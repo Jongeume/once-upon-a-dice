@@ -138,7 +138,7 @@ public static class SetupNodeMapSprites
         {
             RectTransform panelRt = panel.GetComponent<RectTransform>();
             Undo.RecordObject(panelRt, "Scale NodeMapPanel");
-            panelRt.localScale = new Vector3(2.5f, 1.5f, 1.0f);
+            panelRt.localScale = Vector3.one; // 런타임에 NodeMapView.FitToScreen()이 계산
             EditorUtility.SetDirty(panelRt);
         }
 

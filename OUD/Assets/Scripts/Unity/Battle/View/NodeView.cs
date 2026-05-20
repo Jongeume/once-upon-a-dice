@@ -91,9 +91,6 @@ namespace OUD.Unity.Battle.View
         {
             if (_clickButton != null)
                 _clickButton.onClick.AddListener(() => OnClicked?.Invoke(NodeId));
-            // 아이콘으로 프레임을 완전히 덮으므로, 외곽선은 프레임 알파와 무관하게 렌더
-            if (_frameOutline != null)
-                _frameOutline.useGraphicAlpha = false;
         }
 
         // ── 외부 API ─────────────────────────────────────────────────────────
