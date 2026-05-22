@@ -7,13 +7,28 @@ namespace OUD.BattleEngine.Run
 {
     public class EncounterTable
     {
-        private static readonly string[] POOL_SLIME            = { MonsterDatabase.ID_SLIME };
-        private static readonly string[] POOL_SPIDER_SNAKE     = { MonsterDatabase.ID_SPIDER, MonsterDatabase.ID_SNAKE };
-        private static readonly string[] POOL_SNAKE_BEAR       = { MonsterDatabase.ID_SNAKE, MonsterDatabase.ID_BEAR };
-        private static readonly string[] POOL_SPIDER           = { MonsterDatabase.ID_SPIDER };
+        // Layer 0, 1
+        private static readonly string[][] EARLY_PRESETS =
+        {
+            new[] { MonsterDatabase.ID_SPIDER },
+            new[] { MonsterDatabase.ID_SPIDER, MonsterDatabase.ID_SPIDER },
+        };
 
-        private const int COUNT_MIN = 1;
-        private const int COUNT_MAX = 2;
+        // Layer 2
+        private static readonly string[][] MID_PRESETS =
+        {
+            new[] { MonsterDatabase.ID_SNAKE },
+            new[] { MonsterDatabase.ID_SPIDER, MonsterDatabase.ID_SPIDER, MonsterDatabase.ID_SPIDER },
+            new[] { MonsterDatabase.ID_SNAKE, MonsterDatabase.ID_SPIDER },
+        };
+
+        // Layer 4, 5
+        private static readonly string[][] LATE_PRESETS =
+        {
+            new[] { MonsterDatabase.ID_BEAR },
+            new[] { MonsterDatabase.ID_SNAKE, MonsterDatabase.ID_SNAKE },
+            new[] { MonsterDatabase.ID_SNAKE, MonsterDatabase.ID_SPIDER, MonsterDatabase.ID_SPIDER },
+        };
 
         private readonly IRandom _random;
 
@@ -47,27 +62,30 @@ namespace OUD.BattleEngine.Run
 
         private List<MonsterData> GenerateCombatEncounter(int layer)
         {
-            string[] pool;
+            string[][] presets;
             switch (layer)
             {
-                case 0: pool = POOL_SPIDER;       break;  // Col 0: 시작
-                case 1: pool = POOL_SPIDER_SNAKE; break;  // Col 1: 1차 분기
-                case 2: pool = POOL_SPIDER_SNAKE; break;  // Col 2: 2연속 분기
-                case 4: pool = POOL_SNAKE_BEAR;   break;  // Col 4: 3차 분기
-                case 5: pool = POOL_SNAKE_BEAR;   break;  // Col 5: 4연속 분기
+                case 0:
+                case 1:
+                    presets = EARLY_PRESETS;
+                    break;
+                case 2:
+                    presets = MID_PRESETS;
+                    break;
+                case 4:
+                case 5:
+                    presets = LATE_PRESETS;
+                    break;
                 default:
                     throw new ArgumentOutOfRangeException(
                         nameof(layer),
                         $"Combat 노드에 대한 layer 매핑 없음: layer={layer}");
             }
 
-            int count = _random.Next(COUNT_MIN, COUNT_MAX + 1);
-            var result = new List<MonsterData>(count);
-            for (int i = 0; i < count; i++)
-            {
-                int idx = _random.Next(0, pool.Length);
-                result.Add(MonsterDatabase.Get(pool[idx]));
-            }
+            string[] preset = presets[_random.Next(0, presets.Length)];
+            var result = new List<MonsterData>(preset.Length);
+            foreach (string id in preset)
+                result.Add(MonsterDatabase.Get(id));
             return result;
         }
     }

@@ -47,12 +47,12 @@ namespace OUD.Tests
             Assert.Throws<ArgumentNullException>(() => new EncounterTable(null));
         }
 
-        // ── Layer 0: Spider only ──────────────────────────────────────
+        // ── Early (Layer 0, 1): Spider×1 or Spider×2 ─────────────────
 
         [Test]
-        public void Layer0Combat_OneSpider()
+        public void EarlyPreset0_OneSpider()
         {
-            var sut = new EncounterTable(new ScriptedRandom(1, 0));
+            var sut = new EncounterTable(new ScriptedRandom(0));
             List<MonsterData> result = sut.GenerateEncounter(CombatNode(layer: 0));
 
             Assert.AreEqual(1, result.Count);
@@ -60,40 +60,48 @@ namespace OUD.Tests
         }
 
         [Test]
-        public void Layer0Combat_TwoSpiders()
+        public void EarlyPreset1_TwoSpiders()
         {
-            var sut = new EncounterTable(new ScriptedRandom(2, 0, 0));
-            List<MonsterData> result = sut.GenerateEncounter(CombatNode(layer: 0));
-
-            Assert.AreEqual(2, result.Count);
-            foreach (var m in result)
-                Assert.AreEqual(MonsterDatabase.ID_SPIDER, m.Id);
-        }
-
-        // ── Layer 1: Spider / Snake ───────────────────────────────────
-
-        [Test]
-        public void Layer1Combat_SpiderAndSnake()
-        {
-            var sut = new EncounterTable(new ScriptedRandom(2, 0, 1));
+            var sut = new EncounterTable(new ScriptedRandom(1));
             List<MonsterData> result = sut.GenerateEncounter(CombatNode(layer: 1));
 
             Assert.AreEqual(2, result.Count);
             Assert.AreEqual(MonsterDatabase.ID_SPIDER, result[0].Id);
-            Assert.AreEqual(MonsterDatabase.ID_SNAKE,  result[1].Id);
+            Assert.AreEqual(MonsterDatabase.ID_SPIDER, result[1].Id);
         }
 
-        // ── Layer 2: Spider / Snake (X자 교차 분기) ───────────────────
+        // ── Mid (Layer 2): Snake×1 / Spider×3 / Snake+Spider ─────────
 
         [Test]
-        public void Layer2Combat_SpiderAndSnake()
+        public void MidPreset0_OneSnake()
         {
-            var sut = new EncounterTable(new ScriptedRandom(2, 0, 1));
+            var sut = new EncounterTable(new ScriptedRandom(0));
+            List<MonsterData> result = sut.GenerateEncounter(CombatNode(layer: 2));
+
+            Assert.AreEqual(1, result.Count);
+            Assert.AreEqual(MonsterDatabase.ID_SNAKE, result[0].Id);
+        }
+
+        [Test]
+        public void MidPreset1_ThreeSpiders()
+        {
+            var sut = new EncounterTable(new ScriptedRandom(1));
+            List<MonsterData> result = sut.GenerateEncounter(CombatNode(layer: 2));
+
+            Assert.AreEqual(3, result.Count);
+            foreach (var m in result)
+                Assert.AreEqual(MonsterDatabase.ID_SPIDER, m.Id);
+        }
+
+        [Test]
+        public void MidPreset2_SnakeAndSpider()
+        {
+            var sut = new EncounterTable(new ScriptedRandom(2));
             List<MonsterData> result = sut.GenerateEncounter(CombatNode(layer: 2));
 
             Assert.AreEqual(2, result.Count);
-            Assert.AreEqual(MonsterDatabase.ID_SPIDER, result[0].Id);
-            Assert.AreEqual(MonsterDatabase.ID_SNAKE,  result[1].Id);
+            Assert.AreEqual(MonsterDatabase.ID_SNAKE,  result[0].Id);
+            Assert.AreEqual(MonsterDatabase.ID_SPIDER, result[1].Id);
         }
 
         // ── Layer 3: Shop — Combat 불가 ───────────────────────────────
@@ -109,41 +117,51 @@ namespace OUD.Tests
                 () => sut.GenerateEncounter(invalidNode));
         }
 
-        // ── Layer 4: Snake / Bear ─────────────────────────────────────
+        // ── Late (Layer 4, 5): Bear×1 / Snake×2 / Snake+Spider×2 ─────
 
         [Test]
-        public void Layer4Combat_SnakeOrBear()
+        public void LatePreset0_OneBear()
         {
-            var sut = new EncounterTable(new ScriptedRandom(2, 0, 1));
+            var sut = new EncounterTable(new ScriptedRandom(0));
             List<MonsterData> result = sut.GenerateEncounter(CombatNode(layer: 4));
+
+            Assert.AreEqual(1, result.Count);
+            Assert.AreEqual(MonsterDatabase.ID_BEAR, result[0].Id);
+        }
+
+        [Test]
+        public void LatePreset1_TwoSnakes()
+        {
+            var sut = new EncounterTable(new ScriptedRandom(1));
+            List<MonsterData> result = sut.GenerateEncounter(CombatNode(layer: 5));
 
             Assert.AreEqual(2, result.Count);
             Assert.AreEqual(MonsterDatabase.ID_SNAKE, result[0].Id);
-            Assert.AreEqual(MonsterDatabase.ID_BEAR,  result[1].Id);
+            Assert.AreEqual(MonsterDatabase.ID_SNAKE, result[1].Id);
         }
 
-        // ── Layer 5: Snake / Bear (X자 교차 분기) ────────────────────
-
         [Test]
-        public void Layer5Combat_SnakeOrBear()
+        public void LatePreset2_SnakeAndTwoSpiders()
         {
-            var sut = new EncounterTable(new ScriptedRandom(1, 0));
-            List<MonsterData> result = sut.GenerateEncounter(CombatNode(layer: 5));
+            var sut = new EncounterTable(new ScriptedRandom(2));
+            List<MonsterData> result = sut.GenerateEncounter(CombatNode(layer: 4));
 
-            Assert.AreEqual(1, result.Count);
-            Assert.AreEqual(MonsterDatabase.ID_SNAKE, result[0].Id);
+            Assert.AreEqual(3, result.Count);
+            Assert.AreEqual(MonsterDatabase.ID_SNAKE,  result[0].Id);
+            Assert.AreEqual(MonsterDatabase.ID_SPIDER, result[1].Id);
+            Assert.AreEqual(MonsterDatabase.ID_SPIDER, result[2].Id);
         }
 
-        // ── Boss: StoneGolem ───────────────────────────────────────────
+        // ── Boss: EvilQueen ────────────────────────────────────────────
 
         [Test]
-        public void BossNode_ReturnsStoneGolem()
+        public void BossNode_ReturnsEvilQueen()
         {
             var sut = new EncounterTable(new ScriptedRandom(0));
             List<MonsterData> result = sut.GenerateEncounter(BossNode());
 
             Assert.AreEqual(1, result.Count);
-            Assert.AreEqual(MonsterDatabase.ID_STONE_GOLEM, result[0].Id);
+            Assert.AreEqual(MonsterDatabase.ID_EVIL_QUEEN, result[0].Id);
         }
 
         // ── Elite: EliteGolem ──────────────────────────────────────────
