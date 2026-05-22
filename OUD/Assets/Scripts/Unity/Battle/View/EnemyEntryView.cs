@@ -29,7 +29,13 @@ namespace OUD.Unity.Battle.View
         [SerializeField] private GameObject _shieldGroup;
         [SerializeField] private TMP_Text   _shieldText;
 
-        [Header("인텐트")]
+        [Header("공격력 (좌상단)")]
+        [SerializeField] private TMP_Text   _atkText;
+
+        [Header("방어력 (우상단)")]
+        [SerializeField] private TMP_Text   _defText;
+
+        [Header("인텐트 (현재 비활성 — 스프라이트로 대체 예정)")]
         [SerializeField] private TMP_Text   _intentText;
         [SerializeField] private Image      _intentIcon;
 
@@ -103,6 +109,18 @@ namespace OUD.Unity.Battle.View
         {
             if (_shieldGroup) _shieldGroup.SetActive(visible);
             if (_shieldText)  _shieldText.text = shield.ToString();
+        }
+
+        /// <summary>좌상단 공격력(현재 실효 ATK) 표시. 분노 등으로 ATK 변동 시 갱신.</summary>
+        public void UpdateAtk(int atk)
+        {
+            if (_atkText) _atkText.text = atk.ToString();
+        }
+
+        /// <summary>우상단 방어력 표시. (현재 적은 전용 DEF 스탯이 없어 ShieldValue를 전달 — 데이터는 추후 조정.)</summary>
+        public void UpdateDef(int def)
+        {
+            if (_defText) _defText.text = def.ToString();
         }
 
         public void UpdateIntent(IntentType intent, int value)

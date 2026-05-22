@@ -19,6 +19,10 @@ namespace OUD.Unity.Battle
         void Setup(string name, UnityEngine.Sprite sprite, float hpFill, string hpText);
         void UpdateHp(float fillAmount, string hpText);
         void UpdateShield(int shield, bool visible);
+        /// <summary>좌상단 공격력(현재 실효 ATK) 표시 갱신.</summary>
+        void UpdateAtk(int atk);
+        /// <summary>우상단 방어력 표시 갱신. (현재 ShieldValue 전달 — 데이터 조정 예정.)</summary>
+        void UpdateDef(int def);
         void UpdateIntent(IntentType intent, int value);
         void SetTargetSelectable(bool selectable);
         void SetTargetHighlight(bool highlighted);
