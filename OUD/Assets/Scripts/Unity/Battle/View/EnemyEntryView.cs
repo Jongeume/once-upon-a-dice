@@ -125,16 +125,21 @@ namespace OUD.Unity.Battle.View
 
         public void UpdateIntent(IntentType intent, int value)
         {
-            if (_intentText == null) return;
-            _intentText.text = intent switch
+            bool isAttack = intent == IntentType.Attack
+                         || intent == IntentType.StrongAttack
+                         || intent == IntentType.RageWarning;
+            bool isShield = intent == IntentType.Shield;
+
+            if (_atkText)
             {
-                IntentType.Attack       => $"ATK {value}",
-                IntentType.StrongAttack => $"ATK!! {value}",
-                IntentType.Shield       => $"DEF {value}",
-                IntentType.RageWarning  => $"RAGE {value}",
-                IntentType.Summon       => "SUMMON",
-                _                       => "?"
-            };
+                _atkText.gameObject.SetActive(isAttack);
+                if (isAttack) _atkText.text = value.ToString();
+            }
+            if (_defText)
+            {
+                _defText.gameObject.SetActive(isShield);
+                if (isShield) _defText.text = value.ToString();
+            }
         }
 
         public void SetTargetSelectable(bool selectable)

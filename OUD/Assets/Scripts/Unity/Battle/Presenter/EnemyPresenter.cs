@@ -76,6 +76,7 @@ namespace OUD.Unity.Battle.Presenter
             _entryViews[index].UpdateShield(m.Shield, m.Shield > 0);
             _entryViews[index].UpdateAtk(m.Atk);
             _entryViews[index].UpdateDef(m.Data.ShieldValue);
+            _entryViews[index].UpdateIntent(m.GetCurrentIntent(), m.GetIntentValue());
             _entryViews[index].SetRageActive(m.IsEnraged);
 
             // 사망 시 GameObject 비활성화로 화면에서 제거. 이미 비활성이면 스킵(idempotent).
