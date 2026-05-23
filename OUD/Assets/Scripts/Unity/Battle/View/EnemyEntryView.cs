@@ -183,12 +183,12 @@ namespace OUD.Unity.Battle.View
 
         private readonly System.Collections.Generic.List<GameObject> _badgeBoxes = new();
 
-        public void ShowTargetBadge(int slotNumber, string skillName, string damageText)
+        public void ShowTargetBadge(string skillName, SkillCategory category, bool isAoe)
         {
             if (_targetBadgeContainer == null) EnsureTargetBadgeContainer();
             if (_targetBadgeContainer) _targetBadgeContainer.SetActive(true);
 
-            var box = CreateBadgeBox(slotNumber + 1);
+            var box = CreateBadgeBox(skillName, category, isAoe);
             _badgeBoxes.Add(box);
         }
 
@@ -200,40 +200,53 @@ namespace OUD.Unity.Battle.View
             if (_targetBadgeContainer) _targetBadgeContainer.SetActive(false);
         }
 
-        private GameObject CreateBadgeBox(int displayNumber)
+        private GameObject CreateBadgeBox(string skillName, SkillCategory category, bool isAoe)
         {
-            var box = new GameObject($"Badge_{displayNumber}");
+            bool isAttack = category == SkillCategory.Attack;
+
+            Color bgColor   = isAttack ? new Color(0.11f, 0.04f, 0f,  0.95f)
+                                       : new Color(0.02f, 0.05f, 0.11f, 0.95f);
+            Color rimColor  = isAttack ? new Color(0.94f, 0.27f, 0.27f, 1f)
+                                       : new Color(0.23f, 0.51f, 0.96f, 1f);
+            Color textColor = isAttack ? new Color(0.99f, 0.64f, 0.64f, 1f)
+                                       : new Color(0.58f, 0.77f, 0.99f, 1f);
+            string label = isAoe ? $"{skillName} 전체" : skillName;
+
+            var box = new GameObject($"Badge_{skillName}");
             box.transform.SetParent(_targetBadgeContainer.transform, false);
 
             var rt = box.AddComponent<RectTransform>();
-            rt.sizeDelta = new Vector2(32f, 28f);
+            rt.sizeDelta = new Vector2(0f, 20f);
 
             var bg = box.AddComponent<Image>();
-            bg.color = new Color(0.12f, 0.12f, 0.12f, 0.9f);
+            bg.color = bgColor;
             bg.raycastTarget = false;
 
+            var csf = box.AddComponent<ContentSizeFitter>();
+            csf.horizontalFit = ContentSizeFitter.FitMode.PreferredSize;
+
             var outline = box.AddComponent<Outline>();
-            outline.effectColor = new Color(0.95f, 0.78f, 0.18f, 1f);
-            outline.effectDistance = new Vector2(1.5f, -1.5f);
+            outline.effectColor    = rimColor;
+            outline.effectDistance = new Vector2(1f, -1f);
 
             var textGo = new GameObject("Text");
             textGo.transform.SetParent(box.transform, false);
             var textRt = textGo.AddComponent<RectTransform>();
             textRt.anchorMin = Vector2.zero;
             textRt.anchorMax = Vector2.one;
-            textRt.offsetMin = Vector2.zero;
-            textRt.offsetMax = Vector2.zero;
+            textRt.offsetMin = new Vector2(4f, 2f);
+            textRt.offsetMax = new Vector2(-4f, -2f);
 
             var tmp = textGo.AddComponent<TextMeshProUGUI>();
             if (_nameText != null)
             {
-                tmp.font = _nameText.font;
+                tmp.font               = _nameText.font;
                 tmp.fontSharedMaterial = _nameText.fontSharedMaterial;
             }
-            tmp.fontSize = 14f;
-            tmp.color = new Color(1f, 0.9f, 0.3f, 1f);
-            tmp.alignment = TextAlignmentOptions.Center;
-            tmp.text = $"[{displayNumber}]";
+            tmp.fontSize      = 11f;
+            tmp.color         = textColor;
+            tmp.alignment     = TextAlignmentOptions.Center;
+            tmp.text          = label;
             tmp.raycastTarget = false;
 
             return box;
@@ -247,19 +260,19 @@ namespace OUD.Unity.Battle.View
             containerGo.transform.SetParent(transform, false);
 
             var rt = containerGo.AddComponent<RectTransform>();
-            rt.anchorMin = new Vector2(0f, 1f);
-            rt.anchorMax = new Vector2(0f, 1f);
-            rt.pivot     = new Vector2(0f, 0f);
+            rt.anchorMin        = new Vector2(0.5f, 1f);  // 중앙 상단
+            rt.anchorMax        = new Vector2(0.5f, 1f);
+            rt.pivot            = new Vector2(0.5f, 0f);
             rt.anchoredPosition = new Vector2(0f, 4f);
-            rt.sizeDelta = new Vector2(200f, 28f);
+            rt.sizeDelta        = new Vector2(0f, 0f);
 
-            var hlg = containerGo.AddComponent<HorizontalLayoutGroup>();
-            hlg.spacing = 4f;
-            hlg.childAlignment = TextAnchor.MiddleLeft;
-            hlg.childForceExpandWidth = false;
-            hlg.childForceExpandHeight = false;
-            hlg.childControlWidth = false;
-            hlg.childControlHeight = false;
+            var vlg = containerGo.AddComponent<VerticalLayoutGroup>();
+            vlg.spacing                = 2f;
+            vlg.childAlignment         = TextAnchor.MiddleCenter;
+            vlg.childForceExpandWidth  = false;
+            vlg.childForceExpandHeight = false;
+            vlg.childControlWidth      = true;
+            vlg.childControlHeight     = false;
 
             var csf = containerGo.AddComponent<ContentSizeFitter>();
             csf.horizontalFit = ContentSizeFitter.FitMode.PreferredSize;
