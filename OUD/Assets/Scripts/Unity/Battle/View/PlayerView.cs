@@ -85,33 +85,37 @@ namespace OUD.Unity.Battle.View
             box.transform.SetParent(_defenseBadgeContainer.transform, false);
 
             var rt = box.AddComponent<RectTransform>();
-            rt.sizeDelta = new Vector2(0f, 20f);
+            rt.sizeDelta = new Vector2(0f, 22f);
 
             var bg = box.AddComponent<Image>();
             bg.color         = new Color(0.02f, 0.05f, 0.11f, 0.95f);
             bg.raycastTarget = false;
 
-            var csf = box.AddComponent<ContentSizeFitter>();
-            csf.horizontalFit = ContentSizeFitter.FitMode.PreferredSize;
-
             var outline = box.AddComponent<Outline>();
             outline.effectColor    = new Color(0.23f, 0.51f, 0.96f, 1f);
             outline.effectDistance = new Vector2(1f, -1f);
 
+            var hlg = box.AddComponent<HorizontalLayoutGroup>();
+            hlg.padding                = new RectOffset(6, 6, 3, 3);
+            hlg.childForceExpandWidth  = false;
+            hlg.childForceExpandHeight = true;
+            hlg.childControlWidth      = true;
+            hlg.childControlHeight     = true;
+
+            var csf = box.AddComponent<ContentSizeFitter>();
+            csf.horizontalFit = ContentSizeFitter.FitMode.PreferredSize;
+            csf.verticalFit   = ContentSizeFitter.FitMode.Unconstrained;
+
             var textGo = new GameObject("Text");
             textGo.transform.SetParent(box.transform, false);
-            var textRt = textGo.AddComponent<RectTransform>();
-            textRt.anchorMin = Vector2.zero;
-            textRt.anchorMax = Vector2.one;
-            textRt.offsetMin = new Vector2(4f, 2f);
-            textRt.offsetMax = new Vector2(-4f, -2f);
 
             var tmp = textGo.AddComponent<TextMeshProUGUI>();
-            tmp.fontSize      = 11f;
-            tmp.color         = new Color(0.58f, 0.77f, 0.99f, 1f);
-            tmp.alignment     = TextAlignmentOptions.Center;
-            tmp.text          = skillName;
-            tmp.raycastTarget = false;
+            tmp.fontSize           = 11f;
+            tmp.color              = new Color(0.58f, 0.77f, 0.99f, 1f);
+            tmp.alignment          = TextAlignmentOptions.Center;
+            tmp.text               = skillName;
+            tmp.raycastTarget      = false;
+            tmp.enableWordWrapping = false;
 
             _defenseBadgeBoxes.Add(box);
         }

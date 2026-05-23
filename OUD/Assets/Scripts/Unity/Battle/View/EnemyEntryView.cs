@@ -216,26 +216,30 @@ namespace OUD.Unity.Battle.View
             box.transform.SetParent(_targetBadgeContainer.transform, false);
 
             var rt = box.AddComponent<RectTransform>();
-            rt.sizeDelta = new Vector2(0f, 20f);
+            rt.sizeDelta = new Vector2(0f, 22f);
 
             var bg = box.AddComponent<Image>();
             bg.color = bgColor;
             bg.raycastTarget = false;
 
-            var csf = box.AddComponent<ContentSizeFitter>();
-            csf.horizontalFit = ContentSizeFitter.FitMode.PreferredSize;
-
             var outline = box.AddComponent<Outline>();
             outline.effectColor    = rimColor;
             outline.effectDistance = new Vector2(1f, -1f);
 
+            // HorizontalLayoutGroup이 텍스트 preferred width를 box로 전파 → ContentSizeFitter가 올바른 너비 계산
+            var hlg = box.AddComponent<HorizontalLayoutGroup>();
+            hlg.padding                = new RectOffset(6, 6, 3, 3);
+            hlg.childForceExpandWidth  = false;
+            hlg.childForceExpandHeight = true;
+            hlg.childControlWidth      = true;
+            hlg.childControlHeight     = true;
+
+            var csf = box.AddComponent<ContentSizeFitter>();
+            csf.horizontalFit = ContentSizeFitter.FitMode.PreferredSize;
+            csf.verticalFit   = ContentSizeFitter.FitMode.Unconstrained;
+
             var textGo = new GameObject("Text");
             textGo.transform.SetParent(box.transform, false);
-            var textRt = textGo.AddComponent<RectTransform>();
-            textRt.anchorMin = Vector2.zero;
-            textRt.anchorMax = Vector2.one;
-            textRt.offsetMin = new Vector2(4f, 2f);
-            textRt.offsetMax = new Vector2(-4f, -2f);
 
             var tmp = textGo.AddComponent<TextMeshProUGUI>();
             if (_nameText != null)
@@ -243,11 +247,12 @@ namespace OUD.Unity.Battle.View
                 tmp.font               = _nameText.font;
                 tmp.fontSharedMaterial = _nameText.fontSharedMaterial;
             }
-            tmp.fontSize      = 11f;
-            tmp.color         = textColor;
-            tmp.alignment     = TextAlignmentOptions.Center;
-            tmp.text          = label;
-            tmp.raycastTarget = false;
+            tmp.fontSize           = 11f;
+            tmp.color              = textColor;
+            tmp.alignment          = TextAlignmentOptions.Center;
+            tmp.text               = label;
+            tmp.raycastTarget      = false;
+            tmp.enableWordWrapping = false;
 
             return box;
         }
