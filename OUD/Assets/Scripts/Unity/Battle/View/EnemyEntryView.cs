@@ -216,7 +216,7 @@ namespace OUD.Unity.Battle.View
             box.transform.SetParent(_targetBadgeContainer.transform, false);
 
             var rt = box.AddComponent<RectTransform>();
-            rt.sizeDelta = new Vector2(0f, 22f);
+            rt.sizeDelta = new Vector2(0f, 44f);
 
             var bg = box.AddComponent<Image>();
             bg.color = bgColor;
@@ -228,7 +228,7 @@ namespace OUD.Unity.Battle.View
 
             // HorizontalLayoutGroup이 텍스트 preferred width를 box로 전파 → ContentSizeFitter가 올바른 너비 계산
             var hlg = box.AddComponent<HorizontalLayoutGroup>();
-            hlg.padding                = new RectOffset(6, 6, 3, 3);
+            hlg.padding                = new RectOffset(12, 12, 6, 6);
             hlg.childForceExpandWidth  = false;
             hlg.childForceExpandHeight = true;
             hlg.childControlWidth      = true;
@@ -247,7 +247,7 @@ namespace OUD.Unity.Battle.View
                 tmp.font               = _nameText.font;
                 tmp.fontSharedMaterial = _nameText.fontSharedMaterial;
             }
-            tmp.fontSize           = 11f;
+            tmp.fontSize           = 22f;
             tmp.color              = textColor;
             tmp.alignment          = TextAlignmentOptions.Center;
             tmp.text               = label;

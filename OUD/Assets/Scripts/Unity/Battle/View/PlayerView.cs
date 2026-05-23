@@ -85,7 +85,7 @@ namespace OUD.Unity.Battle.View
             box.transform.SetParent(_defenseBadgeContainer.transform, false);
 
             var rt = box.AddComponent<RectTransform>();
-            rt.sizeDelta = new Vector2(0f, 22f);
+            rt.sizeDelta = new Vector2(0f, 44f);
 
             var bg = box.AddComponent<Image>();
             bg.color         = new Color(0.02f, 0.05f, 0.11f, 0.95f);
@@ -96,7 +96,7 @@ namespace OUD.Unity.Battle.View
             outline.effectDistance = new Vector2(1f, -1f);
 
             var hlg = box.AddComponent<HorizontalLayoutGroup>();
-            hlg.padding                = new RectOffset(6, 6, 3, 3);
+            hlg.padding                = new RectOffset(12, 12, 6, 6);
             hlg.childForceExpandWidth  = false;
             hlg.childForceExpandHeight = true;
             hlg.childControlWidth      = true;
@@ -110,7 +110,7 @@ namespace OUD.Unity.Battle.View
             textGo.transform.SetParent(box.transform, false);
 
             var tmp = textGo.AddComponent<TextMeshProUGUI>();
-            tmp.fontSize           = 11f;
+            tmp.fontSize           = 22f;
             tmp.color              = new Color(0.58f, 0.77f, 0.99f, 1f);
             tmp.alignment          = TextAlignmentOptions.Center;
             tmp.text               = skillName;
