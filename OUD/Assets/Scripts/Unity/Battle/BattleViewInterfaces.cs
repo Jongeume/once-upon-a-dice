@@ -1,6 +1,5 @@
 using System.Collections.Generic;
 using OUD.BattleEngine.Core;
-using OUD.BattleEngine.Skill;
 using OUD.Unity.Battle;
 
 namespace OUD.Unity.Battle
