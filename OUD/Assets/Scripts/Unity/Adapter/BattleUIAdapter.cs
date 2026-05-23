@@ -944,8 +944,20 @@ namespace OUD.Unity.Adapter
             PlayerState player = _playerPresenter.Player;
             if (player == null) return;
 
-            _topBarText.text =
-                $"{_playerName}   HP: {player.Hp}/{player.MaxHp}   돈 {player.Gold}   XP {player.Xp}";
+            string nameText = string.IsNullOrEmpty(_playerName) ? "Player" : _playerName;
+
+            string xpText;
+            if (LevelUpSystem.IsMaxLevel(player.Level))
+            {
+                xpText = "MAX";
+            }
+            else
+            {
+                int threshold = LevelUpSystem.GetXpThreshold(player.Level);
+                xpText = $"{player.Xp}/{threshold}";
+            }
+
+            _topBarText.text = $"{nameText}  HP {player.Hp}/{player.MaxHp}  XP {xpText}  돈 {player.Gold}";
         }
     }
 }
