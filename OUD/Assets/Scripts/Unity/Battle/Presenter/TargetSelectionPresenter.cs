@@ -17,6 +17,7 @@ namespace OUD.Unity.Battle.Presenter
     {
         private readonly ITargetSelectionView _view;
         private EnemyPresenter _enemyPresenter;
+        private IPlayerView    _playerView;
 
         private SkillData[]   _slots;
         private int[]         _targetIndices;
@@ -29,6 +30,8 @@ namespace OUD.Unity.Battle.Presenter
 
         public void SetEnemyPresenter(EnemyPresenter enemyPresenter) => _enemyPresenter = enemyPresenter;
 
+        public void SetPlayerView(IPlayerView playerView) => _playerView = playerView;
+
         /// <summary>새 턴/새 전투 시작 시 내부 상태 초기화. 이전 턴 슬롯이 클릭 처리에 영향 주지 않도록.</summary>
         public void ResetForNewTurn()
         {
@@ -38,6 +41,7 @@ namespace OUD.Unity.Battle.Presenter
             _aliveEnemies          = null;
             _onAllTargetsConfirmed = null;
             _enemyPresenter?.ClearAllTargetBadges();
+            _playerView?.ClearDefenseBadges();
         }
 
         public void Begin(
@@ -57,6 +61,10 @@ namespace OUD.Unity.Battle.Presenter
             _view.ClearTargetLinks();
             _view.SetExecuteButtonActive(false);
             _view.SetSlotClickable(true);
+
+            // AllEnemies / Self 자동 배정 뱃지
+            ShowAutoAssignedBadges();
+
             AdvanceToNextAttackSlot(0);
         }
 
@@ -92,10 +100,9 @@ namespace OUD.Unity.Battle.Presenter
         {
             if (_activeSlotIndex < 0 || _activeSlotIndex >= _slots.Length) return;
             if (_slots[_activeSlotIndex] == null) return;
-            if (_slots[_activeSlotIndex].Category != SkillCategory.Attack) return;
+            if (_slots[_activeSlotIndex].Target != TargetType.Single) return;
 
             _targetIndices[_activeSlotIndex] = enemyIndex;
-            _view.ShowTargetLink(_activeSlotIndex, enemyIndex);
             RefreshAllTargetBadges();
 
             // 다음 미확정 공격 슬롯으로 이동
@@ -120,7 +127,7 @@ namespace OUD.Unity.Battle.Presenter
             if (_slots == null) return;
             if (slotIndex < 0 || slotIndex >= _slots.Length) return;
             if (_slots[slotIndex] == null) return;
-            if (_slots[slotIndex].Category != SkillCategory.Attack) return;
+            if (_slots[slotIndex].Target != TargetType.Single) return;
             _activeSlotIndex = slotIndex;
             _view.HighlightSlot(slotIndex);
             _view.SetExecuteButtonActive(false);
@@ -131,14 +138,14 @@ namespace OUD.Unity.Battle.Presenter
             for (int i = startFrom; i < _slots.Length; i++)
             {
                 if (_slots[i] == null) continue;
-                if (_slots[i].Category == SkillCategory.Attack)
+                if (_slots[i].Target == TargetType.Single)
                 {
                     _activeSlotIndex = i;
                     _view.HighlightSlot(i);
                     return;
                 }
             }
-            // 공격 슬롯 없음 → 즉시 확정
+            // Single 슬롯 없음 → 즉시 확정
             _activeSlotIndex = -1;
             _view.SetExecuteButtonActive(true);
             _onAllTargetsConfirmed?.Invoke(_targetIndices);
@@ -146,6 +153,28 @@ namespace OUD.Unity.Battle.Presenter
 
         /// <summary>현재까지 확정된 타겟 인덱스 배열 반환. Execute 버튼 클릭 시 Confirm()에 전달.</summary>
         public int[] GetTargetIndices() => _targetIndices;
+
+        private void ShowAutoAssignedBadges()
+        {
+            if (_slots == null) return;
+            for (int i = 0; i < _slots.Length; i++)
+            {
+                if (_slots[i] == null) continue;
+
+                if (_slots[i].Target == TargetType.AllEnemies && _enemyPresenter != null)
+                {
+                    for (int e = 0; e < _aliveEnemies.Count; e++)
+                    {
+                        if (_aliveEnemies[e].IsDead) continue;
+                        _enemyPresenter.ShowTargetBadge(e, _slots[i].Name, SkillCategory.Attack, isAoe: true);
+                    }
+                }
+                else if (_slots[i].Target == TargetType.Self && _playerView != null)
+                {
+                    _playerView.ShowDefenseBadge(_slots[i].Name);
+                }
+            }
+        }
 
         private void RefreshAllTargetBadges()
         {
@@ -156,17 +185,19 @@ namespace OUD.Unity.Battle.Presenter
             for (int i = 0; i < _slots.Length; i++)
             {
                 if (_slots[i] == null) continue;
-                if (_slots[i].Category != SkillCategory.Attack) continue;
-                if (_targetIndices[i] < 0) continue;
 
-                string damageText = "";
-                if (_playerState != null)
+                if (_slots[i].Target == TargetType.AllEnemies)
                 {
-                    int enhLv = _playerState.GetEnhanceLevel(_slots[i].Hand);
-                    damageText = SkillValueHelper.BuildValueText(
-                        _slots[i], _playerState.Atk, _playerState.Def, enhLv);
+                    for (int e = 0; e < _aliveEnemies.Count; e++)
+                    {
+                        if (_aliveEnemies[e].IsDead) continue;
+                        _enemyPresenter.ShowTargetBadge(e, _slots[i].Name, SkillCategory.Attack, isAoe: true);
+                    }
                 }
-                _enemyPresenter.ShowTargetBadge(_targetIndices[i], i, _slots[i].Name, damageText);
+                else if (_slots[i].Target == TargetType.Single && _targetIndices[i] >= 0)
+                {
+                    _enemyPresenter.ShowTargetBadge(_targetIndices[i], _slots[i].Name, SkillCategory.Attack, isAoe: false);
+                }
             }
         }
 
@@ -175,7 +206,7 @@ namespace OUD.Unity.Battle.Presenter
             for (int i = startFrom; i < _slots.Length; i++)
             {
                 if (_slots[i] == null) continue;
-                if (_slots[i].Category == SkillCategory.Attack && _targetIndices[i] < 0)
+                if (_slots[i].Target == TargetType.Single && _targetIndices[i] < 0)
                     return i;
             }
             return -1;
