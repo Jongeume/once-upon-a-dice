@@ -591,16 +591,40 @@ namespace OUD.Unity.Adapter
         /// <summary>
         /// Screen B(DiceTablePanel)의 뒤로가기 버튼을 Screen A(진행 중 배틀 화면)로 전환하도록 연결.
         /// 상태 리셋 없이 패널 가시성만 토글한다 — Roll Dice 버튼이 재진입 시 상태 유지 분기 처리.
-        /// BuildUI_Part2에서 생성된 "ActionButtons/BackButton" 경로를 따라 런타임에 찾는다.
+        /// 씬에 정적으로 배치된 BackButton을 DiceTablePanel(=_diceView) 하위에서 이름으로 탐색.
+        /// SafeArea 등 래퍼 GameObject가 중간에 삽입돼도 동작하도록 재귀 탐색을 사용한다.
+        /// (회귀 이력: SafeArea wrapper 도입으로 정적 경로 "ActionButtons/BackButton"이 깨지며 클릭 무응답)
         /// </summary>
         private void WireBackButton()
         {
             if (_diceView == null || _uiManager == null) return;
-            Transform backBtnT = _diceView.transform.Find("ActionButtons/BackButton");
-            if (backBtnT == null) return;
+            Transform backBtnT = FindDescendantByName(_diceView.transform, "BackButton");
+            if (backBtnT == null)
+            {
+                Debug.LogWarning("[BattleUIAdapter] WireBackButton: 'BackButton' GameObject not found under DiceView. 뒤로가기 동작이 비활성화됩니다.");
+                return;
+            }
             var btn = backBtnT.GetComponent<UnityEngine.UI.Button>();
-            if (btn == null) return;
+            if (btn == null)
+            {
+                Debug.LogWarning("[BattleUIAdapter] WireBackButton: 'BackButton'에 Button 컴포넌트가 없습니다.");
+                return;
+            }
             btn.onClick.AddListener(HandleBackClicked);
+        }
+
+        /// <summary>지정한 root 하위에서 이름이 일치하는 첫 Transform을 DFS로 탐색.</summary>
+        private static Transform FindDescendantByName(Transform root, string targetName)
+        {
+            if (root == null) return null;
+            for (int i = 0; i < root.childCount; i++)
+            {
+                Transform child = root.GetChild(i);
+                if (child.name == targetName) return child;
+                Transform inner = FindDescendantByName(child, targetName);
+                if (inner != null) return inner;
+            }
+            return null;
         }
 
         private void HandleBackClicked()
