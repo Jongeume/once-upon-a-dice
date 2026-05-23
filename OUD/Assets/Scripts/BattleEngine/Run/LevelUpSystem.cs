@@ -21,6 +21,16 @@ namespace OUD.BattleEngine.Run
             return totalXp >= XP_THRESHOLDS[currentLevel];
         }
 
+        /// <summary>지정 레벨에서 다음 레벨업에 필요한 누적 XP. 최대 레벨이면 0 반환.</summary>
+        public static int GetXpThreshold(int level)
+        {
+            if (level < 0 || level >= MAX_LEVEL) return 0;
+            return XP_THRESHOLDS[level];
+        }
+
+        /// <summary>최대 레벨 도달 여부.</summary>
+        public static bool IsMaxLevel(int level) => level >= MAX_LEVEL;
+
         public void ApplyLevelUp(PlayerState player, StatChoice choice)
         {
             if (player == null) throw new ArgumentNullException(nameof(player));
