@@ -3,6 +3,7 @@ using System.Collections;
 using OUD.Unity.Battle;
 using OUD.Unity.Common;
 using UnityEngine;
+using UnityEngine.EventSystems;
 using UnityEngine.UI;
 
 namespace OUD.Unity.Battle.View
@@ -50,6 +51,17 @@ namespace OUD.Unity.Battle.View
         [SerializeField] private Color   _keptColor   = new Color(0.83f, 0.63f, 0.09f);
         [SerializeField] private Vector2 _borderThickness = new Vector2(4f, 4f);
 
+        // 5개 주사위의 RollingArea 내 기본 배치 (정규화 좌표 0~1)
+        private static readonly Vector2[] SLOT_OFFSETS = new Vector2[]
+        {
+            new Vector2(0.20f, 0.72f),   // Dice1: 좌상
+            new Vector2(0.50f, 0.78f),   // Dice2: 중상
+            new Vector2(0.80f, 0.68f),   // Dice3: 우상
+            new Vector2(0.30f, 0.28f),   // Dice4: 좌하
+            new Vector2(0.70f, 0.32f),   // Dice5: 우하
+        };
+        private const float POSITION_JITTER = 15f;
+
         private bool    _kept;
         private Outline _outline;
         private Coroutine _rollCoroutine;
@@ -70,22 +82,40 @@ namespace OUD.Unity.Battle.View
 
         private void Awake()
         {
-            if (_button) _button.onClick.AddListener(() => OnToggled?.Invoke());
-
             if (_diceImage)
                 _diceImageRect = _diceImage.GetComponent<RectTransform>();
 
-            if (_background)
+            // ── DiceImage에 Canvas + GraphicRaycaster + Button 추가 ──
+            // DiceArea 슬롯 배경 위에 렌더링 + RollingArea 위치에서 클릭 가능
+            if (_diceImageRect != null)
             {
-                _background.color = _normalColor;
-                _outline = _background.GetComponent<Outline>();
-                if (_outline == null) _outline = _background.gameObject.AddComponent<Outline>();
+                var imgCanvas = _diceImageRect.gameObject.GetComponent<Canvas>();
+                if (imgCanvas == null) imgCanvas = _diceImageRect.gameObject.AddComponent<Canvas>();
+                imgCanvas.overrideSorting = true;
+                imgCanvas.sortingOrder = 100;
+
+                if (_diceImageRect.gameObject.GetComponent<GraphicRaycaster>() == null)
+                    _diceImageRect.gameObject.AddComponent<GraphicRaycaster>();
+
+                // DiceImage 클릭으로 Keep 토글
+                _diceImage.raycastTarget = true;
+                var imgButton = _diceImageRect.gameObject.GetComponent<Button>();
+                if (imgButton == null) imgButton = _diceImageRect.gameObject.AddComponent<Button>();
+                imgButton.transition = Selectable.Transition.None;
+                imgButton.onClick.AddListener(() => OnToggled?.Invoke());
+
+                // Keep 하이라이트: DiceImage에 Outline
+                _outline = _diceImage.GetComponent<Outline>();
+                if (_outline == null) _outline = _diceImage.gameObject.AddComponent<Outline>();
                 _outline.effectDistance = _borderThickness;
                 _outline.useGraphicAlpha = false;
                 var hidden = _keptColor;
                 hidden.a = 0f;
                 _outline.effectColor = hidden;
             }
+
+            // DiceArea 슬롯 배경 숨기기 (주사위가 RollingArea에 표시되므로 불필요)
+            if (_background) _background.enabled = false;
         }
 
         private void OnEnable()
@@ -180,11 +210,13 @@ namespace OUD.Unity.Battle.View
             float zVelocity = -UnityEngine.Random.Range(50f, 150f);
             bool hasLanded = false;
 
-            // === 시작 위치 (RollingArea 중앙 부근) ===
-            float cx = (minX + maxX) * 0.5f;
-            float cy = (minY + maxY) * 0.5f;
-            float rx = (maxX - minX) * 0.2f;
-            float ry = (maxY - minY) * 0.2f;
+            // === 시작 위치 (주사위별 영역 — 겹침 방지) ===
+            int diceIdx = Mathf.Clamp(transform.GetSiblingIndex(), 0, SLOT_OFFSETS.Length - 1);
+            Vector2 baseNorm = SLOT_OFFSETS[diceIdx];
+            float cx = Mathf.Lerp(minX, maxX, baseNorm.x);
+            float cy = Mathf.Lerp(minY, maxY, baseNorm.y);
+            float rx = (maxX - minX) * 0.10f;
+            float ry = (maxY - minY) * 0.10f;
             Vector2 tablePos = new Vector2(
                 cx + UnityEngine.Random.Range(-rx, rx),
                 cy + UnityEngine.Random.Range(-ry, ry));
@@ -386,14 +418,16 @@ namespace OUD.Unity.Battle.View
 
             GetRollingBounds(out float minX, out float maxX, out float minY, out float maxY);
 
-            float cx = (minX + maxX) * 0.5f;
-            float cy = (minY + maxY) * 0.5f;
-            float rx = (maxX - minX) * 0.35f;
-            float ry = (maxY - minY) * 0.35f;
+            // 각 주사위별 고정 슬롯 + 약간의 랜덤 오프셋으로 겹침 방지
+            int idx = Mathf.Clamp(transform.GetSiblingIndex(), 0, SLOT_OFFSETS.Length - 1);
+            Vector2 norm = SLOT_OFFSETS[idx];
+
+            float baseX = Mathf.Lerp(minX, maxX, norm.x);
+            float baseY = Mathf.Lerp(minY, maxY, norm.y);
 
             _restingPosition = new Vector2(
-                cx + UnityEngine.Random.Range(-rx, rx),
-                cy + UnityEngine.Random.Range(-ry, ry));
+                baseX + UnityEngine.Random.Range(-POSITION_JITTER, POSITION_JITTER),
+                baseY + UnityEngine.Random.Range(-POSITION_JITTER, POSITION_JITTER));
             _restingRotation = UnityEngine.Random.Range(-15f, 15f);
 
             _diceImageRect.anchoredPosition = _restingPosition;
