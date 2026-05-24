@@ -25,7 +25,7 @@ namespace OUD.Unity.Battle.View
         [SerializeField] private float _dropHeight = 250f;
         [SerializeField] private float _zGravity = 2000f;
         [SerializeField] private float _zBounceCoeff = 0.45f;
-        [SerializeField] private float _scaleAtMaxHeight = 0.3f;
+        [SerializeField] private float _scaleAtMaxHeight = 1.8f;
         [SerializeField] private float _impactSquash = 1.15f;
         [SerializeField] private float _squashDuration = 0.06f;
 
@@ -141,21 +141,23 @@ namespace OUD.Unity.Battle.View
                 yield break;
             }
 
-            // === 경계 계산 (테이블 표면 = DiceArea) ===
-            Vector2 tableBounds = CalculateTableBounds();
-            float halfW = tableBounds.x;
-            float halfH = tableBounds.y;
+            // === 경계 계산 (부모 슬롯 위치 보정 포함) ===
+            CalculateTableBounds(out float minX, out float maxX, out float minY, out float maxY);
 
             // === Z축 상태 (높이: 0 = 테이블 위) ===
             float zHeight = _dropHeight + UnityEngine.Random.Range(0f, 80f);
-            float zVelocity = -UnityEngine.Random.Range(50f, 150f); // 초기 약간 하강
+            float zVelocity = -UnityEngine.Random.Range(50f, 150f);
             bool hasLanded = false;
-            int bounceCount = 0;
 
             // === 테이블 X/Y 상태 (탑뷰 평면 이동) ===
+            // 시작 위치: DiceArea 중앙 부근 (슬롯 보정 적용)
+            float centerX = (minX + maxX) * 0.5f;
+            float centerY = (minY + maxY) * 0.5f;
+            float rangeX = (maxX - minX) * 0.3f;
+            float rangeY = (maxY - minY) * 0.3f;
             Vector2 tablePos = new Vector2(
-                UnityEngine.Random.Range(-halfW * 0.3f, halfW * 0.3f),
-                UnityEngine.Random.Range(-halfH * 0.3f, halfH * 0.3f));
+                centerX + UnityEngine.Random.Range(-rangeX, rangeX),
+                centerY + UnityEngine.Random.Range(-rangeY, rangeY));
             Vector2 tableVel = Vector2.zero;
             float rotation = UnityEngine.Random.Range(0f, 360f);
 
@@ -165,7 +167,7 @@ namespace OUD.Unity.Battle.View
             int lastSpriteIndex = -1;
             float elapsed = 0f;
 
-            // 낙하 전 초기 스케일 적용
+            // 초기 스케일 적용
             ApplyVisuals(tablePos, zHeight, rotation);
 
             // === 메인 물리 루프 ===
@@ -181,7 +183,6 @@ namespace OUD.Unity.Battle.View
                 if (zHeight <= 0f)
                 {
                     zHeight = 0f;
-                    bounceCount++;
 
                     if (!hasLanded)
                     {
@@ -197,9 +198,9 @@ namespace OUD.Unity.Battle.View
                         StartCoroutine(SquashEffect());
                     }
 
-                    // Z 바운스 (점점 약해짐)
+                    // Z 바운스
                     zVelocity = Mathf.Abs(zVelocity) * _zBounceCoeff;
-                    if (zVelocity < 30f) zVelocity = 0f; // 미세 바운스 제거
+                    if (zVelocity < 30f) zVelocity = 0f;
                 }
 
                 // --- 테이블 X/Y 물리 (착지 후에만) ---
@@ -207,16 +208,16 @@ namespace OUD.Unity.Battle.View
                 {
                     tablePos += tableVel * dt;
 
-                    // 벽 충돌
-                    if (tablePos.x < -halfW) { tablePos.x = -halfW; tableVel.x = -tableVel.x * _wallBounceCoeff; }
-                    if (tablePos.x >  halfW) { tablePos.x =  halfW; tableVel.x = -tableVel.x * _wallBounceCoeff; }
-                    if (tablePos.y < -halfH) { tablePos.y = -halfH; tableVel.y = -tableVel.y * _wallBounceCoeff; }
-                    if (tablePos.y >  halfH) { tablePos.y =  halfH; tableVel.y = -tableVel.y * _wallBounceCoeff; }
+                    // 벽 충돌 (부모 슬롯 위치 보정된 경계)
+                    if (tablePos.x < minX) { tablePos.x = minX; tableVel.x = -tableVel.x * _wallBounceCoeff; }
+                    if (tablePos.x > maxX) { tablePos.x = maxX; tableVel.x = -tableVel.x * _wallBounceCoeff; }
+                    if (tablePos.y < minY) { tablePos.y = minY; tableVel.y = -tableVel.y * _wallBounceCoeff; }
+                    if (tablePos.y > maxY) { tablePos.y = maxY; tableVel.y = -tableVel.y * _wallBounceCoeff; }
 
                     // 마찰 감속
                     tableVel *= Mathf.Exp(-_slideFriction * dt);
 
-                    // 이동 방향에 따른 회전
+                    // 이동에 따른 회전
                     rotation += tableVel.magnitude * _rotationMultiplier * dt *
                                 Mathf.Sign(tableVel.x + tableVel.y * 0.5f);
                 }
@@ -248,7 +249,7 @@ namespace OUD.Unity.Battle.View
                 float stepElapsed = 0f;
                 float interval = 1f / decelFps[step];
                 float stepTimer = 0f;
-                float dampMult = 1f + step * 2f; // 점점 더 강한 감쇠
+                float dampMult = 1f + step * 2f;
 
                 while (stepElapsed < stepDuration)
                 {
@@ -257,16 +258,15 @@ namespace OUD.Unity.Battle.View
 
                     // 테이블 물리 (강한 감쇠)
                     tablePos += tableVel * dt;
-                    if (tablePos.x < -halfW) { tablePos.x = -halfW; tableVel.x = -tableVel.x * 0.3f; }
-                    if (tablePos.x >  halfW) { tablePos.x =  halfW; tableVel.x = -tableVel.x * 0.3f; }
-                    if (tablePos.y < -halfH) { tablePos.y = -halfH; tableVel.y = -tableVel.y * 0.3f; }
-                    if (tablePos.y >  halfH) { tablePos.y =  halfH; tableVel.y = -tableVel.y * 0.3f; }
+                    if (tablePos.x < minX) { tablePos.x = minX; tableVel.x = -tableVel.x * 0.3f; }
+                    if (tablePos.x > maxX) { tablePos.x = maxX; tableVel.x = -tableVel.x * 0.3f; }
+                    if (tablePos.y < minY) { tablePos.y = minY; tableVel.y = -tableVel.y * 0.3f; }
+                    if (tablePos.y > maxY) { tablePos.y = maxY; tableVel.y = -tableVel.y * 0.3f; }
                     tableVel *= Mathf.Exp(-_slideFriction * dampMult * dt);
 
                     rotation += tableVel.magnitude * _rotationMultiplier * 0.5f * dt *
                                 Mathf.Sign(tableVel.x);
 
-                    // Z는 이미 0에 안착
                     ApplyVisuals(tablePos, 0f, rotation);
 
                     stepTimer += dt;
@@ -296,13 +296,13 @@ namespace OUD.Unity.Battle.View
         }
 
         /// <summary>
-        /// Z축 높이 → 스케일, 테이블 위치 → anchoredPosition, 회전 적용
+        /// Z축 높이 → 스케일 (높을수록 큼 = 카메라에 가까움), 위치/회전 적용
         /// </summary>
         private void ApplyVisuals(Vector2 tablePos, float zHeight, float rotation)
         {
             if (_diceImageRect == null) return;
 
-            // Z 높이에 따른 스케일 (높을수록 작음 = 멀리 있음)
+            // 높을수록 크게 (카메라 근처 → 테이블로 떨어짐)
             float heightRatio = Mathf.Clamp01(zHeight / _dropHeight);
             float scale = Mathf.Lerp(1f, _scaleAtMaxHeight, heightRatio);
 
@@ -321,7 +321,7 @@ namespace OUD.Unity.Battle.View
             float half = _squashDuration * 0.5f;
             float elapsed = 0f;
 
-            // 스쿼시 (가로 넓고 세로 납작)
+            // 스쿼시
             while (elapsed < half)
             {
                 elapsed += Time.deltaTime;
@@ -348,21 +348,40 @@ namespace OUD.Unity.Battle.View
         }
 
         /// <summary>
-        /// DiceArea 기준 테이블 표면 이동 영역 (half-extents)
+        /// DiceArea 전체 영역에서 이동 가능한 경계를 부모 슬롯 위치 기준으로 계산.
+        /// 각 Dice 슬롯의 오프셋을 보정하여 DiceImage가 DiceArea 전체를 활용.
         /// </summary>
-        private Vector2 CalculateTableBounds()
+        private void CalculateTableBounds(out float minX, out float maxX, out float minY, out float maxY)
         {
             if (_diceAreaRect == null || _diceImageRect == null)
-                return new Vector2(100f, 60f);
+            {
+                minX = -100f; maxX = 100f;
+                minY = -60f;  maxY = 60f;
+                return;
+            }
 
             Vector2 areaSize = _diceAreaRect.rect.size;
-            Vector2 imgSize = _diceImageRect.rect.size;
+            Vector2 areaPivot = _diceAreaRect.pivot;
 
-            // DiceImage가 DiceArea 안에서 이동 가능한 범위
-            float halfW = (areaSize.x - imgSize.x) * 0.5f;
-            float halfH = (areaSize.y - imgSize.y) * 0.5f;
+            // DiceArea 로컬 좌표계에서의 경계
+            float areaLeft   = -areaSize.x * areaPivot.x;
+            float areaRight  =  areaSize.x * (1f - areaPivot.x);
+            float areaBottom = -areaSize.y * areaPivot.y;
+            float areaTop    =  areaSize.y * (1f - areaPivot.y);
 
-            return new Vector2(Mathf.Max(halfW, 20f), Mathf.Max(halfH, 20f));
+            // 이 슬롯(Dice1~5)의 DiceArea 내 위치
+            RectTransform slotRect = transform as RectTransform;
+            Vector2 slotPos = slotRect.anchoredPosition;
+
+            // 다이스 이미지 절반 크기 (여유분)
+            Vector2 imgHalf = _diceImageRect.rect.size * 0.5f;
+
+            // DiceImage의 anchoredPosition은 부모(슬롯) 기준이므로
+            // DiceArea 전체를 쓰려면 슬롯 오프셋만큼 보정 필요
+            minX = areaLeft   + imgHalf.x - slotPos.x;
+            maxX = areaRight  - imgHalf.x - slotPos.x;
+            minY = areaBottom + imgHalf.y - slotPos.y;
+            maxY = areaTop    - imgHalf.y - slotPos.y;
         }
 
         /// <summary>
@@ -380,7 +399,7 @@ namespace OUD.Unity.Battle.View
             {
                 elapsed += Time.deltaTime;
                 float t = elapsed / _settleTime;
-                float ease = 1f - (1f - t) * (1f - t) * (1f - t); // ease-out cubic
+                float ease = 1f - (1f - t) * (1f - t) * (1f - t);
 
                 _diceImageRect.anchoredPosition = Vector2.Lerp(fromPos, Vector2.zero, ease);
                 _diceImageRect.localRotation = Quaternion.Slerp(startRot, Quaternion.identity, ease);
