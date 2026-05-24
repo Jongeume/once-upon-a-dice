@@ -55,8 +55,8 @@ namespace OUD.Unity.Battle.View
         // ── 주사위 간 충돌 공유 상태 ──
         private static readonly Vector2[] s_positions = new Vector2[5];
         private static readonly bool[] s_active = new bool[5];
-        private const float DICE_COLLISION_RADIUS = 25f;
-        private const float COLLISION_REPULSION   = 600f;
+        private const float DICE_COLLISION_RADIUS = 30f;
+        private const float COLLISION_REPULSION   = 1200f;
         private const float KEEP_SCALE            = 0.75f;
 
         // KeepSlot 동적 할당 (첫 번째 빈 슬롯부터 채움)
@@ -261,7 +261,7 @@ namespace OUD.Unity.Battle.View
             float centerY = (minY + maxY) * 0.5f;
             float spreadAngle = _diceIdx * (360f / 5f) * Mathf.Deg2Rad
                                 + UnityEngine.Random.Range(-0.3f, 0.3f);
-            float spreadRadius = DICE_COLLISION_RADIUS * 2.8f; // 겹치지 않게 충분한 거리
+            float spreadRadius = DICE_COLLISION_RADIUS * 3f; // 겹치지 않게 충분한 거리 (반경30*3=90)
             Vector2 tablePos = new Vector2(
                 centerX + Mathf.Cos(spreadAngle) * spreadRadius,
                 centerY + Mathf.Sin(spreadAngle) * spreadRadius);
@@ -295,9 +295,10 @@ namespace OUD.Unity.Battle.View
                     if (!hasLanded)
                     {
                         hasLanded = true;
+                        // 착지 속도: 다른 주사위들과 반대 방향으로 굴러감
                         float speed = UnityEngine.Random.Range(_slideSpeedMin, _slideSpeedMax);
-                        float angle = UnityEngine.Random.Range(0f, 360f) * Mathf.Deg2Rad;
-                        tableVel = new Vector2(Mathf.Cos(angle) * speed, Mathf.Sin(angle) * speed);
+                        Vector2 awayDir = GetAwayDirection(tablePos);
+                        tableVel = awayDir * speed;
                         StartCoroutine(SquashEffect());
                     }
                     zVelocity = Mathf.Abs(zVelocity) * _zBounceCoeff;
@@ -409,6 +410,30 @@ namespace OUD.Unity.Battle.View
         // 충돌 시스템
         // ─────────────────────────────────────────────────────────────────────
 
+        /// <summary>다른 활성 주사위들과 반대 방향 벡터 계산 (착지 시 초기 속도용)</summary>
+        private Vector2 GetAwayDirection(Vector2 myPos)
+        {
+            Vector2 awaySum = Vector2.zero;
+            int count = 0;
+            for (int other = 0; other < 5; other++)
+            {
+                if (other == _diceIdx) continue;
+                if (!s_active[other]) continue;
+                Vector2 delta = myPos - s_positions[other];
+                float dist = delta.magnitude;
+                if (dist > 0.01f)
+                {
+                    awaySum += delta / dist; // 정규화된 방향 합산
+                    count++;
+                }
+            }
+            if (count > 0 && awaySum.sqrMagnitude > 0.01f)
+                return awaySum.normalized;
+            // 다른 주사위 없으면 랜덤 방향
+            float a = UnityEngine.Random.Range(0f, 360f) * Mathf.Deg2Rad;
+            return new Vector2(Mathf.Cos(a), Mathf.Sin(a));
+        }
+
         /// <summary>실시간 충돌: 다른 주사위와 반발력 적용</summary>
         private void ApplyDiceCollision(ref Vector2 pos, ref Vector2 vel, float dt)
         {
@@ -423,8 +448,9 @@ namespace OUD.Unity.Battle.View
                 if (dist < minDist && dist > 0.01f)
                 {
                     Vector2 dir = delta / dist;
+                    float overlap = minDist - dist;
                     vel += dir * COLLISION_REPULSION * dt;
-                    pos += dir * (minDist - dist) * 0.3f;
+                    pos += dir * overlap * 0.5f; // 즉시 절반만큼 밀어내기
                 }
             }
         }

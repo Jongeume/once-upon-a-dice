@@ -2946,7 +2946,7 @@ MonoBehaviour:
   _dropHeight: 250
   _zGravity: 2000
   _zBounceCoeff: 0.45
-  _scaleOnTable: 0.65
+  _scaleOnTable: 0.5
   _impactSquash: 1.15
   _squashDuration: 0.06
   _slideSpeedMin: 150
@@ -11477,7 +11477,7 @@ MonoBehaviour:
   _dropHeight: 250
   _zGravity: 2000
   _zBounceCoeff: 0.45
-  _scaleOnTable: 0.65
+  _scaleOnTable: 0.5
   _impactSquash: 1.15
   _squashDuration: 0.06
   _slideSpeedMin: 150
@@ -15268,7 +15268,7 @@ MonoBehaviour:
   _dropHeight: 250
   _zGravity: 2000
   _zBounceCoeff: 0.45
-  _scaleOnTable: 0.65
+  _scaleOnTable: 0.5
   _impactSquash: 1.15
   _squashDuration: 0.06
   _slideSpeedMin: 150
@@ -20943,7 +20943,7 @@ MonoBehaviour:
   _dropHeight: 250
   _zGravity: 2000
   _zBounceCoeff: 0.45
-  _scaleOnTable: 0.65
+  _scaleOnTable: 0.5
   _impactSquash: 1.15
   _squashDuration: 0.06
   _slideSpeedMin: 150
@@ -22526,7 +22526,7 @@ MonoBehaviour:
   _dropHeight: 250
   _zGravity: 2000
   _zBounceCoeff: 0.45
-  _scaleOnTable: 0.65
+  _scaleOnTable: 0.5
   _impactSquash: 1.15
   _squashDuration: 0.06
   _slideSpeedMin: 150
