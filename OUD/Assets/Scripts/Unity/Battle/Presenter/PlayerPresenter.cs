@@ -28,6 +28,13 @@ namespace OUD.Unity.Battle.Presenter
             _view.UpdateStats(_state.Atk, _state.Def);
         }
 
+        public void DisplayValues(int hp, int maxHp, int shield)
+        {
+            float fill = maxHp > 0 ? (float)hp / maxHp : 0f;
+            _view.UpdateHp(fill, $"{hp} / {maxHp}");
+            _view.UpdateShield(shield, shield > 0);
+        }
+
         public void SyncShield()
         {
             _view.UpdateShield(_state.Shield, _state.Shield > 0);
