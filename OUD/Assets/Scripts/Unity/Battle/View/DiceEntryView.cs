@@ -32,6 +32,7 @@ namespace OUD.Unity.Battle.View
         [SerializeField] private float _zGravity = 2000f;
         [SerializeField] private float _zBounceCoeff = 0.45f;
         [SerializeField] private float _scaleOnTable = 0.5f;
+        [SerializeField] private float _rollingScale = 0.65f;
         [SerializeField] private float _impactSquash = 1.15f;
         [SerializeField] private float _squashDuration = 0.06f;
 
@@ -593,7 +594,7 @@ namespace OUD.Unity.Battle.View
             if (_diceImageRect == null) return;
 
             float heightRatio = Mathf.Clamp01(zHeight / _dropHeight);
-            float scale = Mathf.Lerp(_scaleOnTable, 1f, heightRatio);
+            float scale = Mathf.Lerp(_rollingScale, 1f, heightRatio);
 
             _diceImageRect.anchoredPosition = tablePos;
             _diceImageRect.localScale = Vector3.one * scale;
@@ -605,7 +606,7 @@ namespace OUD.Unity.Battle.View
             if (_diceImageRect == null) yield break;
 
             float half = _squashDuration * 0.5f;
-            float baseScale = _scaleOnTable;
+            float baseScale = _rollingScale;
             float elapsed = 0f;
 
             while (elapsed < half)
