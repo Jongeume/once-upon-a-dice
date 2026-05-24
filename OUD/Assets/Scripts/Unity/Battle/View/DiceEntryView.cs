@@ -256,11 +256,12 @@ namespace OUD.Unity.Battle.View
             float zVelocity = -UnityEngine.Random.Range(50f, 150f);
             bool hasLanded = false;
 
-            // === 시작 위치: RollingArea 중앙 (약간 퍼짐) ===
+            // === 시작 위치: RollingArea 중앙에서 충분히 퍼져서 시작 ===
             float centerX = (minX + maxX) * 0.5f;
             float centerY = (minY + maxY) * 0.5f;
-            float spreadAngle = _diceIdx * (360f / 5f) * Mathf.Deg2Rad;
-            float spreadRadius = 12f;
+            float spreadAngle = _diceIdx * (360f / 5f) * Mathf.Deg2Rad
+                                + UnityEngine.Random.Range(-0.3f, 0.3f);
+            float spreadRadius = DICE_COLLISION_RADIUS * 2.8f; // 겹치지 않게 충분한 거리
             Vector2 tablePos = new Vector2(
                 centerX + Mathf.Cos(spreadAngle) * spreadRadius,
                 centerY + Mathf.Sin(spreadAngle) * spreadRadius);
@@ -303,11 +304,11 @@ namespace OUD.Unity.Battle.View
                     if (zVelocity < 30f) zVelocity = 0f;
                 }
 
+                // 주사위 간 충돌 — 착지 전에도 적용 (겹침 방지)
+                ApplyDiceCollision(ref tablePos, ref tableVel, dt);
+
                 if (hasLanded)
                 {
-                    // 주사위 간 충돌
-                    ApplyDiceCollision(ref tablePos, ref tableVel, dt);
-
                     // 이동 + 벽 바운스
                     tablePos += tableVel * dt;
                     ClampToBounds(ref tablePos, ref tableVel, minX, maxX, minY, maxY, _wallBounceCoeff);
@@ -316,6 +317,13 @@ namespace OUD.Unity.Battle.View
                     tableVel *= Mathf.Exp(-_slideFriction * dt);
                     rotation += tableVel.magnitude * _rotationMultiplier * dt *
                                 Mathf.Sign(tableVel.x + tableVel.y * 0.5f);
+                }
+                else
+                {
+                    // 공중에서도 XY 위치 갱신 + 경계 클램프
+                    tablePos += tableVel * dt;
+                    ClampToBounds(ref tablePos, ref tableVel, minX, maxX, minY, maxY, 0.3f);
+                    tableVel *= Mathf.Exp(-1f * dt); // 가벼운 공기 저항
                 }
 
                 // 공유 위치 갱신
