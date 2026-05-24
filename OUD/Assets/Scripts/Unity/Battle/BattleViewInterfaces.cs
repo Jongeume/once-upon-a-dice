@@ -11,6 +11,8 @@ namespace OUD.Unity.Battle
         void UpdateStats(int atk, int def);
         void PlayDamageEffect();
         void PlayHealEffect();
+        void ShowDefenseBadge(string skillName);
+        void ClearDefenseBadges();
     }
 
     public interface IEnemyEntryView
@@ -29,7 +31,7 @@ namespace OUD.Unity.Battle
         /// <summary>분노 상태 표시 토글 (보스 전용 — HP 임계치 도달 시 영구 활성).</summary>
         void SetRageActive(bool active);
         void PlayDeathEffect();
-        void ShowTargetBadge(int slotNumber, string skillName, string damageText);
+        void ShowTargetBadge(string skillName, SkillCategory category, bool isAoe);
         void ClearTargetBadge();
     }
 

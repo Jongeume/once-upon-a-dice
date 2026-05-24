@@ -1,4 +1,3 @@
-using System.Collections.Generic;
 using OUD.Unity.Battle;
 using OUD.Unity.Common;
 using UnityEngine;
@@ -14,7 +13,6 @@ namespace OUD.Unity.Battle.View
     {
         [SerializeField] private Button      _executeButton;
         [SerializeField] private SkillSlotView _slotView;
-        [SerializeField] private List<LineRenderer> _targetLines;
 
         public event System.Action OnExecuteClicked;
         public event System.Action<int> OnSlotClicked;
@@ -39,19 +37,9 @@ namespace OUD.Unity.Battle.View
 
         public void HighlightSlot(int slotIndex) => _slotView?.HighlightSlot(slotIndex);
 
-        public void ShowTargetLink(int slotIndex, int enemyIndex)
-        {
-            if (_targetLines == null || slotIndex >= _targetLines.Count) return;
-            if (_targetLines[slotIndex] != null)
-                _targetLines[slotIndex].enabled = true;
-        }
+        public void ShowTargetLink(int slotIndex, int enemyIndex) { }
 
-        public void ClearTargetLinks()
-        {
-            if (_targetLines == null) return;
-            foreach (var line in _targetLines)
-                if (line != null) line.enabled = false;
-        }
+        public void ClearTargetLinks() { }
 
         public void SetExecuteButtonActive(bool active)
         {

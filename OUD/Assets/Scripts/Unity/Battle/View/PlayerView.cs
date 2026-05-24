@@ -71,5 +71,107 @@ namespace OUD.Unity.Battle.View
         {
             if (_animator) _animator.SetTrigger(_healHash);
         }
+
+        // 방어 뱃지
+        private GameObject _defenseBadgeContainer;
+        private readonly System.Collections.Generic.List<GameObject> _defenseBadgeBoxes = new();
+
+        public void ShowDefenseBadge(string skillName)
+        {
+            if (_defenseBadgeContainer == null) EnsureDefenseBadgeContainer();
+            if (_defenseBadgeContainer) _defenseBadgeContainer.SetActive(true);
+
+            var box = new GameObject($"DefBadge_{skillName}");
+            box.transform.SetParent(_defenseBadgeContainer.transform, false);
+
+            var rt = box.AddComponent<RectTransform>();
+            rt.sizeDelta = new Vector2(0f, 44f);
+
+            var bg = box.AddComponent<Image>();
+            bg.color         = new Color(0.02f, 0.05f, 0.11f, 0.95f);
+            bg.raycastTarget = false;
+
+            var outline = box.AddComponent<Outline>();
+            outline.effectColor    = new Color(0.23f, 0.51f, 0.96f, 1f);
+            outline.effectDistance = new Vector2(1f, -1f);
+
+            var textGo = new GameObject("Text");
+            textGo.transform.SetParent(box.transform, false);
+            var textRt = textGo.AddComponent<RectTransform>();
+            textRt.anchorMin = Vector2.zero;
+            textRt.anchorMax = Vector2.one;
+            textRt.offsetMin = new Vector2(12f, 6f);
+            textRt.offsetMax = new Vector2(-12f, -6f);
+
+            var tmp = textGo.AddComponent<TextMeshProUGUI>();
+            tmp.fontSize           = 22f;
+            tmp.color              = new Color(0.58f, 0.77f, 0.99f, 1f);
+            tmp.alignment          = TextAlignmentOptions.Center;
+            tmp.text               = skillName;
+            tmp.raycastTarget      = false;
+            tmp.enableWordWrapping = false;
+
+            _defenseBadgeBoxes.Add(box);
+            NormalizeDefenseBadgeWidths();
+        }
+
+        private void NormalizeDefenseBadgeWidths()
+        {
+            const float PADDING = 24f;
+            float maxWidth = 0f;
+            foreach (var box in _defenseBadgeBoxes)
+            {
+                if (box == null) continue;
+                var tmp = box.GetComponentInChildren<TextMeshProUGUI>();
+                if (tmp != null)
+                    maxWidth = Mathf.Max(maxWidth, tmp.GetPreferredValues(tmp.text).x + PADDING);
+            }
+            foreach (var box in _defenseBadgeBoxes)
+            {
+                if (box == null) continue;
+                var rt = box.GetComponent<RectTransform>();
+                if (rt != null) rt.sizeDelta = new Vector2(maxWidth, rt.sizeDelta.y);
+            }
+            var containerRt = _defenseBadgeContainer?.GetComponent<RectTransform>();
+            if (containerRt != null) containerRt.sizeDelta = new Vector2(maxWidth, containerRt.sizeDelta.y);
+        }
+
+        public void ClearDefenseBadges()
+        {
+            foreach (var box in _defenseBadgeBoxes)
+                if (box != null) Destroy(box);
+            _defenseBadgeBoxes.Clear();
+            if (_defenseBadgeContainer) _defenseBadgeContainer.SetActive(false);
+        }
+
+        private void EnsureDefenseBadgeContainer()
+        {
+            if (_defenseBadgeContainer != null) return;
+
+            var go = new GameObject("DefenseBadgeContainer");
+            go.transform.SetParent(transform, false);
+
+            var rt = go.AddComponent<RectTransform>();
+            rt.anchorMin        = new Vector2(0.5f, 1f);
+            rt.anchorMax        = new Vector2(0.5f, 1f);
+            rt.pivot            = new Vector2(0.5f, 0f);
+            rt.anchoredPosition = new Vector2(0f, 4f);
+            rt.sizeDelta        = new Vector2(0f, 0f);
+
+            var vlg = go.AddComponent<VerticalLayoutGroup>();
+            vlg.spacing                = 2f;
+            vlg.childAlignment         = TextAnchor.MiddleCenter;
+            vlg.childForceExpandWidth  = false;
+            vlg.childForceExpandHeight = false;
+            vlg.childControlWidth      = false;  // 수동 너비(sizeDelta) 유지
+            vlg.childControlHeight     = false;
+
+            var csf = go.AddComponent<ContentSizeFitter>();
+            csf.horizontalFit = ContentSizeFitter.FitMode.Unconstrained;  // NormalizeDefenseBadgeWidths가 수동 설정
+            csf.verticalFit   = ContentSizeFitter.FitMode.PreferredSize;
+
+            _defenseBadgeContainer = go;
+            go.SetActive(false);
+        }
     }
 }
