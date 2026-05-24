@@ -61,6 +61,12 @@ namespace OUD.Unity.Battle.View
             new Vector2(0.70f, 0.32f),   // Dice5: 우하
         };
         private const float POSITION_JITTER = 15f;
+        private const float SETTLE_DURATION = 0.12f;
+
+        // KeepSlot 동적 할당 (첫 번째 빈 슬롯부터 채움)
+        private static readonly bool[] _slotOccupied = new bool[5];
+        private int _assignedSlotIndex = -1;
+        private RectTransform[] _allKeepSlots;
 
         private bool    _kept;
         private Outline _outline;
@@ -116,6 +122,15 @@ namespace OUD.Unity.Battle.View
 
             // DiceArea 슬롯 배경 숨기기 (주사위가 RollingArea에 표시되므로 불필요)
             if (_background) _background.enabled = false;
+
+            // KeepSlot 전체 탐색: _keepSlotRect의 부모(KeepSlotsArea) 자식 전부
+            if (_keepSlotRect != null)
+            {
+                Transform slotsParent = _keepSlotRect.parent;
+                _allKeepSlots = new RectTransform[slotsParent.childCount];
+                for (int i = 0; i < slotsParent.childCount; i++)
+                    _allKeepSlots[i] = slotsParent.GetChild(i).GetComponent<RectTransform>();
+            }
         }
 
         private void OnEnable()
@@ -164,8 +179,9 @@ namespace OUD.Unity.Battle.View
             if (_resultSprites != null && value >= 1 && value <= _resultSprites.Length)
                 _diceImage.sprite = _resultSprites[value - 1];
 
-            // RollingArea 내 랜덤 위치에 배치
-            PlaceInRollingArea();
+            // Keep 상태면 KeepSlot에 유지, 아니면 RollingArea에 배치
+            if (!_kept)
+                PlaceInRollingArea();
         }
 
         public void SetKept(bool kept)
@@ -180,13 +196,38 @@ namespace OUD.Unity.Battle.View
                 _outline.effectColor = c;
             }
 
-            // 이동 애니메이션: RollingArea ↔ KeepSlot
             if (_moveCoroutine != null) StopCoroutine(_moveCoroutine);
 
             if (kept)
-                _moveCoroutine = StartCoroutine(MoveToKeepSlot());
+            {
+                // 첫 번째 빈 KeepSlot 할당
+                if (_allKeepSlots != null)
+                {
+                    for (int i = 0; i < _allKeepSlots.Length && i < _slotOccupied.Length; i++)
+                    {
+                        if (!_slotOccupied[i])
+                        {
+                            _assignedSlotIndex = i;
+                            _slotOccupied[i] = true;
+                            break;
+                        }
+                    }
+                }
+                RectTransform target = (_allKeepSlots != null && _assignedSlotIndex >= 0)
+                    ? _allKeepSlots[_assignedSlotIndex]
+                    : _keepSlotRect;
+                _moveCoroutine = StartCoroutine(MoveToKeepSlot(target));
+            }
             else
+            {
+                // 슬롯 해제
+                if (_assignedSlotIndex >= 0 && _assignedSlotIndex < _slotOccupied.Length)
+                {
+                    _slotOccupied[_assignedSlotIndex] = false;
+                    _assignedSlotIndex = -1;
+                }
                 _moveCoroutine = StartCoroutine(MoveToRollingArea());
+            }
         }
 
         // ─────────────────────────────────────────────────────────────────────
@@ -322,13 +363,32 @@ namespace OUD.Unity.Battle.View
                 }
             }
 
-            // === 결과 스프라이트 + RollingArea에서 대기 ===
+            // === 결과 스프라이트 ===
             if (_resultSprites != null && resultValue >= 1 && resultValue <= _resultSprites.Length)
                 _diceImage.sprite = _resultSprites[resultValue - 1];
 
-            // 현재 위치에서 대기 (슬롯으로 돌아가지 않음)
-            _restingPosition = tablePos;
+            // === 그리드 슬롯으로 정착 (겹침 방지) ===
+            GetRollingBounds(out float sMinX, out float sMaxX, out float sMinY, out float sMaxY);
+            Vector2 gridNorm = SLOT_OFFSETS[diceIdx];
+            Vector2 gridPos = new Vector2(
+                Mathf.Lerp(sMinX, sMaxX, gridNorm.x) + UnityEngine.Random.Range(-POSITION_JITTER, POSITION_JITTER),
+                Mathf.Lerp(sMinY, sMaxY, gridNorm.y) + UnityEngine.Random.Range(-POSITION_JITTER, POSITION_JITTER));
+
+            // 현재 위치에서 그리드 위치로 스무스 이동
+            Vector2 settleFrom = tablePos;
+            float settleElapsed = 0f;
+            while (settleElapsed < SETTLE_DURATION)
+            {
+                settleElapsed += Time.deltaTime;
+                float st = settleElapsed / SETTLE_DURATION;
+                float ease = 1f - (1f - st) * (1f - st);
+                _diceImageRect.anchoredPosition = Vector2.Lerp(settleFrom, gridPos, ease);
+                yield return null;
+            }
+
+            _restingPosition = gridPos;
             _restingRotation = rotation;
+            _diceImageRect.anchoredPosition = gridPos;
             _diceImageRect.localScale = Vector3.one * _scaleOnTable;
 
             _rollCoroutine = null;
@@ -340,20 +400,27 @@ namespace OUD.Unity.Battle.View
         // ─────────────────────────────────────────────────────────────────────
 
         /// <summary>
-        /// RollingArea → KeepSlot 이동
+        /// RollingArea → KeepSlot 이동 (슬롯 크기에 맞춤)
         /// </summary>
-        private IEnumerator MoveToKeepSlot()
+        private IEnumerator MoveToKeepSlot(RectTransform targetSlot)
         {
-            if (_diceImageRect == null || _keepSlotRect == null) yield break;
+            if (_diceImageRect == null || targetSlot == null) yield break;
 
             Vector2 fromPos = _diceImageRect.anchoredPosition;
             Quaternion fromRot = _diceImageRect.localRotation;
             Vector3 fromScale = _diceImageRect.localScale;
 
             // KeepSlot의 월드 위치를 DiceImage 부모 로컬 좌표로 변환
-            Vector3 worldTarget = _keepSlotRect.TransformPoint(Vector3.zero);
+            Vector3 worldTarget = targetSlot.TransformPoint(Vector3.zero);
             Vector3 localTarget = _diceImageRect.parent.InverseTransformPoint(worldTarget);
             Vector2 toPos = new Vector2(localTarget.x, localTarget.y);
+
+            // KeepSlot 크기에 맞춘 스케일
+            float slotSize = Mathf.Min(targetSlot.rect.width, targetSlot.rect.height);
+            float diceSize = Mathf.Min(_diceImageRect.rect.width, _diceImageRect.rect.height);
+            float fitScale = (diceSize > 0f) ? slotSize / diceSize : 1f;
+            fitScale *= 0.85f; // 약간의 여백
+            Vector3 toScale = Vector3.one * fitScale;
 
             float elapsed = 0f;
             while (elapsed < _moveToKeepDuration)
@@ -364,13 +431,13 @@ namespace OUD.Unity.Battle.View
 
                 _diceImageRect.anchoredPosition = Vector2.Lerp(fromPos, toPos, ease);
                 _diceImageRect.localRotation = Quaternion.Slerp(fromRot, Quaternion.identity, ease);
-                _diceImageRect.localScale = Vector3.Lerp(fromScale, Vector3.one, ease);
+                _diceImageRect.localScale = Vector3.Lerp(fromScale, toScale, ease);
                 yield return null;
             }
 
             _diceImageRect.anchoredPosition = toPos;
             _diceImageRect.localRotation = Quaternion.identity;
-            _diceImageRect.localScale = Vector3.one;
+            _diceImageRect.localScale = toScale;
             _moveCoroutine = null;
         }
 
@@ -495,11 +562,15 @@ namespace OUD.Unity.Battle.View
             Rect areaRect = _rollingAreaRect.rect;
             Transform parentTransform = _diceImageRect.parent;
 
+            // 주사위 크기를 고려한 동적 패딩 (주사위가 영역 밖으로 나가지 않도록)
+            float diceHalf = _diceImageRect.rect.width * _scaleOnTable * 0.5f;
+            float padding = Mathf.Max(_tablePadding, diceHalf);
+
             // RollingArea 로컬 좌표의 min/max 코너
             Vector3 worldMin = _rollingAreaRect.TransformPoint(
-                new Vector3(areaRect.xMin + _tablePadding, areaRect.yMin + _tablePadding, 0f));
+                new Vector3(areaRect.xMin + padding, areaRect.yMin + padding, 0f));
             Vector3 worldMax = _rollingAreaRect.TransformPoint(
-                new Vector3(areaRect.xMax - _tablePadding, areaRect.yMax - _tablePadding, 0f));
+                new Vector3(areaRect.xMax - padding, areaRect.yMax - padding, 0f));
 
             // 부모 로컬 좌표로 변환
             Vector3 localMin = parentTransform.InverseTransformPoint(worldMin);

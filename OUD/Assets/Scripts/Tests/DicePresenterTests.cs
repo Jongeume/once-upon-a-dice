@@ -172,8 +172,13 @@ namespace OUD.Tests
         [Test]
         public void UpdateDice_Reroll_KeptDiceUseSetResultImmediate()
         {
-            // Arrange — 첫 롤 후 Die 1, 3을 Keep
+            // Arrange — 첫 롤 + 1차 리롤 완료 (Keep 활성화 조건 충족)
             PerformFirstRoll();
+            _presenter.UpdateDice(new[] { 1, 2, 3, 4, 5 }, DicePresenter.MAX_REROLLS - 1);
+            for (int i = 0; i < DicePresenter.DICE_COUNT; i++)
+                _entryMocks[i].SimulateRollComplete();
+
+            // Die 1, 3을 Keep (리롤 후이므로 가능)
             _presenter.OnDieToggleKeep(1);
             _presenter.OnDieToggleKeep(3);
 
@@ -186,15 +191,15 @@ namespace OUD.Tests
                 preImmediateCounts[i] = _entryMocks[i].SetResultImmediateCallCount;
             }
 
-            // Act — 리롤
-            int[] secondValues = { 6, 2, 6, 4, 6 };
-            _presenter.UpdateDice(secondValues, DicePresenter.MAX_REROLLS - 1);
+            // Act — 2차 리롤
+            int[] thirdValues = { 6, 2, 6, 4, 6 };
+            _presenter.UpdateDice(thirdValues, DicePresenter.MAX_REROLLS - 2);
 
             // Assert — Kept dice (1, 3)은 SetResultImmediate
             Assert.AreEqual(preImmediateCounts[1] + 1, _entryMocks[1].SetResultImmediateCallCount);
-            Assert.AreEqual(secondValues[1], _entryMocks[1].ImmediateValue);
+            Assert.AreEqual(thirdValues[1], _entryMocks[1].ImmediateValue);
             Assert.AreEqual(preImmediateCounts[3] + 1, _entryMocks[3].SetResultImmediateCallCount);
-            Assert.AreEqual(secondValues[3], _entryMocks[3].ImmediateValue);
+            Assert.AreEqual(thirdValues[3], _entryMocks[3].ImmediateValue);
 
             // Assert — Non-kept dice (0, 2, 4)는 PlayRoll
             Assert.AreEqual(prePlayRollCounts[0] + 1, _entryMocks[0].PlayRollCallCount);
@@ -204,6 +209,23 @@ namespace OUD.Tests
             // Kept에는 추가 PlayRoll 없음
             Assert.AreEqual(prePlayRollCounts[1], _entryMocks[1].PlayRollCallCount);
             Assert.AreEqual(prePlayRollCounts[3], _entryMocks[3].PlayRollCallCount);
+        }
+
+        // ── Test 3b: 리롤 전에는 Keep 선택 불가 ────────────────────────────────
+        [Test]
+        public void OnDieToggleKeep_IgnoredBeforeFirstReroll()
+        {
+            // Arrange — 첫 롤만 수행 (리롤 아직 안 함)
+            PerformFirstRoll();
+
+            bool keptBefore = _entryMocks[0].Kept;
+
+            // Act — Keep 시도
+            _presenter.OnDieToggleKeep(0);
+
+            // Assert — 리롤 전에는 Keep 불가
+            Assert.AreEqual(keptBefore, _entryMocks[0].Kept,
+                "리롤 전에는 Keep 토글이 무시되어야 한다.");
         }
 
         // ── Test 4: 리롤 중 버튼 비활성화 ───────────────────────────────────

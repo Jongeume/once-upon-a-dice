@@ -16,6 +16,7 @@ namespace OUD.Unity.Battle.Presenter
         private bool   _isRolling;
         private int    _pendingCount;
         private bool   _isFirstRollOfTurn = true;
+        private int    _totalRollsThisTurn;
 
         public const int   MAX_REROLLS         = 3;
         public const int   DICE_COUNT          = 5;
@@ -36,6 +37,7 @@ namespace OUD.Unity.Battle.Presenter
         {
             _values      = values;
             _rerollsLeft = rerollsLeft;
+            _totalRollsThisTurn++;
 
             // 첫 롤: 애니메이션 없이 즉시 결과 표시
             if (_isFirstRollOfTurn)
@@ -93,6 +95,7 @@ namespace OUD.Unity.Battle.Presenter
         public void OnDieToggleKeep(int index)
         {
             if (_isRolling) return;
+            if (_totalRollsThisTurn < 2) return; // 리롤 전에는 Keep 불가
             _keepMask[index] = !_keepMask[index];
             _entryViews[index].SetKept(_keepMask[index]);
         }
@@ -111,6 +114,7 @@ namespace OUD.Unity.Battle.Presenter
         public void ResetKeep()
         {
             _isFirstRollOfTurn = true;
+            _totalRollsThisTurn = 0;
             for (int i = 0; i < DICE_COUNT; i++)
             {
                 _keepMask[i] = false;
