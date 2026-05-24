@@ -1,0 +1,1105 @@
+fileFormatVersion: 2
+guid: ca13f0d10886409469e24e0cad7bf498
+TextureImporter:
+  internalIDToNameTable:
+  - first:
+      213: -318924120344664151
+    second: Defeat_UI_0
+  - first:
+      213: -8893698942469857179
+    second: Defeat_UI_1
+  - first:
+      213: 2461713716764652596
+    second: Defeat_UI_2
+  - first:
+      213: 8955077355106860652
+    second: Defeat_UI_3
+  - first:
+      213: 8118790746595800829
+    second: Defeat_UI_4
+  - first:
+      213: -1260849824651079899
+    second: Defeat_UI_5
+  - first:
+      213: -8124202785068401278
+    second: Defeat_UI_6
+  - first:
+      213: 4656779399032477819
+    second: Defeat_UI_7
+  - first:
+      213: 8539913517296800814
+    second: Defeat_UI_8
+  - first:
+      213: 1408614182658956305
+    second: Defeat_UI_9
+  - first:
+      213: -4630428638744790778
+    second: Defeat_UI_10
+  - first:
+      213: -2096167964873308849
+    second: Defeat_UI_11
+  - first:
+      213: -5153833689115851483
+    second: Defeat_UI_12
+  - first:
+      213: -4208520073086777989
+    second: Defeat_UI_13
+  - first:
+      213: 3964792238932136014
+    second: Defeat_UI_14
+  - first:
+      213: 7776840493658795267
+    second: Defeat_UI_15
+  - first:
+      213: 8770669677507572604
+    second: Defeat_UI_16
+  - first:
+      213: 9532765339867417
+    second: Defeat_UI_17
+  - first:
+      213: 6389279505568487081
+    second: Defeat_UI_18
+  - first:
+      213: 6138683600981603143
+    second: Defeat_UI_19
+  - first:
+      213: -280294680684481920
+    second: Defeat_UI_20
+  - first:
+      213: 4973328225349497291
+    second: Defeat_UI_21
+  - first:
+      213: 7668161326766275352
+    second: Defeat_UI_22
+  - first:
+      213: -6997660463300963081
+    second: Defeat_UI_23
+  - first:
+      213: 747479262090329236
+    second: Defeat_UI_24
+  - first:
+      213: 8754878248371823822
+    second: Defeat_UI_25
+  - first:
+      213: -4468672529857880226
+    second: Defeat_UI_26
+  - first:
+      213: -7650681935649213898
+    second: Defeat_UI_27
+  - first:
+      213: -1954739721299364176
+    second: Defeat_UI_28
+  - first:
+      213: -2304695532035742208
+    second: Defeat_UI_29
+  - first:
+      213: -8337656340091586163
+    second: Defeat_UI_30
+  - first:
+      213: 8697528848315194152
+    second: Defeat_UI_31
+  - first:
+      213: 1756794318558075200
+    second: Defeat_UI_32
+  - first:
+      213: -5983338832860963175
+    second: Defeat_UI_33
+  - first:
+      213: 9031028861849619277
+    second: Defeat_UI_34
+  - first:
+      213: 1884679022650362965
+    second: Defeat_UI_35
+  - first:
+      213: 2401543062505726512
+    second: Defeat_UI_36
+  externalObjects: {}
+  serializedVersion: 13
+  mipmaps:
+    mipMapMode: 0
+    enableMipMap: 0
+    sRGBTexture: 1
+    linearTexture: 0
+    fadeOut: 0
+    borderMipMap: 0
+    mipMapsPreserveCoverage: 0
+    alphaTestReferenceValue: 0.5
+    mipMapFadeDistanceStart: 1
+    mipMapFadeDistanceEnd: 3
+  bumpmap:
+    convertToNormalMap: 0
+    externalNormalMap: 0
+    heightScale: 0.25
+    normalMapFilter: 0
+    flipGreenChannel: 0
+  isReadable: 0
+  streamingMipmaps: 0
+  streamingMipmapsPriority: 0
+  vTOnly: 0
+  ignoreMipmapLimit: 0
+  grayScaleToAlpha: 0
+  generateCubemap: 6
+  cubemapConvolution: 0
+  seamlessCubemap: 0
+  textureFormat: 1
+  maxTextureSize: 2048
+  textureSettings:
+    serializedVersion: 2
+    filterMode: 1
+    aniso: 1
+    mipBias: 0
+    wrapU: 1
+    wrapV: 1
+    wrapW: 1
+  nPOTScale: 0
+  lightmap: 0
+  compressionQuality: 50
+  spriteMode: 1
+  spriteExtrude: 1
+  spriteMeshType: 1
+  alignment: 0
+  spritePivot: {x: 0.5, y: 0.5}
+  spritePixelsToUnits: 100
+  spriteBorder: {x: 0, y: 0, z: 0, w: 0}
+  spriteGenerateFallbackPhysicsShape: 1
+  alphaUsage: 1
+  alphaIsTransparency: 1
+  spriteTessellationDetail: -1
+  textureType: 8
+  textureShape: 1
+  singleChannelComponent: 0
+  flipbookRows: 1
+  flipbookColumns: 1
+  maxTextureSizeSet: 0
+  compressionQualitySet: 0
+  textureFormatSet: 0
+  ignorePngGamma: 0
+  applyGammaDecoding: 0
+  swizzle: 50462976
+  cookieLightType: 0
+  platformSettings:
+  - serializedVersion: 4
+    buildTarget: DefaultTexturePlatform
+    maxTextureSize: 2048
+    resizeAlgorithm: 0
+    textureFormat: -1
+    textureCompression: 1
+    compressionQuality: 50
+    crunchedCompression: 0
+    allowsAlphaSplitting: 0
+    overridden: 0
+    ignorePlatformSupport: 0
+    androidETC2FallbackOverride: 0
+    forceMaximumCompressionQuality_BC6H_BC7: 0
+  - serializedVersion: 4
+    buildTarget: Standalone
+    maxTextureSize: 2048
+    resizeAlgorithm: 0
+    textureFormat: -1
+    textureCompression: 1
+    compressionQuality: 50
+    crunchedCompression: 0
+    allowsAlphaSplitting: 0
+    overridden: 0
+    ignorePlatformSupport: 0
+    androidETC2FallbackOverride: 0
+    forceMaximumCompressionQuality_BC6H_BC7: 0
+  - serializedVersion: 4
+    buildTarget: Android
+    maxTextureSize: 2048
+    resizeAlgorithm: 0
+    textureFormat: -1
+    textureCompression: 1
+    compressionQuality: 50
+    crunchedCompression: 0
+    allowsAlphaSplitting: 0
+    overridden: 0
+    ignorePlatformSupport: 0
+    androidETC2FallbackOverride: 0
+    forceMaximumCompressionQuality_BC6H_BC7: 0
+  - serializedVersion: 4
+    buildTarget: iOS
+    maxTextureSize: 2048
+    resizeAlgorithm: 0
+    textureFormat: -1
+    textureCompression: 1
+    compressionQuality: 50
+    crunchedCompression: 0
+    allowsAlphaSplitting: 0
+    overridden: 0
+    ignorePlatformSupport: 0
+    androidETC2FallbackOverride: 0
+    forceMaximumCompressionQuality_BC6H_BC7: 0
+  spriteSheet:
+    serializedVersion: 2
+    sprites:
+    - serializedVersion: 2
+      name: Defeat_UI_0
+      rect:
+        serializedVersion: 2
+        x: 127
+        y: 656
+        width: 19
+        height: 23
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 9a76d88c334f29bf0800000000000000
+      internalID: -318924120344664151
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: Defeat_UI_1
+      rect:
+        serializedVersion: 2
+        x: 132
+        y: 585
+        width: 106
+        height: 187
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 56021d2ceeb339480800000000000000
+      internalID: -8893698942469857179
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: Defeat_UI_2
+      rect:
+        serializedVersion: 2
+        x: 269
+        y: 626
+        width: 33
+        height: 30
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 434b67a2593c92220800000000000000
+      internalID: 2461713716764652596
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: Defeat_UI_3
+      rect:
+        serializedVersion: 2
+        x: 1376
+        y: 628
+        width: 39
+        height: 43
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: c6ef94f8863d64c70800000000000000
+      internalID: 8955077355106860652
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: Defeat_UI_4
+      rect:
+        serializedVersion: 2
+        x: 1447
+        y: 592
+        width: 94
+        height: 186
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: df632983b2dbba070800000000000000
+      internalID: 8118790746595800829
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: Defeat_UI_5
+      rect:
+        serializedVersion: 2
+        x: 1541
+        y: 647
+        width: 20
+        height: 34
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 52f0f86c3cf808ee0800000000000000
+      internalID: -1260849824651079899
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: Defeat_UI_6
+      rect:
+        serializedVersion: 2
+        x: 68
+        y: 475
+        width: 58
+        height: 177
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 28d32c06c98014f80800000000000000
+      internalID: -8124202785068401278
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: Defeat_UI_7
+      rect:
+        serializedVersion: 2
+        x: 1434
+        y: 595
+        width: 13
+        height: 17
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: b7810b4d03430a040800000000000000
+      internalID: 4656779399032477819
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: Defeat_UI_8
+      rect:
+        serializedVersion: 2
+        x: 1546
+        y: 467
+        width: 68
+        height: 183
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: e24580bf81ed38670800000000000000
+      internalID: 8539913517296800814
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: Defeat_UI_9
+      rect:
+        serializedVersion: 2
+        x: 92
+        y: 438
+        width: 70
+        height: 139
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 11cd6fec2276c8310800000000000000
+      internalID: 1408614182658956305
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: Defeat_UI_10
+      rect:
+        serializedVersion: 2
+        x: 169
+        y: 526
+        width: 118
+        height: 62
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 60932d5afa96dbfb0800000000000000
+      internalID: -4630428638744790778
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: Defeat_UI_11
+      rect:
+        serializedVersion: 2
+        x: 278
+        y: 570
+        width: 24
+        height: 23
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: f454c28875ae8e2e0800000000000000
+      internalID: -2096167964873308849
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: Defeat_UI_12
+      rect:
+        serializedVersion: 2
+        x: 357
+        y: 365
+        width: 190
+        height: 212
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 5250fc0e097e978b0800000000000000
+      internalID: -5153833689115851483
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: Defeat_UI_13
+      rect:
+        serializedVersion: 2
+        x: 564
+        y: 365
+        width: 146
+        height: 211
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: b75cf8d8a455895c0800000000000000
+      internalID: -4208520073086777989
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: Defeat_UI_14
+      rect:
+        serializedVersion: 2
+        x: 732
+        y: 365
+        width: 135
+        height: 211
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: e4096c1f885c50730800000000000000
+      internalID: 3964792238932136014
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: Defeat_UI_15
+      rect:
+        serializedVersion: 2
+        x: 886
+        y: 365
+        width: 145
+        height: 211
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 30de76bb933eceb60800000000000000
+      internalID: 7776840493658795267
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: Defeat_UI_16
+      rect:
+        serializedVersion: 2
+        x: 1042
+        y: 365
+        width: 180
+        height: 214
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: c73f02a4a9da7b970800000000000000
+      internalID: 8770669677507572604
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: Defeat_UI_17
+      rect:
+        serializedVersion: 2
+        x: 1208
+        y: 365
+        width: 153
+        height: 214
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 9195fc3effdd12000800000000000000
+      internalID: 9532765339867417
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: Defeat_UI_18
+      rect:
+        serializedVersion: 2
+        x: 1384
+        y: 573
+        width: 23
+        height: 20
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 9a6d714cbd74ba850800000000000000
+      internalID: 6389279505568487081
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: Defeat_UI_19
+      rect:
+        serializedVersion: 2
+        x: 1396
+        y: 526
+        width: 115
+        height: 61
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 7433601063cf03550800000000000000
+      internalID: 6138683600981603143
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: Defeat_UI_20
+      rect:
+        serializedVersion: 2
+        x: 1519
+        y: 457
+        width: 71
+        height: 119
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 082be5519713c1cf0800000000000000
+      internalID: -280294680684481920
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: Defeat_UI_21
+      rect:
+        serializedVersion: 2
+        x: 41
+        y: 413
+        width: 43
+        height: 58
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: bc1716fcbafc40540800000000000000
+      internalID: 4973328225349497291
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: Defeat_UI_22
+      rect:
+        serializedVersion: 2
+        x: 129
+        y: 341
+        width: 68
+        height: 104
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 81bba4a5918ca6a60800000000000000
+      internalID: 7668161326766275352
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: Defeat_UI_23
+      rect:
+        serializedVersion: 2
+        x: 131
+        y: 445
+        width: 43
+        height: 52
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 7f4962242e053ee90800000000000000
+      internalID: -6997660463300963081
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: Defeat_UI_24
+      rect:
+        serializedVersion: 2
+        x: 191
+        y: 419
+        width: 81
+        height: 86
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 49c7dd5bd649f5a00800000000000000
+      internalID: 747479262090329236
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: Defeat_UI_25
+      rect:
+        serializedVersion: 2
+        x: 1415
+        y: 420
+        width: 82
+        height: 85
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: ec42ffda1639f7970800000000000000
+      internalID: 8754878248371823822
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: Defeat_UI_26
+      rect:
+        serializedVersion: 2
+        x: 1474
+        y: 339
+        width: 81
+        height: 157
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: e5f564892061cf1c0800000000000000
+      internalID: -4468672529857880226
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: Defeat_UI_27
+      rect:
+        serializedVersion: 2
+        x: 1549
+        y: 378
+        width: 39
+        height: 75
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 6327128805153d590800000000000000
+      internalID: -7650681935649213898
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: Defeat_UI_28
+      rect:
+        serializedVersion: 2
+        x: 1608
+        y: 435
+        width: 34
+        height: 39
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 0b6fa93849e5fd4e0800000000000000
+      internalID: -1954739721299364176
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: Defeat_UI_29
+      rect:
+        serializedVersion: 2
+        x: 64
+        y: 311
+        width: 93
+        height: 109
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 0066499df931400e0800000000000000
+      internalID: -2304695532035742208
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: Defeat_UI_30
+      rect:
+        serializedVersion: 2
+        x: 104
+        y: 385
+        width: 24
+        height: 44
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: d89be85cbb1ba4c80800000000000000
+      internalID: -8337656340091586163
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: Defeat_UI_31
+      rect:
+        serializedVersion: 2
+        x: 202
+        y: 286
+        width: 130
+        height: 142
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 82b1a83f764d3b870800000000000000
+      internalID: 8697528848315194152
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: Defeat_UI_32
+      rect:
+        serializedVersion: 2
+        x: 1357
+        y: 225
+        width: 184
+        height: 203
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 0491415ff13616810800000000000000
+      internalID: 1756794318558075200
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: Defeat_UI_33
+      rect:
+        serializedVersion: 2
+        x: 1531
+        y: 313
+        width: 101
+        height: 131
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 99e95885809e6fca0800000000000000
+      internalID: -5983338832860963175
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: Defeat_UI_34
+      rect:
+        serializedVersion: 2
+        x: 85
+        y: 257
+        width: 34
+        height: 26
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: d4bc8d2c6e8a45d70800000000000000
+      internalID: 9031028861849619277
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: Defeat_UI_35
+      rect:
+        serializedVersion: 2
+        x: 136
+        y: 226
+        width: 176
+        height: 110
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 55c84bce599b72a10800000000000000
+      internalID: 1884679022650362965
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: Defeat_UI_36
+      rect:
+        serializedVersion: 2
+        x: 1556
+        y: 258
+        width: 35
+        height: 30
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 032257101bef35120800000000000000
+      internalID: 2401543062505726512
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    outline: []
+    customData: 
+    physicsShape: []
+    bones: []
+    spriteID: 5e97eb03825dee720800000000000000
+    internalID: 0
+    vertices: []
+    indices: 
+    edges: []
+    weights: []
+    secondaryTextures: []
+    spriteCustomMetadata:
+      entries: []
+    nameFileIdTable:
+      Defeat_UI_0: -318924120344664151
+      Defeat_UI_1: -8893698942469857179
+      Defeat_UI_10: -4630428638744790778
+      Defeat_UI_11: -2096167964873308849
+      Defeat_UI_12: -5153833689115851483
+      Defeat_UI_13: -4208520073086777989
+      Defeat_UI_14: 3964792238932136014
+      Defeat_UI_15: 7776840493658795267
+      Defeat_UI_16: 8770669677507572604
+      Defeat_UI_17: 9532765339867417
+      Defeat_UI_18: 6389279505568487081
+      Defeat_UI_19: 6138683600981603143
+      Defeat_UI_2: 2461713716764652596
+      Defeat_UI_20: -280294680684481920
+      Defeat_UI_21: 4973328225349497291
+      Defeat_UI_22: 7668161326766275352
+      Defeat_UI_23: -6997660463300963081
+      Defeat_UI_24: 747479262090329236
+      Defeat_UI_25: 8754878248371823822
+      Defeat_UI_26: -4468672529857880226
+      Defeat_UI_27: -7650681935649213898
+      Defeat_UI_28: -1954739721299364176
+      Defeat_UI_29: -2304695532035742208
+      Defeat_UI_3: 8955077355106860652
+      Defeat_UI_30: -8337656340091586163
+      Defeat_UI_31: 8697528848315194152
+      Defeat_UI_32: 1756794318558075200
+      Defeat_UI_33: -5983338832860963175
+      Defeat_UI_34: 9031028861849619277
+      Defeat_UI_35: 1884679022650362965
+      Defeat_UI_36: 2401543062505726512
+      Defeat_UI_4: 8118790746595800829
+      Defeat_UI_5: -1260849824651079899
+      Defeat_UI_6: -8124202785068401278
+      Defeat_UI_7: 4656779399032477819
+      Defeat_UI_8: 8539913517296800814
+      Defeat_UI_9: 1408614182658956305
+  mipmapLimitGroupName: 
+  pSDRemoveMatte: 0
+  userData: 
+  assetBundleName: 
+  assetBundleVariant: 
