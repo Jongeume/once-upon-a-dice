@@ -644,21 +644,30 @@ namespace OUD.Unity.Battle.View
             Rect areaRect = _rollingAreaRect.rect;
             Transform parentTransform = _diceImageRect.parent;
 
-            float diceHalf = _diceImageRect.rect.width * _scaleOnTable * 0.5f;
-            float padding = Mathf.Max(_tablePadding, diceHalf);
-
+            // RollingArea 경계를 부모 로컬 좌표로 변환 (패딩 없이 원본)
             Vector3 worldMin = _rollingAreaRect.TransformPoint(
-                new Vector3(areaRect.xMin + padding, areaRect.yMin + padding, 0f));
+                new Vector3(areaRect.xMin, areaRect.yMin, 0f));
             Vector3 worldMax = _rollingAreaRect.TransformPoint(
-                new Vector3(areaRect.xMax - padding, areaRect.yMax - padding, 0f));
+                new Vector3(areaRect.xMax, areaRect.yMax, 0f));
 
             Vector3 localMin = parentTransform.InverseTransformPoint(worldMin);
             Vector3 localMax = parentTransform.InverseTransformPoint(worldMax);
 
-            minX = Mathf.Min(localMin.x, localMax.x);
-            maxX = Mathf.Max(localMin.x, localMax.x);
-            minY = Mathf.Min(localMin.y, localMax.y);
-            maxY = Mathf.Max(localMin.y, localMax.y);
+            float rawMinX = Mathf.Min(localMin.x, localMax.x);
+            float rawMaxX = Mathf.Max(localMin.x, localMax.x);
+            float rawMinY = Mathf.Min(localMin.y, localMax.y);
+            float rawMaxY = Mathf.Max(localMin.y, localMax.y);
+
+            // 부모 로컬 좌표계에서 DiceImage의 시각적 반크기만큼 패딩
+            float diceHalfX = _diceImageRect.rect.width * _scaleOnTable * 0.5f;
+            float diceHalfY = _diceImageRect.rect.height * _scaleOnTable * 0.5f;
+            float padX = diceHalfX + _tablePadding;
+            float padY = diceHalfY + _tablePadding;
+
+            minX = rawMinX + padX;
+            maxX = rawMaxX - padX;
+            minY = rawMinY + padY;
+            maxY = rawMaxY - padY;
         }
     }
 }
