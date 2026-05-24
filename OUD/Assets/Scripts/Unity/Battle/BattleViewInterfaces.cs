@@ -37,7 +37,8 @@ namespace OUD.Unity.Battle
 
     public interface IDiceEntryView
     {
-        void UpdateValue(int value);
+        void PlayRoll(int resultValue, float stopDelay, System.Action onComplete);
+        void SetResultImmediate(int value);
         void SetKept(bool kept);
     }
 
