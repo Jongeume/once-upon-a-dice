@@ -178,8 +178,8 @@ MonoBehaviour:
       m_Calls: []
   m_text: "\uC0C8 \uAC8C\uC784"
   m_isRightToLeft: 0
-  m_fontAsset: {fileID: 11400000, guid: 14d53e187bfb6c44c8c1103308bd6808, type: 2}
-  m_sharedMaterial: {fileID: 1335944360995467704, guid: 14d53e187bfb6c44c8c1103308bd6808, type: 2}
+  m_fontAsset: {fileID: 11400000, guid: 0bab88640a1677d4596db5e478e5a01e, type: 2}
+  m_sharedMaterial: {fileID: 8315090994651466644, guid: 0bab88640a1677d4596db5e478e5a01e, type: 2}
   m_fontSharedMaterials: []
   m_fontMaterial: {fileID: 0}
   m_fontMaterials: []
@@ -394,8 +394,8 @@ MonoBehaviour:
       m_Calls: []
   m_text: Once Upon a Dice
   m_isRightToLeft: 0
-  m_fontAsset: {fileID: 11400000, guid: 14d53e187bfb6c44c8c1103308bd6808, type: 2}
-  m_sharedMaterial: {fileID: 1335944360995467704, guid: 14d53e187bfb6c44c8c1103308bd6808, type: 2}
+  m_fontAsset: {fileID: 11400000, guid: 0bab88640a1677d4596db5e478e5a01e, type: 2}
+  m_sharedMaterial: {fileID: 8315090994651466644, guid: 0bab88640a1677d4596db5e478e5a01e, type: 2}
   m_fontSharedMaterials: []
   m_fontMaterial: {fileID: 0}
   m_fontMaterials: []
