@@ -713,6 +713,62 @@ CanvasRenderer:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 915996005}
   m_CullTransparentMesh: 1
+--- !u!1 &1072216591
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 1072216593}
+  - component: {fileID: 1072216592}
+  m_Layer: 0
+  m_Name: SoundManager
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!114 &1072216592
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1072216591}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 7a252bfd82a4a54459bf337d71cbbcf2, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::OUD.Unity.Common.SoundManager
+  _bgmClip: {fileID: 8300000, guid: d5a14435a7acac743983504c7aa847b0, type: 3}
+  _diceRollClip: {fileID: 8300000, guid: 6c747a7bc58223e4e9aaba2a9b1bef91, type: 3}
+  _playerAttackClip: {fileID: 8300000, guid: 6b51b3516da0dbb478cf9f271f4cc802, type: 3}
+  _monsterAttackClip: {fileID: 8300000, guid: 6357d070205485a40ab11729f15b46ed, type: 3}
+  _shieldClip: {fileID: 8300000, guid: bdce9afcd34e8c6478d5099750e99a40, type: 3}
+  _victoryClip: {fileID: 8300000, guid: 6f7ebaf5b71136540aec79ddcdc85def, type: 3}
+  _defeatClip: {fileID: 8300000, guid: 110f4c43eb1269749a5ff5b6f67221b8, type: 3}
+  _coinClip: {fileID: 8300000, guid: 233835c1f183ccc4aa3996accae41a5a, type: 3}
+  _mapClip: {fileID: 8300000, guid: 8b1729012fa12354897f618f78ec55ee, type: 3}
+  _levelUpClip: {fileID: 8300000, guid: 7b873e947fabcc34bbd591133832f9f0, type: 3}
+  _bgmVolume: 0.5
+  _sfxVolume: 1
+--- !u!4 &1072216593
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1072216591}
+  serializedVersion: 2
+  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_LocalPosition: {x: 0, y: 0, z: 0}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_ConstrainProportionsScale: 0
+  m_Children: []
+  m_Father: {fileID: 0}
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!1 &1537959178
 GameObject:
   m_ObjectHideFlags: 0
@@ -1090,3 +1146,4 @@ SceneRoots:
   - {fileID: 177841874}
   - {fileID: 1537959179}
   - {fileID: 855680425}
+  - {fileID: 1072216593}
