@@ -123,13 +123,19 @@ namespace OUD.Unity.Battle.View
             // DiceArea 슬롯 배경 숨기기 (주사위가 RollingArea에 표시되므로 불필요)
             if (_background) _background.enabled = false;
 
-            // KeepSlot 전체 탐색: _keepSlotRect의 부모(KeepSlotsArea) 자식 전부
+            // KeepSlot 탐색: "KeepSlot" 이름의 자식만 (라벨 등 제외)
             if (_keepSlotRect != null)
             {
                 Transform slotsParent = _keepSlotRect.parent;
-                _allKeepSlots = new RectTransform[slotsParent.childCount];
+                var slots = new System.Collections.Generic.List<RectTransform>();
                 for (int i = 0; i < slotsParent.childCount; i++)
-                    _allKeepSlots[i] = slotsParent.GetChild(i).GetComponent<RectTransform>();
+                {
+                    var child = slotsParent.GetChild(i);
+                    if (child.name.StartsWith("KeepSlot"))
+                        slots.Add(child.GetComponent<RectTransform>());
+                }
+                slots.Sort((a, b) => string.Compare(a.name, b.name, StringComparison.Ordinal));
+                _allKeepSlots = slots.ToArray();
             }
         }
 
@@ -196,7 +202,9 @@ namespace OUD.Unity.Battle.View
                 _outline.effectColor = c;
             }
 
-            if (_moveCoroutine != null) StopCoroutine(_moveCoroutine);
+            if (_moveCoroutine != null && gameObject.activeInHierarchy)
+                StopCoroutine(_moveCoroutine);
+            _moveCoroutine = null;
 
             if (kept)
             {
@@ -216,7 +224,8 @@ namespace OUD.Unity.Battle.View
                 RectTransform target = (_allKeepSlots != null && _assignedSlotIndex >= 0)
                     ? _allKeepSlots[_assignedSlotIndex]
                     : _keepSlotRect;
-                _moveCoroutine = StartCoroutine(MoveToKeepSlot(target));
+                if (gameObject.activeInHierarchy)
+                    _moveCoroutine = StartCoroutine(MoveToKeepSlot(target));
             }
             else
             {
@@ -226,7 +235,9 @@ namespace OUD.Unity.Battle.View
                     _slotOccupied[_assignedSlotIndex] = false;
                     _assignedSlotIndex = -1;
                 }
-                _moveCoroutine = StartCoroutine(MoveToRollingArea());
+                // 비활성이면 코루틴 안 함 — 다음 활성화 시 PlaceInRollingArea로 배치됨
+                if (gameObject.activeInHierarchy)
+                    _moveCoroutine = StartCoroutine(MoveToRollingArea());
             }
         }
 
@@ -415,12 +426,8 @@ namespace OUD.Unity.Battle.View
             Vector3 localTarget = _diceImageRect.parent.InverseTransformPoint(worldTarget);
             Vector2 toPos = new Vector2(localTarget.x, localTarget.y);
 
-            // KeepSlot 크기에 맞춘 스케일
-            float slotSize = Mathf.Min(targetSlot.rect.width, targetSlot.rect.height);
-            float diceSize = Mathf.Min(_diceImageRect.rect.width, _diceImageRect.rect.height);
-            float fitScale = (diceSize > 0f) ? slotSize / diceSize : 1f;
-            fitScale *= 0.85f; // 약간의 여백
-            Vector3 toScale = Vector3.one * fitScale;
+            // KeepSlot에서는 정상 스케일로 복원
+            Vector3 toScale = Vector3.one;
 
             float elapsed = 0f;
             while (elapsed < _moveToKeepDuration)
