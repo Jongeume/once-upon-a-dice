@@ -17,11 +17,15 @@ namespace OUD.Unity.Battle.View
         [SerializeField] private Sprite[] _rollingFrames;
         [SerializeField] private Sprite[] _resultSprites;
 
+        [Header("영역 참조")]
+        [SerializeField] private RectTransform _rollingAreaRect;
+        [SerializeField] private RectTransform _keepSlotRect;
+
         [Header("애니메이션")]
         [SerializeField] private float _frameRate = 12f;
         [SerializeField] private float _decelerationDuration = 0.3f;
 
-        [Header("Z축 낙하 (탑뷰 — 앞으로 던지기)")]
+        [Header("Z축 낙하 (탑뷰)")]
         [SerializeField] private float _dropHeight = 250f;
         [SerializeField] private float _zGravity = 2000f;
         [SerializeField] private float _zBounceCoeff = 0.45f;
@@ -29,7 +33,7 @@ namespace OUD.Unity.Battle.View
         [SerializeField] private float _impactSquash = 1.15f;
         [SerializeField] private float _squashDuration = 0.06f;
 
-        [Header("테이블 위 미끄러짐 (탑뷰 X/Y)")]
+        [Header("테이블 위 미끄러짐")]
         [SerializeField] private float _slideSpeedMin = 150f;
         [SerializeField] private float _slideSpeedMax = 350f;
         [SerializeField] private float _slideFriction = 3f;
@@ -37,8 +41,9 @@ namespace OUD.Unity.Battle.View
         [SerializeField] private float _rotationMultiplier = 0.4f;
         [SerializeField] private float _tablePadding = 10f;
 
-        [Header("복귀")]
-        [SerializeField] private float _settleTime = 0.25f;
+        [Header("이동 애니메이션")]
+        [SerializeField] private float _moveToKeepDuration = 0.2f;
+        [SerializeField] private float _moveToRollingDuration = 0.15f;
 
         [Header("Keep 하이라이트")]
         [SerializeField] private Color   _normalColor = new Color(0.09f, 0.06f, 0.04f);
@@ -48,8 +53,12 @@ namespace OUD.Unity.Battle.View
         private bool    _kept;
         private Outline _outline;
         private Coroutine _rollCoroutine;
+        private Coroutine _moveCoroutine;
         private RectTransform _diceImageRect;
-        private RectTransform _diceAreaRect;
+
+        // 롤링 후 대기 위치 (RollingArea 내, 부모 로컬 좌표)
+        private Vector2 _restingPosition;
+        private float   _restingRotation;
 
         // 비활성 상태에서 PlayRoll 호출 시 대기용
         private bool   _pendingRoll;
@@ -65,9 +74,6 @@ namespace OUD.Unity.Battle.View
 
             if (_diceImage)
                 _diceImageRect = _diceImage.GetComponent<RectTransform>();
-
-            if (transform.parent != null)
-                _diceAreaRect = transform.parent.GetComponent<RectTransform>();
 
             if (_background)
             {
@@ -103,6 +109,11 @@ namespace OUD.Unity.Battle.View
                 return;
             }
 
+            // Keep 상태 해제 (리롤되는 주사위는 Keep이 아님)
+            _kept = false;
+            if (_outline) { var c = _keptColor; c.a = 0f; _outline.effectColor = c; }
+
+            if (_moveCoroutine != null) { StopCoroutine(_moveCoroutine); _moveCoroutine = null; }
             if (_rollCoroutine != null) StopCoroutine(_rollCoroutine);
             _rollCoroutine = StartCoroutine(RollRoutine(resultValue, stopDelay, onComplete));
         }
@@ -114,23 +125,43 @@ namespace OUD.Unity.Battle.View
                 StopCoroutine(_rollCoroutine);
                 _rollCoroutine = null;
             }
-
-            ResetMotion();
+            if (_moveCoroutine != null)
+            {
+                StopCoroutine(_moveCoroutine);
+                _moveCoroutine = null;
+            }
 
             if (_resultSprites != null && value >= 1 && value <= _resultSprites.Length)
                 _diceImage.sprite = _resultSprites[value - 1];
+
+            // RollingArea 내 랜덤 위치에 배치
+            PlaceInRollingArea();
         }
 
         public void SetKept(bool kept)
         {
+            if (_kept == kept) return;
             _kept = kept;
+
             if (_outline)
             {
                 var c = _keptColor;
                 c.a = kept ? 1f : 0f;
                 _outline.effectColor = c;
             }
+
+            // 이동 애니메이션: RollingArea ↔ KeepSlot
+            if (_moveCoroutine != null) StopCoroutine(_moveCoroutine);
+
+            if (kept)
+                _moveCoroutine = StartCoroutine(MoveToKeepSlot());
+            else
+                _moveCoroutine = StartCoroutine(MoveToRollingArea());
         }
+
+        // ─────────────────────────────────────────────────────────────────────
+        // 롤링 루틴
+        // ─────────────────────────────────────────────────────────────────────
 
         private IEnumerator RollRoutine(int resultValue, float stopDelay, Action onComplete)
         {
@@ -141,31 +172,31 @@ namespace OUD.Unity.Battle.View
                 yield break;
             }
 
-            // === 정사각형 굴림 영역 계산 (DiceArea 중앙 기준) ===
-            CalculateSquareBounds(out float minX, out float maxX, out float minY, out float maxY);
+            // === RollingArea 경계 계산 ===
+            GetRollingBounds(out float minX, out float maxX, out float minY, out float maxY);
 
             // === Z축 상태 ===
             float zHeight = _dropHeight + UnityEngine.Random.Range(0f, 80f);
             float zVelocity = -UnityEngine.Random.Range(50f, 150f);
             bool hasLanded = false;
 
-            // === 테이블 X/Y (정사각형 영역 중앙 근처에서 시작) ===
+            // === 시작 위치 (RollingArea 중앙 부근) ===
             float cx = (minX + maxX) * 0.5f;
             float cy = (minY + maxY) * 0.5f;
-            float rangeX = (maxX - minX) * 0.2f;
-            float rangeY = (maxY - minY) * 0.2f;
+            float rx = (maxX - minX) * 0.2f;
+            float ry = (maxY - minY) * 0.2f;
             Vector2 tablePos = new Vector2(
-                cx + UnityEngine.Random.Range(-rangeX, rangeX),
-                cy + UnityEngine.Random.Range(-rangeY, rangeY));
+                cx + UnityEngine.Random.Range(-rx, rx),
+                cy + UnityEngine.Random.Range(-ry, ry));
             Vector2 tableVel = Vector2.zero;
             float rotation = UnityEngine.Random.Range(0f, 360f);
 
-            // === 스프라이트 ===
             float frameInterval = 1f / _frameRate;
             float frameTimer = 0f;
             int lastSpriteIndex = -1;
             float elapsed = 0f;
 
+            // 스케일 초기화
             ApplyVisuals(tablePos, zHeight, rotation);
 
             // === 메인 물리 루프 ===
@@ -174,49 +205,38 @@ namespace OUD.Unity.Battle.View
                 float dt = Time.deltaTime;
                 elapsed += dt;
 
-                // --- Z축 물리 ---
                 zVelocity -= _zGravity * dt;
                 zHeight += zVelocity * dt;
 
                 if (zHeight <= 0f)
                 {
                     zHeight = 0f;
-
                     if (!hasLanded)
                     {
                         hasLanded = true;
-                        float slideSpeed = UnityEngine.Random.Range(_slideSpeedMin, _slideSpeedMax);
-                        float slideAngle = UnityEngine.Random.Range(0f, 360f) * Mathf.Deg2Rad;
-                        tableVel = new Vector2(
-                            Mathf.Cos(slideAngle) * slideSpeed,
-                            Mathf.Sin(slideAngle) * slideSpeed);
-
+                        float speed = UnityEngine.Random.Range(_slideSpeedMin, _slideSpeedMax);
+                        float angle = UnityEngine.Random.Range(0f, 360f) * Mathf.Deg2Rad;
+                        tableVel = new Vector2(Mathf.Cos(angle) * speed, Mathf.Sin(angle) * speed);
                         StartCoroutine(SquashEffect());
                     }
-
                     zVelocity = Mathf.Abs(zVelocity) * _zBounceCoeff;
                     if (zVelocity < 30f) zVelocity = 0f;
                 }
 
-                // --- 테이블 X/Y 물리 ---
                 if (hasLanded)
                 {
                     tablePos += tableVel * dt;
-
                     if (tablePos.x < minX) { tablePos.x = minX; tableVel.x = -tableVel.x * _wallBounceCoeff; }
                     if (tablePos.x > maxX) { tablePos.x = maxX; tableVel.x = -tableVel.x * _wallBounceCoeff; }
                     if (tablePos.y < minY) { tablePos.y = minY; tableVel.y = -tableVel.y * _wallBounceCoeff; }
                     if (tablePos.y > maxY) { tablePos.y = maxY; tableVel.y = -tableVel.y * _wallBounceCoeff; }
-
                     tableVel *= Mathf.Exp(-_slideFriction * dt);
-
                     rotation += tableVel.magnitude * _rotationMultiplier * dt *
                                 Mathf.Sign(tableVel.x + tableVel.y * 0.5f);
                 }
 
                 ApplyVisuals(tablePos, zHeight, rotation);
 
-                // ���프라이트
                 frameTimer += dt;
                 if (frameTimer >= frameInterval)
                 {
@@ -227,7 +247,6 @@ namespace OUD.Unity.Battle.View
                     lastSpriteIndex = index;
                     _diceImage.sprite = _rollingFrames[index];
                 }
-
                 yield return null;
             }
 
@@ -253,9 +272,7 @@ namespace OUD.Unity.Battle.View
                     if (tablePos.y < minY) { tablePos.y = minY; tableVel.y = -tableVel.y * 0.3f; }
                     if (tablePos.y > maxY) { tablePos.y = maxY; tableVel.y = -tableVel.y * 0.3f; }
                     tableVel *= Mathf.Exp(-_slideFriction * dampMult * dt);
-
-                    rotation += tableVel.magnitude * _rotationMultiplier * 0.5f * dt *
-                                Mathf.Sign(tableVel.x);
+                    rotation += tableVel.magnitude * _rotationMultiplier * 0.5f * dt * Mathf.Sign(tableVel.x);
 
                     ApplyVisuals(tablePos, 0f, rotation);
 
@@ -269,33 +286,126 @@ namespace OUD.Unity.Battle.View
                         lastSpriteIndex = index;
                         _diceImage.sprite = _rollingFrames[index];
                     }
-
                     yield return null;
                 }
             }
 
-            // === 결과 스프라이트 ===
+            // === 결과 스프라이트 + RollingArea에서 대기 ===
             if (_resultSprites != null && resultValue >= 1 && resultValue <= _resultSprites.Length)
                 _diceImage.sprite = _resultSprites[resultValue - 1];
 
-            // === 슬롯으로 복귀 ===
-            yield return SettleRoutine(tablePos, rotation);
+            // 현재 위치에서 대기 (슬롯으로 돌아가지 않음)
+            _restingPosition = tablePos;
+            _restingRotation = rotation;
+            _diceImageRect.localScale = Vector3.one * _scaleOnTable;
 
             _rollCoroutine = null;
             onComplete?.Invoke();
         }
 
+        // ─────────────────────────────────────────────────────────────────────
+        // 이동 애니메이션
+        // ─────────────────────────────────────────────────────────────────────
+
         /// <summary>
-        /// 스��일: 높이가 높을수록 큼(1.0=가까움), 테이블에 착지하면 작아짐(_scaleOnTable=멀어짐).
-        /// 앞으로 던지는 느낌: 시작(큼) → 착지(작음).
+        /// RollingArea → KeepSlot 이동
         /// </summary>
+        private IEnumerator MoveToKeepSlot()
+        {
+            if (_diceImageRect == null || _keepSlotRect == null) yield break;
+
+            Vector2 fromPos = _diceImageRect.anchoredPosition;
+            Quaternion fromRot = _diceImageRect.localRotation;
+            Vector3 fromScale = _diceImageRect.localScale;
+
+            // KeepSlot의 월드 위치를 DiceImage 부모 로컬 좌표로 변환
+            Vector3 worldTarget = _keepSlotRect.TransformPoint(Vector3.zero);
+            Vector3 localTarget = _diceImageRect.parent.InverseTransformPoint(worldTarget);
+            Vector2 toPos = new Vector2(localTarget.x, localTarget.y);
+
+            float elapsed = 0f;
+            while (elapsed < _moveToKeepDuration)
+            {
+                elapsed += Time.deltaTime;
+                float t = elapsed / _moveToKeepDuration;
+                float ease = 1f - (1f - t) * (1f - t); // ease-out quad
+
+                _diceImageRect.anchoredPosition = Vector2.Lerp(fromPos, toPos, ease);
+                _diceImageRect.localRotation = Quaternion.Slerp(fromRot, Quaternion.identity, ease);
+                _diceImageRect.localScale = Vector3.Lerp(fromScale, Vector3.one, ease);
+                yield return null;
+            }
+
+            _diceImageRect.anchoredPosition = toPos;
+            _diceImageRect.localRotation = Quaternion.identity;
+            _diceImageRect.localScale = Vector3.one;
+            _moveCoroutine = null;
+        }
+
+        /// <summary>
+        /// KeepSlot → RollingArea 복귀
+        /// </summary>
+        private IEnumerator MoveToRollingArea()
+        {
+            if (_diceImageRect == null) yield break;
+
+            Vector2 fromPos = _diceImageRect.anchoredPosition;
+            Vector3 fromScale = _diceImageRect.localScale;
+
+            // 대기 위치로 복귀
+            Vector2 toPos = _restingPosition;
+            Vector3 toScale = Vector3.one * _scaleOnTable;
+
+            float elapsed = 0f;
+            while (elapsed < _moveToRollingDuration)
+            {
+                elapsed += Time.deltaTime;
+                float t = elapsed / _moveToRollingDuration;
+                float ease = 1f - (1f - t) * (1f - t);
+
+                _diceImageRect.anchoredPosition = Vector2.Lerp(fromPos, toPos, ease);
+                _diceImageRect.localScale = Vector3.Lerp(fromScale, toScale, ease);
+                yield return null;
+            }
+
+            _diceImageRect.anchoredPosition = toPos;
+            _diceImageRect.localScale = toScale;
+            _moveCoroutine = null;
+        }
+
+        // ─────────────────────────────────────────────────────────────────────
+        // 유틸리티
+        // ─────────────────────────────────────────────────────────────────────
+
+        /// <summary>
+        /// 첫 롤(즉시 표시) 시 RollingArea 내 랜덤 위치에 배치
+        /// </summary>
+        private void PlaceInRollingArea()
+        {
+            if (_diceImageRect == null) return;
+
+            GetRollingBounds(out float minX, out float maxX, out float minY, out float maxY);
+
+            float cx = (minX + maxX) * 0.5f;
+            float cy = (minY + maxY) * 0.5f;
+            float rx = (maxX - minX) * 0.35f;
+            float ry = (maxY - minY) * 0.35f;
+
+            _restingPosition = new Vector2(
+                cx + UnityEngine.Random.Range(-rx, rx),
+                cy + UnityEngine.Random.Range(-ry, ry));
+            _restingRotation = UnityEngine.Random.Range(-15f, 15f);
+
+            _diceImageRect.anchoredPosition = _restingPosition;
+            _diceImageRect.localRotation = Quaternion.Euler(0f, 0f, _restingRotation);
+            _diceImageRect.localScale = Vector3.one * _scaleOnTable;
+        }
+
         private void ApplyVisuals(Vector2 tablePos, float zHeight, float rotation)
         {
             if (_diceImageRect == null) return;
 
-            // heightRatio: 1=시작(��음/가까움), 0=착지(테이블/멀어짐)
             float heightRatio = Mathf.Clamp01(zHeight / _dropHeight);
-            // ���까울 때(높���) = 1.0, 멀어졌을 때(테이블) = _scaleOnTable(0.65)
             float scale = Mathf.Lerp(_scaleOnTable, 1f, heightRatio);
 
             _diceImageRect.anchoredPosition = tablePos;
@@ -303,9 +413,6 @@ namespace OUD.Unity.Battle.View
             _diceImageRect.localRotation = Quaternion.Euler(0f, 0f, rotation);
         }
 
-        /// <summary>
-        /// 착지 스쿼시 효과
-        /// </summary>
         private IEnumerator SquashEffect()
         {
             if (_diceImageRect == null) yield break;
@@ -339,72 +446,35 @@ namespace OUD.Unity.Battle.View
         }
 
         /// <summary>
-        /// DiceArea 중앙에 정사각형 굴림판을 설정.
-        /// 가로/세로 중 짧은 쪽 ��준으로 정사각형을 만들어 패널 침범 방지.
-        /// 각 슬롯의 위치 ��프셋을 보정하여 모��� 주사위가 같은 판에서 움직임.
+        /// RollingArea의 경계를 DiceImage 부모(Dice슬롯) 로컬 좌표로 변환
         /// </summary>
-        private void CalculateSquareBounds(out float minX, out float maxX, out float minY, out float maxY)
+        private void GetRollingBounds(out float minX, out float maxX, out float minY, out float maxY)
         {
-            if (_diceAreaRect == null || _diceImageRect == null)
+            if (_rollingAreaRect == null || _diceImageRect == null)
             {
-                minX = -80f; maxX = 80f;
-                minY = -80f; maxY = 80f;
+                minX = -100f; maxX = 100f;
+                minY = -100f; maxY = 100f;
                 return;
             }
 
-            Vector2 areaSize = _diceAreaRect.rect.size;
+            // RollingArea의 네 코너를 DiceImage 부모 로컬 좌표로 변환
+            Rect areaRect = _rollingAreaRect.rect;
+            Transform parentTransform = _diceImageRect.parent;
 
-            // 정사각형: 가로/세로 중 짧은 쪽 기준 (패딩 적용)
-            float side = Mathf.Min(areaSize.x, areaSize.y) - _tablePadding * 2f;
-            float halfSide = side * 0.5f;
+            // RollingArea 로컬 좌표의 min/max 코너
+            Vector3 worldMin = _rollingAreaRect.TransformPoint(
+                new Vector3(areaRect.xMin + _tablePadding, areaRect.yMin + _tablePadding, 0f));
+            Vector3 worldMax = _rollingAreaRect.TransformPoint(
+                new Vector3(areaRect.xMax - _tablePadding, areaRect.yMax - _tablePadding, 0f));
 
-            // ��� 슬롯의 DiceArea 내 위치 (오프셋 보정)
-            RectTransform slotRect = transform as RectTransform;
-            Vector2 slotPos = slotRect.anchoredPosition;
+            // 부모 로컬 좌표로 변환
+            Vector3 localMin = parentTransform.InverseTransformPoint(worldMin);
+            Vector3 localMax = parentTransform.InverseTransformPoint(worldMax);
 
-            // DiceImage 반경 (스케일 고려)
-            float imgRadius = _diceImageRect.rect.size.x * _scaleOnTable * 0.5f;
-            float bound = halfSide - imgRadius;
-
-            // 슬롯 위치를 빼서 DiceImage 로컬 좌표 기준으로 변환
-            minX = -bound - slotPos.x;
-            maxX =  bound - slotPos.x;
-            minY = -bound - slotPos.y;
-            maxY =  bound - slotPos.y;
-        }
-
-        /// <summary>
-        /// 테이블 위 위치에서 슬롯 원점(0,0) + 정상 스케일(1.0)로 복귀
-        /// </summary>
-        private IEnumerator SettleRoutine(Vector2 fromPos, float fromRotation)
-        {
-            if (_diceImageRect == null) yield break;
-
-            float elapsed = 0f;
-            Quaternion startRot = Quaternion.Euler(0f, 0f, fromRotation);
-            Vector3 startScale = _diceImageRect.localScale;
-
-            while (elapsed < _settleTime)
-            {
-                elapsed += Time.deltaTime;
-                float t = elapsed / _settleTime;
-                float ease = 1f - (1f - t) * (1f - t) * (1f - t);
-
-                _diceImageRect.anchoredPosition = Vector2.Lerp(fromPos, Vector2.zero, ease);
-                _diceImageRect.localRotation = Quaternion.Slerp(startRot, Quaternion.identity, ease);
-                _diceImageRect.localScale = Vector3.Lerp(startScale, Vector3.one, ease);
-                yield return null;
-            }
-
-            ResetMotion();
-        }
-
-        private void ResetMotion()
-        {
-            if (_diceImageRect == null) return;
-            _diceImageRect.anchoredPosition = Vector2.zero;
-            _diceImageRect.localRotation = Quaternion.identity;
-            _diceImageRect.localScale = Vector3.one;
+            minX = Mathf.Min(localMin.x, localMax.x);
+            maxX = Mathf.Max(localMin.x, localMax.x);
+            minY = Mathf.Min(localMin.y, localMax.y);
+            maxY = Mathf.Max(localMin.y, localMax.y);
         }
     }
 }

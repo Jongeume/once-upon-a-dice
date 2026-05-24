@@ -212,6 +212,62 @@ namespace OUD.Editor
                     Debug.Log($"[DiceSetup]   Wired _resultSprites (6 sprites) for {diceName}");
                 }
 
+                // Wire _rollingAreaRect
+                var rollingAreaGO = GameObject.Find("BattleCanvas/DiceTablePanel/SafeArea/RollingArea");
+                if (rollingAreaGO == null)
+                {
+                    // Search inactive
+                    var allT = Resources.FindObjectsOfTypeAll<Transform>();
+                    foreach (var t in allT)
+                        if (t.name == "RollingArea" && t.gameObject.scene.isLoaded)
+                        { rollingAreaGO = t.gameObject; break; }
+                }
+                if (rollingAreaGO != null)
+                {
+                    var raProp = so.FindProperty("_rollingAreaRect");
+                    if (raProp != null)
+                    {
+                        raProp.objectReferenceValue = rollingAreaGO.GetComponent<RectTransform>();
+                        Debug.Log($"[DiceSetup]   Wired _rollingAreaRect for {diceName}");
+                    }
+                }
+                else
+                {
+                    Debug.LogWarning("[DiceSetup]   RollingArea not found in scene!");
+                }
+
+                // Wire _keepSlotRect
+                var keepSlotsAreaGO = GameObject.Find("BattleCanvas/DiceTablePanel/SafeArea/KeepSlotsArea");
+                if (keepSlotsAreaGO == null)
+                {
+                    var allT = Resources.FindObjectsOfTypeAll<Transform>();
+                    foreach (var t in allT)
+                        if (t.name == "KeepSlotsArea" && t.gameObject.scene.isLoaded)
+                        { keepSlotsAreaGO = t.gameObject; break; }
+                }
+                if (keepSlotsAreaGO != null)
+                {
+                    string keepSlotName = $"KeepSlot{i}";
+                    Transform keepSlotT = keepSlotsAreaGO.transform.Find(keepSlotName);
+                    if (keepSlotT != null)
+                    {
+                        var ksProp = so.FindProperty("_keepSlotRect");
+                        if (ksProp != null)
+                        {
+                            ksProp.objectReferenceValue = keepSlotT.GetComponent<RectTransform>();
+                            Debug.Log($"[DiceSetup]   Wired _keepSlotRect → {keepSlotName} for {diceName}");
+                        }
+                    }
+                    else
+                    {
+                        Debug.LogWarning($"[DiceSetup]   {keepSlotName} not found under KeepSlotsArea!");
+                    }
+                }
+                else
+                {
+                    Debug.LogWarning("[DiceSetup]   KeepSlotsArea not found in scene!");
+                }
+
                 so.ApplyModifiedProperties();
             }
 
