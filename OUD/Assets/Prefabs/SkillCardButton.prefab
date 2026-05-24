@@ -67,8 +67,8 @@ MonoBehaviour:
       m_Calls: []
   m_text: (OnePair)
   m_isRightToLeft: 0
-  m_fontAsset: {fileID: 11400000, guid: 8f586378b4e144a9851e7b34d9b748ee, type: 2}
-  m_sharedMaterial: {fileID: 2180264, guid: 8f586378b4e144a9851e7b34d9b748ee, type: 2}
+  m_fontAsset: {fileID: 11400000, guid: 0bab88640a1677d4596db5e478e5a01e, type: 2}
+  m_sharedMaterial: {fileID: 0}
   m_fontSharedMaterials: []
   m_fontMaterial: {fileID: 0}
   m_fontMaterials: []
@@ -204,8 +204,8 @@ MonoBehaviour:
       m_Calls: []
   m_text: Skill
   m_isRightToLeft: 0
-  m_fontAsset: {fileID: 11400000, guid: 8f586378b4e144a9851e7b34d9b748ee, type: 2}
-  m_sharedMaterial: {fileID: 2180264, guid: 8f586378b4e144a9851e7b34d9b748ee, type: 2}
+  m_fontAsset: {fileID: 11400000, guid: 0bab88640a1677d4596db5e478e5a01e, type: 2}
+  m_sharedMaterial: {fileID: 0}
   m_fontSharedMaterials: []
   m_fontMaterial: {fileID: 0}
   m_fontMaterials: []
@@ -416,6 +416,8 @@ MonoBehaviour:
   _background: {fileID: 2696394562878546103}
   _enabledColor: {r: 0.09, g: 0.06, b: 0.04, a: 0.9}
   _disabledColor: {r: 0.16, g: 0.13, b: 0.09, a: 0.6}
+  _enabledOutline: {r: 0.95, g: 0.78, b: 0.18, a: 1}
+  _disabledOutline: {r: 0.3, g: 0.25, b: 0.18, a: 0.5}
 --- !u!114 &7320826235964064409
 MonoBehaviour:
   m_ObjectHideFlags: 0
