@@ -205,6 +205,7 @@ namespace OUD.Unity.Adapter
             _playerPresenter.SyncView();
             RefreshTopBar();
 
+            SoundManager.Instance?.PlayCoin();
             _shopView.RefreshGold(player.Gold, player.Hp, player.Xp);
         }
 
@@ -216,6 +217,7 @@ namespace OUD.Unity.Adapter
                 _shopSystem.BuyXp(player);
             _playerPresenter.SyncView();
             RefreshTopBar();
+            SoundManager.Instance?.PlayCoin();
 
             if (_levelUpSystem != null && _levelUpSystem.CanLevelUp(player.Xp, player.Level))
             {
@@ -238,6 +240,7 @@ namespace OUD.Unity.Adapter
             PlayerState player = _runManager.State.Player;
             if (_levelUpStatView != null)
             {
+                SoundManager.Instance?.PlayLevelUp();
                 _levelUpStatView.SetStats(player.Atk, player.Def, player.MaxHp, player.Hp);
                 _levelUpStatView.Show();
                 _pendingShopLevelUp = true;
@@ -297,6 +300,7 @@ namespace OUD.Unity.Adapter
 
             if (_levelUpStatView != null)
             {
+                SoundManager.Instance?.PlayLevelUp();
                 _levelUpStatView.SetStats(player.Atk, player.Def, player.MaxHp, player.Hp);
                 _levelUpStatView.Show();
                 _pendingFlow = flow;
@@ -506,6 +510,8 @@ namespace OUD.Unity.Adapter
                 _mapPeekMode = false;
                 return;
             }
+
+            SoundManager.Instance?.PlayMapClick();
 
             int currentNodeId = _runManager.State.CurrentNodeId;
 
@@ -785,6 +791,7 @@ namespace OUD.Unity.Adapter
             _dicePresenter.UpdateDice(values, rerollsLeft);
             _slotAssignmentPresenter.OnRerollCountChanged(rerollsLeft);
             _uiManager.ShowScreen(UIManager.BattleScreen.B_DiceTable);
+            SoundManager.Instance?.PlayDiceRoll();
         }
 
         public void OnHandsEvaluated(List<HandType> hands, List<SkillData> usableSkills) { }
@@ -806,6 +813,11 @@ namespace OUD.Unity.Adapter
             _playerPresenter.SyncView();
             _enemyPresenter.RefreshAll();
             RefreshTopBar();
+
+            if (result.Skill.Category == SkillCategory.Attack)
+                SoundManager.Instance?.PlayPlayerAttack();
+            else
+                SoundManager.Instance?.PlayShield();
         }
 
         public void OnEnemyAction(int enemyIndex, IntentType intent, int value)
@@ -814,6 +826,9 @@ namespace OUD.Unity.Adapter
             _battleLogPresenter.ShowEnemyAction(enemyIndex, intent, value);
             _playerPresenter.SyncView();
             RefreshTopBar();
+
+            if (intent == IntentType.Attack || intent == IntentType.StrongAttack)
+                SoundManager.Instance?.PlayMonsterAttack();
         }
 
         public void OnIntentUpdated(int enemyIndex, IntentType intent, int value)
@@ -835,6 +850,7 @@ namespace OUD.Unity.Adapter
 
         public void OnBattleWon()
         {
+            SoundManager.Instance?.PlayVictory();
             // VICTORY 화면 표시 → 사용자가 화면 클릭 또는 일정 시간 경과 시 보상 화면으로 전환.
             _battleLogPresenter.ShowBattleWon();
             _winRewardTransitioned = false;
@@ -891,6 +907,7 @@ namespace OUD.Unity.Adapter
 
         public void OnBattleLost()
         {
+            SoundManager.Instance?.PlayDefeat();
             _battleLogPresenter.ShowBattleLost();
             _loseDefeatTransitioned = false;
             if (_battleLogView != null)
@@ -952,6 +969,8 @@ namespace OUD.Unity.Adapter
             RewardResult reward = _rewardSystem.CalculateReward(currentNode.Type);
             player.AddXp(reward.Xp);
             player.AddGold(reward.Gold);
+
+            SoundManager.Instance?.PlayCoin();
 
             if (_rewardView != null)
             {
