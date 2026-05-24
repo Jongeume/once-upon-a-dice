@@ -190,6 +190,28 @@ namespace OUD.Unity.Battle.View
 
             var box = CreateBadgeBox(skillName, category, isAoe);
             _badgeBoxes.Add(box);
+            NormalizeBadgeWidths();
+        }
+
+        private void NormalizeBadgeWidths()
+        {
+            const float PADDING = 24f;
+            float maxWidth = 0f;
+            foreach (var box in _badgeBoxes)
+            {
+                if (box == null) continue;
+                var tmp = box.GetComponentInChildren<TextMeshProUGUI>();
+                if (tmp != null)
+                    maxWidth = Mathf.Max(maxWidth, tmp.GetPreferredValues(tmp.text).x + PADDING);
+            }
+            foreach (var box in _badgeBoxes)
+            {
+                if (box == null) continue;
+                var rt = box.GetComponent<RectTransform>();
+                if (rt != null) rt.sizeDelta = new Vector2(maxWidth, rt.sizeDelta.y);
+            }
+            var containerRt = _targetBadgeContainer?.GetComponent<RectTransform>();
+            if (containerRt != null) containerRt.sizeDelta = new Vector2(maxWidth, containerRt.sizeDelta.y);
         }
 
         public void ClearTargetBadge()
@@ -215,6 +237,7 @@ namespace OUD.Unity.Battle.View
             var box = new GameObject($"Badge_{skillName}");
             box.transform.SetParent(_targetBadgeContainer.transform, false);
 
+            // 너비는 NormalizeBadgeWidths()가 일괄 고정하므로 초기 0으로 설정
             var rt = box.AddComponent<RectTransform>();
             rt.sizeDelta = new Vector2(0f, 44f);
 
@@ -226,20 +249,13 @@ namespace OUD.Unity.Battle.View
             outline.effectColor    = rimColor;
             outline.effectDistance = new Vector2(1f, -1f);
 
-            // HorizontalLayoutGroup이 텍스트 preferred width를 box로 전파 → ContentSizeFitter가 올바른 너비 계산
-            var hlg = box.AddComponent<HorizontalLayoutGroup>();
-            hlg.padding                = new RectOffset(12, 12, 6, 6);
-            hlg.childForceExpandWidth  = false;
-            hlg.childForceExpandHeight = true;
-            hlg.childControlWidth      = true;
-            hlg.childControlHeight     = true;
-
-            var csf = box.AddComponent<ContentSizeFitter>();
-            csf.horizontalFit = ContentSizeFitter.FitMode.PreferredSize;
-            csf.verticalFit   = ContentSizeFitter.FitMode.Unconstrained;
-
             var textGo = new GameObject("Text");
             textGo.transform.SetParent(box.transform, false);
+            var textRt = textGo.AddComponent<RectTransform>();
+            textRt.anchorMin = Vector2.zero;
+            textRt.anchorMax = Vector2.one;
+            textRt.offsetMin = new Vector2(12f, 6f);
+            textRt.offsetMax = new Vector2(-12f, -6f);
 
             var tmp = textGo.AddComponent<TextMeshProUGUI>();
             if (_nameText != null)
@@ -276,11 +292,11 @@ namespace OUD.Unity.Battle.View
             vlg.childAlignment         = TextAnchor.MiddleCenter;
             vlg.childForceExpandWidth  = false;
             vlg.childForceExpandHeight = false;
-            vlg.childControlWidth      = true;
+            vlg.childControlWidth      = false;  // 수동 너비(sizeDelta) 유지
             vlg.childControlHeight     = false;
 
             var csf = containerGo.AddComponent<ContentSizeFitter>();
-            csf.horizontalFit = ContentSizeFitter.FitMode.PreferredSize;
+            csf.horizontalFit = ContentSizeFitter.FitMode.Unconstrained;  // NormalizeBadgeWidths가 수동 설정
             csf.verticalFit   = ContentSizeFitter.FitMode.PreferredSize;
 
             _targetBadgeContainer = containerGo;

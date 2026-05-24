@@ -95,19 +95,13 @@ namespace OUD.Unity.Battle.View
             outline.effectColor    = new Color(0.23f, 0.51f, 0.96f, 1f);
             outline.effectDistance = new Vector2(1f, -1f);
 
-            var hlg = box.AddComponent<HorizontalLayoutGroup>();
-            hlg.padding                = new RectOffset(12, 12, 6, 6);
-            hlg.childForceExpandWidth  = false;
-            hlg.childForceExpandHeight = true;
-            hlg.childControlWidth      = true;
-            hlg.childControlHeight     = true;
-
-            var csf = box.AddComponent<ContentSizeFitter>();
-            csf.horizontalFit = ContentSizeFitter.FitMode.PreferredSize;
-            csf.verticalFit   = ContentSizeFitter.FitMode.Unconstrained;
-
             var textGo = new GameObject("Text");
             textGo.transform.SetParent(box.transform, false);
+            var textRt = textGo.AddComponent<RectTransform>();
+            textRt.anchorMin = Vector2.zero;
+            textRt.anchorMax = Vector2.one;
+            textRt.offsetMin = new Vector2(12f, 6f);
+            textRt.offsetMax = new Vector2(-12f, -6f);
 
             var tmp = textGo.AddComponent<TextMeshProUGUI>();
             tmp.fontSize           = 22f;
@@ -118,6 +112,28 @@ namespace OUD.Unity.Battle.View
             tmp.enableWordWrapping = false;
 
             _defenseBadgeBoxes.Add(box);
+            NormalizeDefenseBadgeWidths();
+        }
+
+        private void NormalizeDefenseBadgeWidths()
+        {
+            const float PADDING = 24f;
+            float maxWidth = 0f;
+            foreach (var box in _defenseBadgeBoxes)
+            {
+                if (box == null) continue;
+                var tmp = box.GetComponentInChildren<TextMeshProUGUI>();
+                if (tmp != null)
+                    maxWidth = Mathf.Max(maxWidth, tmp.GetPreferredValues(tmp.text).x + PADDING);
+            }
+            foreach (var box in _defenseBadgeBoxes)
+            {
+                if (box == null) continue;
+                var rt = box.GetComponent<RectTransform>();
+                if (rt != null) rt.sizeDelta = new Vector2(maxWidth, rt.sizeDelta.y);
+            }
+            var containerRt = _defenseBadgeContainer?.GetComponent<RectTransform>();
+            if (containerRt != null) containerRt.sizeDelta = new Vector2(maxWidth, containerRt.sizeDelta.y);
         }
 
         public void ClearDefenseBadges()
@@ -147,11 +163,11 @@ namespace OUD.Unity.Battle.View
             vlg.childAlignment         = TextAnchor.MiddleCenter;
             vlg.childForceExpandWidth  = false;
             vlg.childForceExpandHeight = false;
-            vlg.childControlWidth      = true;
+            vlg.childControlWidth      = false;  // 수동 너비(sizeDelta) 유지
             vlg.childControlHeight     = false;
 
             var csf = go.AddComponent<ContentSizeFitter>();
-            csf.horizontalFit = ContentSizeFitter.FitMode.PreferredSize;
+            csf.horizontalFit = ContentSizeFitter.FitMode.Unconstrained;  // NormalizeDefenseBadgeWidths가 수동 설정
             csf.verticalFit   = ContentSizeFitter.FitMode.PreferredSize;
 
             _defenseBadgeContainer = go;
