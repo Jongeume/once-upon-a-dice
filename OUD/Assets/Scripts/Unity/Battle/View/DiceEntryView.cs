@@ -21,11 +21,11 @@ namespace OUD.Unity.Battle.View
         [SerializeField] private float _frameRate = 12f;
         [SerializeField] private float _decelerationDuration = 0.3f;
 
-        [Header("Z축 낙하 (탑뷰)")]
+        [Header("Z축 낙하 (탑뷰 — 앞으로 던지기)")]
         [SerializeField] private float _dropHeight = 250f;
         [SerializeField] private float _zGravity = 2000f;
         [SerializeField] private float _zBounceCoeff = 0.45f;
-        [SerializeField] private float _scaleAtMaxHeight = 1.8f;
+        [SerializeField] private float _scaleOnTable = 0.65f;
         [SerializeField] private float _impactSquash = 1.15f;
         [SerializeField] private float _squashDuration = 0.06f;
 
@@ -35,6 +35,7 @@ namespace OUD.Unity.Battle.View
         [SerializeField] private float _slideFriction = 3f;
         [SerializeField] private float _wallBounceCoeff = 0.5f;
         [SerializeField] private float _rotationMultiplier = 0.4f;
+        [SerializeField] private float _tablePadding = 10f;
 
         [Header("복귀")]
         [SerializeField] private float _settleTime = 0.25f;
@@ -65,7 +66,6 @@ namespace OUD.Unity.Battle.View
             if (_diceImage)
                 _diceImageRect = _diceImage.GetComponent<RectTransform>();
 
-            // DiceArea = 부모 (Dice1~5의 부모)
             if (transform.parent != null)
                 _diceAreaRect = transform.parent.GetComponent<RectTransform>();
 
@@ -141,23 +141,22 @@ namespace OUD.Unity.Battle.View
                 yield break;
             }
 
-            // === 경계 계산 (부모 슬롯 위치 보정 포함) ===
-            CalculateTableBounds(out float minX, out float maxX, out float minY, out float maxY);
+            // === 정사각형 굴림 영역 계산 (DiceArea 중앙 기준) ===
+            CalculateSquareBounds(out float minX, out float maxX, out float minY, out float maxY);
 
-            // === Z축 상태 (높이: 0 = 테이블 위) ===
+            // === Z축 상태 ===
             float zHeight = _dropHeight + UnityEngine.Random.Range(0f, 80f);
             float zVelocity = -UnityEngine.Random.Range(50f, 150f);
             bool hasLanded = false;
 
-            // === 테이블 X/Y 상태 (탑뷰 평면 이동) ===
-            // 시작 위치: DiceArea 중앙 부근 (슬롯 보정 적용)
-            float centerX = (minX + maxX) * 0.5f;
-            float centerY = (minY + maxY) * 0.5f;
-            float rangeX = (maxX - minX) * 0.3f;
-            float rangeY = (maxY - minY) * 0.3f;
+            // === 테이블 X/Y (정사각형 영역 중앙 근처에서 시작) ===
+            float cx = (minX + maxX) * 0.5f;
+            float cy = (minY + maxY) * 0.5f;
+            float rangeX = (maxX - minX) * 0.2f;
+            float rangeY = (maxY - minY) * 0.2f;
             Vector2 tablePos = new Vector2(
-                centerX + UnityEngine.Random.Range(-rangeX, rangeX),
-                centerY + UnityEngine.Random.Range(-rangeY, rangeY));
+                cx + UnityEngine.Random.Range(-rangeX, rangeX),
+                cy + UnityEngine.Random.Range(-rangeY, rangeY));
             Vector2 tableVel = Vector2.zero;
             float rotation = UnityEngine.Random.Range(0f, 360f);
 
@@ -167,7 +166,6 @@ namespace OUD.Unity.Battle.View
             int lastSpriteIndex = -1;
             float elapsed = 0f;
 
-            // 초기 스케일 적용
             ApplyVisuals(tablePos, zHeight, rotation);
 
             // === 메인 물리 루프 ===
@@ -176,7 +174,7 @@ namespace OUD.Unity.Battle.View
                 float dt = Time.deltaTime;
                 elapsed += dt;
 
-                // --- Z축 물리 (낙하/바운스) ---
+                // --- Z축 물리 ---
                 zVelocity -= _zGravity * dt;
                 zHeight += zVelocity * dt;
 
@@ -186,7 +184,6 @@ namespace OUD.Unity.Battle.View
 
                     if (!hasLanded)
                     {
-                        // 첫 착지: 테이블 위 랜덤 방향으로 미끄러짐 시작
                         hasLanded = true;
                         float slideSpeed = UnityEngine.Random.Range(_slideSpeedMin, _slideSpeedMax);
                         float slideAngle = UnityEngine.Random.Range(0f, 360f) * Mathf.Deg2Rad;
@@ -194,38 +191,32 @@ namespace OUD.Unity.Battle.View
                             Mathf.Cos(slideAngle) * slideSpeed,
                             Mathf.Sin(slideAngle) * slideSpeed);
 
-                        // 착지 스쿼시 효과
                         StartCoroutine(SquashEffect());
                     }
 
-                    // Z 바운스
                     zVelocity = Mathf.Abs(zVelocity) * _zBounceCoeff;
                     if (zVelocity < 30f) zVelocity = 0f;
                 }
 
-                // --- 테이블 X/Y 물리 (착지 후에만) ---
+                // --- 테이블 X/Y 물리 ---
                 if (hasLanded)
                 {
                     tablePos += tableVel * dt;
 
-                    // 벽 충돌 (부모 슬롯 위치 보정된 경계)
                     if (tablePos.x < minX) { tablePos.x = minX; tableVel.x = -tableVel.x * _wallBounceCoeff; }
                     if (tablePos.x > maxX) { tablePos.x = maxX; tableVel.x = -tableVel.x * _wallBounceCoeff; }
                     if (tablePos.y < minY) { tablePos.y = minY; tableVel.y = -tableVel.y * _wallBounceCoeff; }
                     if (tablePos.y > maxY) { tablePos.y = maxY; tableVel.y = -tableVel.y * _wallBounceCoeff; }
 
-                    // 마찰 감속
                     tableVel *= Mathf.Exp(-_slideFriction * dt);
 
-                    // 이동에 따른 회전
                     rotation += tableVel.magnitude * _rotationMultiplier * dt *
                                 Mathf.Sign(tableVel.x + tableVel.y * 0.5f);
                 }
 
-                // --- 비주얼 적용 ---
                 ApplyVisuals(tablePos, zHeight, rotation);
 
-                // --- 스프라이트 프레임 순환 ---
+                // ���프라이트
                 frameTimer += dt;
                 if (frameTimer >= frameInterval)
                 {
@@ -256,7 +247,6 @@ namespace OUD.Unity.Battle.View
                     float dt = Time.deltaTime;
                     stepElapsed += dt;
 
-                    // 테이블 물리 (강한 감쇠)
                     tablePos += tableVel * dt;
                     if (tablePos.x < minX) { tablePos.x = minX; tableVel.x = -tableVel.x * 0.3f; }
                     if (tablePos.x > maxX) { tablePos.x = maxX; tableVel.x = -tableVel.x * 0.3f; }
@@ -288,7 +278,7 @@ namespace OUD.Unity.Battle.View
             if (_resultSprites != null && resultValue >= 1 && resultValue <= _resultSprites.Length)
                 _diceImage.sprite = _resultSprites[resultValue - 1];
 
-            // === 슬롯 위치로 복귀 ===
+            // === 슬롯으로 복귀 ===
             yield return SettleRoutine(tablePos, rotation);
 
             _rollCoroutine = null;
@@ -296,15 +286,17 @@ namespace OUD.Unity.Battle.View
         }
 
         /// <summary>
-        /// Z축 높이 → 스케일 (높을수록 큼 = 카메라에 가까움), 위치/회전 적용
+        /// 스��일: 높이가 높을수록 큼(1.0=가까움), 테이블에 착지하면 작아짐(_scaleOnTable=멀어짐).
+        /// 앞으로 던지는 느낌: 시작(큼) → 착지(작음).
         /// </summary>
         private void ApplyVisuals(Vector2 tablePos, float zHeight, float rotation)
         {
             if (_diceImageRect == null) return;
 
-            // 높을수록 크게 (카메라 근처 → 테이블로 떨어짐)
+            // heightRatio: 1=시작(��음/가까움), 0=착지(테이블/멀어짐)
             float heightRatio = Mathf.Clamp01(zHeight / _dropHeight);
-            float scale = Mathf.Lerp(1f, _scaleAtMaxHeight, heightRatio);
+            // ���까울 때(높���) = 1.0, 멀어졌을 때(테이블) = _scaleOnTable(0.65)
+            float scale = Mathf.Lerp(_scaleOnTable, 1f, heightRatio);
 
             _diceImageRect.anchoredPosition = tablePos;
             _diceImageRect.localScale = Vector3.one * scale;
@@ -312,80 +304,77 @@ namespace OUD.Unity.Battle.View
         }
 
         /// <summary>
-        /// 착지 순간 스쿼시 효과 (납작해졌다 복원)
+        /// 착지 스쿼시 효과
         /// </summary>
         private IEnumerator SquashEffect()
         {
             if (_diceImageRect == null) yield break;
 
             float half = _squashDuration * 0.5f;
+            float baseScale = _scaleOnTable;
             float elapsed = 0f;
 
-            // 스쿼시
             while (elapsed < half)
             {
                 elapsed += Time.deltaTime;
                 float t = elapsed / half;
-                float sx = Mathf.Lerp(1f, _impactSquash, t);
-                float sy = Mathf.Lerp(1f, 1f / _impactSquash, t);
+                float sx = baseScale * Mathf.Lerp(1f, _impactSquash, t);
+                float sy = baseScale * Mathf.Lerp(1f, 1f / _impactSquash, t);
                 _diceImageRect.localScale = new Vector3(sx, sy, 1f);
                 yield return null;
             }
 
-            // 복원
             elapsed = 0f;
             while (elapsed < half)
             {
                 elapsed += Time.deltaTime;
                 float t = elapsed / half;
-                float sx = Mathf.Lerp(_impactSquash, 1f, t);
-                float sy = Mathf.Lerp(1f / _impactSquash, 1f, t);
+                float sx = baseScale * Mathf.Lerp(_impactSquash, 1f, t);
+                float sy = baseScale * Mathf.Lerp(1f / _impactSquash, 1f, t);
                 _diceImageRect.localScale = new Vector3(sx, sy, 1f);
                 yield return null;
             }
 
-            _diceImageRect.localScale = Vector3.one;
+            _diceImageRect.localScale = Vector3.one * baseScale;
         }
 
         /// <summary>
-        /// DiceArea 전체 영역에서 이동 가능한 경계를 부모 슬롯 위치 기준으로 계산.
-        /// 각 Dice 슬롯의 오프셋을 보정하여 DiceImage가 DiceArea 전체를 활용.
+        /// DiceArea 중앙에 정사각형 굴림판을 설정.
+        /// 가로/세로 중 짧은 쪽 ��준으로 정사각형을 만들어 패널 침범 방지.
+        /// 각 슬롯의 위치 ��프셋을 보정하여 모��� 주사위가 같은 판에서 움직임.
         /// </summary>
-        private void CalculateTableBounds(out float minX, out float maxX, out float minY, out float maxY)
+        private void CalculateSquareBounds(out float minX, out float maxX, out float minY, out float maxY)
         {
             if (_diceAreaRect == null || _diceImageRect == null)
             {
-                minX = -100f; maxX = 100f;
-                minY = -60f;  maxY = 60f;
+                minX = -80f; maxX = 80f;
+                minY = -80f; maxY = 80f;
                 return;
             }
 
             Vector2 areaSize = _diceAreaRect.rect.size;
-            Vector2 areaPivot = _diceAreaRect.pivot;
 
-            // DiceArea 로컬 좌표계에서의 경계
-            float areaLeft   = -areaSize.x * areaPivot.x;
-            float areaRight  =  areaSize.x * (1f - areaPivot.x);
-            float areaBottom = -areaSize.y * areaPivot.y;
-            float areaTop    =  areaSize.y * (1f - areaPivot.y);
+            // 정사각형: 가로/세로 중 짧은 쪽 기준 (패딩 적용)
+            float side = Mathf.Min(areaSize.x, areaSize.y) - _tablePadding * 2f;
+            float halfSide = side * 0.5f;
 
-            // 이 슬롯(Dice1~5)의 DiceArea 내 위치
+            // ��� 슬롯의 DiceArea 내 위치 (오프셋 보정)
             RectTransform slotRect = transform as RectTransform;
             Vector2 slotPos = slotRect.anchoredPosition;
 
-            // 다이스 이미지 절반 크기 (여유분)
-            Vector2 imgHalf = _diceImageRect.rect.size * 0.5f;
+            // DiceImage 반경 (스케일 고려)
+            float imgRadius = _diceImageRect.rect.size.x * _scaleOnTable * 0.5f;
+            float bound = halfSide - imgRadius;
 
-            // DiceImage의 anchoredPosition은 부모(슬롯) 기준이므로
-            // DiceArea 전체를 쓰려면 슬롯 오프셋만큼 보정 필요
-            minX = areaLeft   + imgHalf.x - slotPos.x;
-            maxX = areaRight  - imgHalf.x - slotPos.x;
-            minY = areaBottom + imgHalf.y - slotPos.y;
-            maxY = areaTop    - imgHalf.y - slotPos.y;
+            // 슬롯 위치를 빼서 DiceImage 로컬 좌표 기준으로 변환
+            minX = -bound - slotPos.x;
+            maxX =  bound - slotPos.x;
+            minY = -bound - slotPos.y;
+            maxY =  bound - slotPos.y;
         }
 
         /// <summary>
-        /// 현재 위치에서 원래 슬롯(0,0)으로 부드럽게 복귀
+        /// 테이블 위 위치에서 슬롯 원점(0,0) + 정상 스케일(1.0)로 복귀
         /// </summary>
         private IEnumerator SettleRoutine(Vector2 fromPos, float fromRotation)
         {
