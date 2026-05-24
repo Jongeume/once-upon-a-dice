@@ -30,7 +30,7 @@ namespace OUD.Unity.Battle.View
         [SerializeField] private float _dropHeight = 250f;
         [SerializeField] private float _zGravity = 2000f;
         [SerializeField] private float _zBounceCoeff = 0.45f;
-        [SerializeField] private float _scaleOnTable = 0.65f;
+        [SerializeField] private float _scaleOnTable = 0.5f;
         [SerializeField] private float _impactSquash = 1.15f;
         [SerializeField] private float _squashDuration = 0.06f;
 
@@ -426,8 +426,8 @@ namespace OUD.Unity.Battle.View
             Vector3 localTarget = _diceImageRect.parent.InverseTransformPoint(worldTarget);
             Vector2 toPos = new Vector2(localTarget.x, localTarget.y);
 
-            // KeepSlot에서는 정상 스케일로 복원
-            Vector3 toScale = Vector3.one;
+            // KeepSlot 스케일
+            Vector3 toScale = Vector3.one * 0.75f;
 
             float elapsed = 0f;
             while (elapsed < _moveToKeepDuration)
