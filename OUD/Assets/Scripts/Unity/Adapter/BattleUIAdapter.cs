@@ -88,6 +88,52 @@ namespace OUD.Unity.Adapter
 
         private PostBattleFlow _pendingFlow;
 
+        // ── Action Queue — 전투 행동 순차 연출 ───────────────────────────────
+
+        private const float ACTION_DELAY = 0.6f;
+        private const float INTENT_DELAY = 0.15f;
+
+        private enum BattleActionType
+        {
+            SlotExecuted,
+            EnemyAction,
+            ShieldsReset,
+            IntentUpdated,
+            EnemySummoned,
+            BattleWon,
+            BattleLost
+        }
+
+        private struct EnemySnapshot
+        {
+            public int Hp, MaxHp, Shield;
+            public bool IsDead;
+        }
+
+        private struct DisplaySnapshot
+        {
+            public int PlayerHp, PlayerMaxHp, PlayerShield;
+            public EnemySnapshot[] Enemies;
+        }
+
+        private struct QueuedBattleAction
+        {
+            public BattleActionType Type;
+            public int Index;
+            public SkillResult SkillResult;
+            public IntentType Intent;
+            public int Value;
+            public MonsterInstance SummonedMonster;
+            public DisplaySnapshot Snapshot;
+        }
+
+        private bool _isQueueMode;
+        private readonly Queue<QueuedBattleAction> _actionQueue = new Queue<QueuedBattleAction>();
+        private Coroutine _playbackCoroutine;
+        private List<MonsterInstance> _battleEnemies;
+
+        public bool IsPlayingQueue { get; private set; }
+
         private void Awake()
         {
             BuildPresenters();
@@ -715,10 +761,20 @@ namespace OUD.Unity.Adapter
                 return;
             }
 
+            _isQueueMode = true;
             _turnManager.ConfirmDice();
 
             if (_hasUsableSkills)
+            {
+                _isQueueMode = false;
                 HandleUseSkillClicked();
+            }
+            else
+            {
+                _isQueueMode = false;
+                _uiManager.ShowScreen(UIManager.BattleScreen.A_BattleBasic);
+                StartQueuePlayback();
+            }
         }
 
         private void HandleUseSkillClicked()
@@ -738,15 +794,18 @@ namespace OUD.Unity.Adapter
             _enemyPresenter.SetTargetSelectable(false);
             _playerView.ClearDefenseBadges();
             var targetIndices = _targetSelectionPresenter.GetTargetIndices();
+
+            _isQueueMode = true;
             if (targetIndices != null)
                 _slotAssignmentPresenter.Confirm(targetIndices);
+            _isQueueMode = false;
 
-            // 기술 실행 직후 슬롯을 빈 상태로 표시 — 다음 Roll Dice 전 Screen A에서 사용된 스킬이 잔류하지 않도록.
             _slotAssignmentPresenter.ResetForNewTurn();
             _targetSelectionPresenter?.ResetForNewTurn();
             if (_targetSelectionView != null) _targetSelectionView.ResetForNewTurn();
 
             _uiManager.ShowScreen(UIManager.BattleScreen.A_BattleBasic);
+            StartQueuePlayback();
         }
 
         // ── IBattleUI ────────────────────────────────────────────────────
@@ -755,6 +814,7 @@ namespace OUD.Unity.Adapter
         {
             if (_battleLogView != null) _battleLogView.HideResultScreens();
 
+            _battleEnemies = enemies;
             _playerPresenter.Init(player);
             _enemyPresenter.Init(enemies);
             _battleLogPresenter = new BattleLogPresenter(
@@ -809,6 +869,17 @@ namespace OUD.Unity.Adapter
 
         public void OnSlotExecuted(int slotIndex, SkillResult result)
         {
+            if (_isQueueMode)
+            {
+                _actionQueue.Enqueue(new QueuedBattleAction
+                {
+                    Type = BattleActionType.SlotExecuted,
+                    Index = slotIndex,
+                    SkillResult = result,
+                    Snapshot = CaptureSnapshot()
+                });
+                return;
+            }
             _battleLogPresenter.ShowSlotResult(slotIndex, result);
             _playerPresenter.SyncView();
             _enemyPresenter.RefreshAll();
@@ -822,6 +893,18 @@ namespace OUD.Unity.Adapter
 
         public void OnEnemyAction(int enemyIndex, IntentType intent, int value)
         {
+            if (_isQueueMode)
+            {
+                _actionQueue.Enqueue(new QueuedBattleAction
+                {
+                    Type = BattleActionType.EnemyAction,
+                    Index = enemyIndex,
+                    Intent = intent,
+                    Value = value,
+                    Snapshot = CaptureSnapshot()
+                });
+                return;
+            }
             _enemyPresenter.ShowAction(enemyIndex, intent, value);
             _battleLogPresenter.ShowEnemyAction(enemyIndex, intent, value);
             _playerPresenter.SyncView();
@@ -833,16 +916,48 @@ namespace OUD.Unity.Adapter
 
         public void OnIntentUpdated(int enemyIndex, IntentType intent, int value)
         {
+            if (_isQueueMode)
+            {
+                _actionQueue.Enqueue(new QueuedBattleAction
+                {
+                    Type = BattleActionType.IntentUpdated,
+                    Index = enemyIndex,
+                    Intent = intent,
+                    Value = value,
+                    Snapshot = CaptureSnapshot()
+                });
+                return;
+            }
             _enemyPresenter.ShowAction(enemyIndex, intent, value);
         }
 
         public void OnEnemySummoned(int enemyIndex, MonsterInstance clone)
         {
+            if (_isQueueMode)
+            {
+                _actionQueue.Enqueue(new QueuedBattleAction
+                {
+                    Type = BattleActionType.EnemySummoned,
+                    Index = enemyIndex,
+                    SummonedMonster = clone,
+                    Snapshot = CaptureSnapshot()
+                });
+                return;
+            }
             _enemyPresenter.AddEntry(clone, enemyIndex);
         }
 
         public void OnShieldsReset()
         {
+            if (_isQueueMode)
+            {
+                _actionQueue.Enqueue(new QueuedBattleAction
+                {
+                    Type = BattleActionType.ShieldsReset,
+                    Snapshot = CaptureSnapshot()
+                });
+                return;
+            }
             _playerPresenter.SyncShield();
             _enemyPresenter.RefreshAllShields();
             RefreshTopBar();
@@ -850,8 +965,28 @@ namespace OUD.Unity.Adapter
 
         public void OnBattleWon()
         {
+            if (_isQueueMode)
+            {
+                _actionQueue.Enqueue(new QueuedBattleAction
+                {
+                    Type = BattleActionType.BattleWon,
+                    Snapshot = CaptureSnapshot()
+                });
+                return;
+            }
+
+            if (IsPlayingQueue)
+                StopPlayback();
+
+            _playerPresenter.SyncView();
+            _enemyPresenter.RefreshAll();
+            RefreshTopBar();
+            ExecuteBattleWon();
+        }
+
+        private void ExecuteBattleWon()
+        {
             SoundManager.Instance?.PlayVictory();
-            // VICTORY 화면 표시 → 사용자가 화면 클릭 또는 일정 시간 경과 시 보상 화면으로 전환.
             _battleLogPresenter.ShowBattleWon();
             _winRewardTransitioned = false;
             if (_battleLogView != null)
@@ -906,6 +1041,27 @@ namespace OUD.Unity.Adapter
         }
 
         public void OnBattleLost()
+        {
+            if (_isQueueMode)
+            {
+                _actionQueue.Enqueue(new QueuedBattleAction
+                {
+                    Type = BattleActionType.BattleLost,
+                    Snapshot = CaptureSnapshot()
+                });
+                return;
+            }
+
+            if (IsPlayingQueue)
+                StopPlayback();
+
+            _playerPresenter.SyncView();
+            _enemyPresenter.RefreshAll();
+            RefreshTopBar();
+            ExecuteBattleLost();
+        }
+
+        private void ExecuteBattleLost()
         {
             SoundManager.Instance?.PlayDefeat();
             _battleLogPresenter.ShowBattleLost();
@@ -980,6 +1136,162 @@ namespace OUD.Unity.Adapter
 
             _playerPresenter.SyncView();
             RefreshTopBar();
+        }
+
+        // ── Queue Playback Engine ────────────────────────────────────────
+
+        private DisplaySnapshot CaptureSnapshot()
+        {
+            var player = _playerPresenter.Player;
+            var snap = new DisplaySnapshot
+            {
+                PlayerHp = player.Hp,
+                PlayerMaxHp = player.MaxHp,
+                PlayerShield = player.Shield,
+                Enemies = new EnemySnapshot[_battleEnemies.Count]
+            };
+            for (int i = 0; i < _battleEnemies.Count; i++)
+            {
+                var m = _battleEnemies[i];
+                snap.Enemies[i] = new EnemySnapshot
+                {
+                    Hp = m.Hp,
+                    MaxHp = m.Data.MaxHp,
+                    Shield = m.Shield,
+                    IsDead = m.IsDead
+                };
+            }
+            return snap;
+        }
+
+        private void ApplySnapshot(DisplaySnapshot snapshot)
+        {
+            _playerPresenter.DisplayValues(snapshot.PlayerHp, snapshot.PlayerMaxHp, snapshot.PlayerShield);
+            for (int i = 0; i < snapshot.Enemies.Length; i++)
+            {
+                var e = snapshot.Enemies[i];
+                _enemyPresenter.DisplayValues(i, e.Hp, e.MaxHp, e.Shield, e.IsDead);
+            }
+            RefreshTopBarFromSnapshot(snapshot.PlayerHp, snapshot.PlayerMaxHp);
+        }
+
+        private void RefreshTopBarFromSnapshot(int hp, int maxHp)
+        {
+            if (_topBarText == null || _playerPresenter == null) return;
+            PlayerState player = _playerPresenter.Player;
+            if (player == null) return;
+
+            string nameText = string.IsNullOrEmpty(_playerName) ? "Player" : _playerName;
+            string xpText;
+            if (LevelUpSystem.IsMaxLevel(player.Level))
+                xpText = "MAX";
+            else
+                xpText = $"{player.Xp}/{LevelUpSystem.GetXpThreshold(player.Level)}";
+            _topBarText.text = $"{nameText}  HP {hp}/{maxHp}  XP {xpText}  돈 {player.Gold}";
+        }
+
+        private void StartQueuePlayback()
+        {
+            if (_actionQueue.Count == 0)
+            {
+                IsPlayingQueue = false;
+                return;
+            }
+            IsPlayingQueue = true;
+            _playbackCoroutine = StartCoroutine(PlayActionQueue());
+        }
+
+        private System.Collections.IEnumerator PlayActionQueue()
+        {
+            while (_actionQueue.Count > 0)
+            {
+                var action = _actionQueue.Dequeue();
+                ExecuteQueuedAction(action);
+
+                if (action.Type == BattleActionType.BattleWon || action.Type == BattleActionType.BattleLost)
+                {
+                    _actionQueue.Clear();
+                    break;
+                }
+
+                float delay = ACTION_DELAY;
+                if (action.Type == BattleActionType.IntentUpdated)
+                    delay = INTENT_DELAY;
+                if (delay > 0f && _actionQueue.Count > 0
+                    && _actionQueue.Peek().Type == BattleActionType.IntentUpdated
+                    && action.Type == BattleActionType.IntentUpdated)
+                    delay = 0f;
+
+                if (delay > 0f)
+                    yield return new WaitForSeconds(delay);
+            }
+
+            _playerPresenter.SyncView();
+            _enemyPresenter.RefreshAll();
+            RefreshTopBar();
+
+            IsPlayingQueue = false;
+            _playbackCoroutine = null;
+        }
+
+        private void ExecuteQueuedAction(QueuedBattleAction action)
+        {
+            if (action.Type == BattleActionType.EnemySummoned)
+            {
+                _enemyPresenter.AddEntry(action.SummonedMonster, action.Index);
+                _battleLogPresenter = new BattleLogPresenter(
+                    _battleLogView,
+                    _playerView.transform,
+                    BuildEnemyTransforms());
+                ApplySnapshot(action.Snapshot);
+                return;
+            }
+
+            ApplySnapshot(action.Snapshot);
+
+            switch (action.Type)
+            {
+                case BattleActionType.SlotExecuted:
+                    _battleLogPresenter.ShowSlotResult(action.Index, action.SkillResult);
+                    if (action.SkillResult.Skill.Category == SkillCategory.Attack)
+                        SoundManager.Instance?.PlayPlayerAttack();
+                    else
+                        SoundManager.Instance?.PlayShield();
+                    break;
+
+                case BattleActionType.EnemyAction:
+                    _enemyPresenter.ShowAction(action.Index, action.Intent, action.Value);
+                    _battleLogPresenter.ShowEnemyAction(action.Index, action.Intent, action.Value);
+                    if (action.Intent == IntentType.Attack || action.Intent == IntentType.StrongAttack)
+                        SoundManager.Instance?.PlayMonsterAttack();
+                    break;
+
+                case BattleActionType.ShieldsReset:
+                    break;
+
+                case BattleActionType.IntentUpdated:
+                    _enemyPresenter.ShowAction(action.Index, action.Intent, action.Value);
+                    break;
+
+                case BattleActionType.BattleWon:
+                    ExecuteBattleWon();
+                    break;
+
+                case BattleActionType.BattleLost:
+                    ExecuteBattleLost();
+                    break;
+            }
+        }
+
+        private void StopPlayback()
+        {
+            if (_playbackCoroutine != null)
+            {
+                StopCoroutine(_playbackCoroutine);
+                _playbackCoroutine = null;
+            }
+            _actionQueue.Clear();
+            IsPlayingQueue = false;
         }
 
         private void RefreshTopBar()

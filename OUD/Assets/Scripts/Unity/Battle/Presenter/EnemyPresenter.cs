@@ -84,6 +84,16 @@ namespace OUD.Unity.Battle.Presenter
                 HandleDeath(index);
         }
 
+        public void DisplayValues(int index, int hp, int maxHp, int shield, bool isDead)
+        {
+            if (index < 0 || index >= _entryViews.Count) return;
+            float fill = maxHp > 0 ? (float)hp / maxHp : 0f;
+            _entryViews[index].UpdateHp(fill, $"{hp} / {maxHp}");
+            _entryViews[index].UpdateShield(shield, shield > 0);
+            if (isDead && _entryViews[index] is MonoBehaviour mb && mb != null && mb.gameObject.activeSelf)
+                HandleDeath(index);
+        }
+
         public void ShowAction(int enemyIndex, IntentType intent, int value)
         {
             if (enemyIndex < 0 || enemyIndex >= _entryViews.Count) return;

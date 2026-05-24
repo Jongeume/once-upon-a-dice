@@ -42,6 +42,7 @@ namespace OUD.Unity
         {
             if (_turnManager == null) return;
             if (Keyboard.current == null) return;
+            if (_adapter != null && _adapter.IsPlayingQueue) return;
 
             if (Keyboard.current.cKey.wasPressedThisFrame)
             {
@@ -145,6 +146,7 @@ namespace OUD.Unity
         private void OnRollDiceClicked()
         {
             if (_turnManager == null) return;
+            if (_adapter != null && _adapter.IsPlayingQueue) return;
 
             // 이미 플레이어 턴이 진행 중(뒤로가기로 Screen A로 빠져나온 상태)이면
             // 상태를 리셋하지 않고 주사위 패널만 다시 표시한다 — 패널 토글 동작.
