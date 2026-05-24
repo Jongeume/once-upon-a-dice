@@ -782,9 +782,9 @@ namespace OUD.Unity.Adapter
         public void OnDiceRolled(int[] values, int rerollsLeft)
         {
             _hasUsableSkills = false;
+            _uiManager.ShowScreen(UIManager.BattleScreen.B_DiceTable);
             _dicePresenter.UpdateDice(values, rerollsLeft);
             _slotAssignmentPresenter.OnRerollCountChanged(rerollsLeft);
-            _uiManager.ShowScreen(UIManager.BattleScreen.B_DiceTable);
         }
 
         public void OnHandsEvaluated(List<HandType> hands, List<SkillData> usableSkills) { }

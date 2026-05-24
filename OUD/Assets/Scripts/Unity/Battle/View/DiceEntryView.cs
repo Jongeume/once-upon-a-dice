@@ -30,6 +30,12 @@ namespace OUD.Unity.Battle.View
         private Outline _outline;
         private Coroutine _rollCoroutine;
 
+        // 비활성 상태에서 PlayRoll 호출 시 대기용
+        private bool   _pendingRoll;
+        private int    _pendingResult;
+        private float  _pendingDelay;
+        private Action _pendingCallback;
+
         public event Action OnToggled;
 
         private void Awake()
@@ -49,8 +55,27 @@ namespace OUD.Unity.Battle.View
             }
         }
 
+        private void OnEnable()
+        {
+            if (_pendingRoll)
+            {
+                _pendingRoll = false;
+                if (_rollCoroutine != null) StopCoroutine(_rollCoroutine);
+                _rollCoroutine = StartCoroutine(RollRoutine(_pendingResult, _pendingDelay, _pendingCallback));
+            }
+        }
+
         public void PlayRoll(int resultValue, float stopDelay, Action onComplete)
         {
+            if (!gameObject.activeInHierarchy)
+            {
+                _pendingRoll = true;
+                _pendingResult = resultValue;
+                _pendingDelay = stopDelay;
+                _pendingCallback = onComplete;
+                return;
+            }
+
             if (_rollCoroutine != null) StopCoroutine(_rollCoroutine);
             _rollCoroutine = StartCoroutine(RollRoutine(resultValue, stopDelay, onComplete));
         }
