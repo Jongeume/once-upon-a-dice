@@ -15,6 +15,7 @@ namespace OUD.Unity.Battle.Presenter
         private int    _rerollsLeft;
         private bool   _isRolling;
         private int    _pendingCount;
+        private bool   _isFirstRollOfTurn = true;
 
         public const int   MAX_REROLLS         = 3;
         public const int   DICE_COUNT          = 5;
@@ -36,6 +37,19 @@ namespace OUD.Unity.Battle.Presenter
             _values      = values;
             _rerollsLeft = rerollsLeft;
 
+            // 첫 롤: 애니메이션 없이 즉시 결과 표시
+            if (_isFirstRollOfTurn)
+            {
+                _isFirstRollOfTurn = false;
+                for (int i = 0; i < DICE_COUNT; i++)
+                    _entryViews[i].SetResultImmediate(values[i]);
+
+                bool canReroll = _rerollsLeft > 0;
+                _diceView.UpdateRerollInfo(_rerollsLeft, canReroll);
+                return;
+            }
+
+            // 리롤: Keep된 주사위는 즉시, 나머지는 애니메이션
             var rollingIndices = new List<int>();
             for (int i = 0; i < DICE_COUNT; i++)
             {
@@ -96,6 +110,7 @@ namespace OUD.Unity.Battle.Presenter
 
         public void ResetKeep()
         {
+            _isFirstRollOfTurn = true;
             for (int i = 0; i < DICE_COUNT; i++)
             {
                 _keepMask[i] = false;
