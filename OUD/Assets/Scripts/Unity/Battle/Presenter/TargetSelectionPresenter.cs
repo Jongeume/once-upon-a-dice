@@ -122,7 +122,7 @@ namespace OUD.Unity.Battle.Presenter
             }
         }
 
-        /// <summary>슬롯 클릭 시 해당 슬롯으로 타겟 재선택.</summary>
+        /// <summary>슬롯 클릭 시 해당 슬롯으로 타겟 재선택. 기존 타겟 해제 + 뱃지/프리뷰 갱신.</summary>
         public void OnSlotClicked(int slotIndex)
         {
             // 타겟 선택 모드(Begin 호출 후)가 아니면 무시 — 빈 슬롯 클릭으로 인한 오작동 방지.
@@ -130,9 +130,15 @@ namespace OUD.Unity.Battle.Presenter
             if (slotIndex < 0 || slotIndex >= _slots.Length) return;
             if (_slots[slotIndex] == null) return;
             if (_slots[slotIndex].Target != TargetType.Single) return;
+
+            // 기존 타겟 해제 → 적 위의 기술명 뱃지 + 데미지 프리뷰 갱신
+            _targetIndices[slotIndex] = -1;
+
             _activeSlotIndex = slotIndex;
             _view.HighlightSlot(slotIndex);
             _view.SetExecuteButtonActive(false);
+
+            RefreshAllTargetBadges();
         }
 
         private void AdvanceToNextAttackSlot(int startFrom)
