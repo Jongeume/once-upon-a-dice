@@ -177,6 +177,9 @@ namespace OUD.Unity.Battle.View
 
         public void SetResultImmediate(int value)
         {
+            // 이전 턴의 pendingRoll이 남아있으면 OnEnable에서 롤링이 재개되므로 반드시 초기화
+            _pendingRoll = false;
+
             if (_rollCoroutine != null) { StopCoroutine(_rollCoroutine); _rollCoroutine = null; }
             if (_moveCoroutine != null) { StopCoroutine(_moveCoroutine); _moveCoroutine = null; }
 
@@ -568,6 +571,9 @@ namespace OUD.Unity.Battle.View
         private void PlaceInKeepSlot()
         {
             if (_diceImageRect == null) return;
+
+            // 패널 활성화 직후 레이아웃 미갱신 상태에서 TransformPoint 오차 방지
+            Canvas.ForceUpdateCanvases();
 
             RectTransform target = _keepSlotRect;
             if (_allKeepSlots != null && _diceIdx < _allKeepSlots.Length)
