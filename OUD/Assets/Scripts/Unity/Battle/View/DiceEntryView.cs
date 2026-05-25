@@ -56,7 +56,7 @@ namespace OUD.Unity.Battle.View
         // ── 주사위 간 충돌 공유 상태 ──
         private static readonly Vector2[] s_positions = new Vector2[5];
         private static readonly bool[] s_active = new bool[5];
-        private const float DICE_COLLISION_RADIUS = 55f;
+        private const float DICE_COLLISION_RADIUS = 65f;
         private const float KEEP_SCALE            = 0.85f;
 
         // KeepSlot 동적 할당 (첫 번째 빈 슬롯부터 채움)
@@ -463,38 +463,40 @@ namespace OUD.Unity.Battle.View
                         dir = new Vector2(Mathf.Cos(a), Mathf.Sin(a));
                     }
 
-                    // 하드 분리: 여유 마진 포함하여 밀어냄
-                    pos = s_positions[other] + dir * (minDist + 5f);
+                    // 하드 분리: 큰 여유 마진 포함하여 밀어냄 (절대 겹침 불가)
+                    pos = s_positions[other] + dir * (minDist + 10f);
 
-                    // 상대 방향으로 향하는 속도 성분을 강하게 반사
+                    // 상대 방향으로 향하는 속도 성분을 완전 반사 + 추가 반발
                     float inward = Vector2.Dot(vel, -dir);
                     if (inward > 0f)
-                        vel += dir * inward * 2.5f;
+                        vel += dir * inward * 3f;
+                    // 최소 반발 속도 보장: 정지 상태에서도 밀려남
+                    vel += dir * 80f;
                 }
             }
         }
 
-        /// <summary>정지 후 겹침 해소 (반복 밀어내기)</summary>
+        /// <summary>정지 후 겹침 해소 (반복 밀어내기). 50회 반복 + 마진 포함.</summary>
         private void ResolveOverlap(ref Vector2 pos, float minX, float maxX, float minY, float maxY)
         {
-            float minDist = DICE_COLLISION_RADIUS * 2f;
-            for (int iter = 0; iter < 30; iter++)
+            float minDist = DICE_COLLISION_RADIUS * 2f + 10f; // 마진 포함
+            for (int iter = 0; iter < 50; iter++)
             {
                 bool moved = false;
                 for (int other = 0; other < 5; other++)
                 {
                     if (other == _diceIdx) continue;
+                    if (!s_active[other]) continue;
                     Vector2 delta = pos - s_positions[other];
                     float dist = delta.magnitude;
                     if (dist < minDist && dist > 0.01f)
                     {
                         Vector2 dir = delta / dist;
-                        pos += dir * (minDist - dist) * 1f;
+                        pos += dir * (minDist - dist + 5f);
                         moved = true;
                     }
                     else if (dist <= 0.01f)
                     {
-                        // 완전 겹침 — 랜덤 방향으로 밀기
                         float a = UnityEngine.Random.Range(0f, 360f) * Mathf.Deg2Rad;
                         pos += new Vector2(Mathf.Cos(a), Mathf.Sin(a)) * minDist;
                         moved = true;
