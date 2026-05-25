@@ -9,8 +9,8 @@ namespace OUD.BattleEngine.Run
 {
     public class LevelUpSystem
     {
-        private static readonly int[] XP_THRESHOLDS = { 2, 4, 6 };
-        public const int MAX_LEVEL = 3;
+        private static readonly int[] XP_THRESHOLDS = { 2, 4, 6, 8, 10 };
+        public const int MAX_LEVEL = 5;
         public const int ATK_BONUS = 1;
         public const int DEF_BONUS = 1;
         public const int HP_BONUS  = 5;
