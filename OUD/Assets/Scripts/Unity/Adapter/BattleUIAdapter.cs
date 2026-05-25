@@ -299,6 +299,21 @@ namespace OUD.Unity.Adapter
 
         private bool _pendingShopLevelUp;
 
+        private void ReturnToShop()
+        {
+            _pendingShopLevelUp = false;
+            PlayerState player = _runManager.State.Player;
+            if (_shopView != null)
+            {
+                _shopView.RefreshGold(player.Gold, player.Hp, player.Xp);
+                _shopView.Show();
+            }
+            else
+            {
+                FinishShop();
+            }
+        }
+
         private void FinishShop()
         {
             ShowNodeMap();
@@ -403,7 +418,7 @@ namespace OUD.Unity.Adapter
             }
             else
             {
-                FinishShop();
+                ReturnToShop();
             }
         }
 
@@ -415,8 +430,7 @@ namespace OUD.Unity.Adapter
 
             if (_pendingShopLevelUp)
             {
-                _pendingShopLevelUp = false;
-                FinishShop();
+                ReturnToShop();
                 return;
             }
 
@@ -429,8 +443,7 @@ namespace OUD.Unity.Adapter
 
             if (_pendingShopLevelUp)
             {
-                _pendingShopLevelUp = false;
-                FinishShop();
+                ReturnToShop();
                 return;
             }
 
@@ -814,6 +827,8 @@ namespace OUD.Unity.Adapter
         {
             if (_battleLogView != null) _battleLogView.HideResultScreens();
 
+            _uiManager.ShowScreen(UIManager.BattleScreen.A_BattleBasic);
+
             _battleEnemies = enemies;
             _playerPresenter.Init(player);
             _enemyPresenter.Init(enemies);
@@ -829,7 +844,6 @@ namespace OUD.Unity.Adapter
             if (_targetSelectionView != null) _targetSelectionView.ResetForNewTurn();
             _hasUsableSkills = false;
 
-            _uiManager.ShowScreen(UIManager.BattleScreen.A_BattleBasic);
             RefreshTopBar();
         }
 

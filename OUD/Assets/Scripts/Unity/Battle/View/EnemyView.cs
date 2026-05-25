@@ -21,6 +21,7 @@ namespace OUD.Unity.Battle.View
                 _                 => _entryPrefab,
             };
             EnemyEntryView entry = Instantiate(prefab, _container);
+            entry.gameObject.SetActive(true);
             // 보스는 일반 몬스터 대비 카드 크기가 커서 pivot.y=1(상단 기준)로 맞춰야 베이스라인이 정렬됨
             if (tier == MonsterTier.Boss)
             {

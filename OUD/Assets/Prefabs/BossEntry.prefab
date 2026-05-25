@@ -1540,7 +1540,7 @@ MonoBehaviour:
   m_text: 0
   m_isRightToLeft: 0
   m_fontAsset: {fileID: 11400000, guid: 0bab88640a1677d4596db5e478e5a01e, type: 2}
-  m_sharedMaterial: {fileID: 0}
+  m_sharedMaterial: {fileID: 8315090994651466644, guid: 0bab88640a1677d4596db5e478e5a01e, type: 2}
   m_fontSharedMaterials: []
   m_fontMaterial: {fileID: 0}
   m_fontMaterials: []
@@ -1564,7 +1564,7 @@ MonoBehaviour:
   m_faceColor:
     serializedVersion: 2
     rgba: 4294967295
-  m_fontSize: 40.25
+  m_fontSize: 35
   m_fontSizeBase: 36
   m_fontWeight: 400
   m_enableAutoSizing: 1
@@ -1827,7 +1827,7 @@ MonoBehaviour:
   m_text: 0
   m_isRightToLeft: 0
   m_fontAsset: {fileID: 11400000, guid: 0bab88640a1677d4596db5e478e5a01e, type: 2}
-  m_sharedMaterial: {fileID: 0}
+  m_sharedMaterial: {fileID: 8315090994651466644, guid: 0bab88640a1677d4596db5e478e5a01e, type: 2}
   m_fontSharedMaterials: []
   m_fontMaterial: {fileID: 0}
   m_fontMaterials: []
@@ -1851,7 +1851,7 @@ MonoBehaviour:
   m_faceColor:
     serializedVersion: 2
     rgba: 4294967295
-  m_fontSize: 40.25
+  m_fontSize: 35
   m_fontSizeBase: 36
   m_fontWeight: 400
   m_enableAutoSizing: 1
@@ -2284,7 +2284,7 @@ MonoBehaviour:
   m_text: Enemy
   m_isRightToLeft: 0
   m_fontAsset: {fileID: 11400000, guid: 0bab88640a1677d4596db5e478e5a01e, type: 2}
-  m_sharedMaterial: {fileID: 0}
+  m_sharedMaterial: {fileID: 8315090994651466644, guid: 0bab88640a1677d4596db5e478e5a01e, type: 2}
   m_fontSharedMaterials: []
   m_fontMaterial: {fileID: 0}
   m_fontMaterials: []
@@ -2456,8 +2456,8 @@ MonoBehaviour:
   m_EditorClassIdentifier: Assembly-CSharp::OUD.Unity.Battle.View.EnemyEntryView
   _portrait: {fileID: 413182580768583656}
   _nameText: {fileID: 5104408129890789725}
-  _hpFill: {fileID: 0}
-  _hpText: {fileID: 0}
+  _hpFill: {fileID: 7981548291945412283}
+  _hpText: {fileID: 8349389013509908379}
   _lifeImage: {fileID: 7000000000000000004}
   _lifeFull: {fileID: 21300000, guid: c6e392d18ca39f049b9778c94fe2b2d4, type: 3}
   _lifeMid: {fileID: 21300000, guid: fa52d6deb45829e47a6f0012f7a28171, type: 3}
@@ -2629,7 +2629,7 @@ MonoBehaviour:
   m_text: 'HP: 20/20'
   m_isRightToLeft: 0
   m_fontAsset: {fileID: 11400000, guid: 0bab88640a1677d4596db5e478e5a01e, type: 2}
-  m_sharedMaterial: {fileID: 0}
+  m_sharedMaterial: {fileID: 8315090994651466644, guid: 0bab88640a1677d4596db5e478e5a01e, type: 2}
   m_fontSharedMaterials: []
   m_fontMaterial: {fileID: 0}
   m_fontMaterials: []
