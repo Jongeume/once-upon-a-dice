@@ -30568,6 +30568,7 @@ MonoBehaviour:
   _battleBackgroundImage: {fileID: 1956544052}
   _combatBackgroundSprite: {fileID: 21300000, guid: 1a8d8d8702f3aba44ab30f9a51264238, type: 3}
   _eliteBackgroundSprite: {fileID: 0}
+  _bossBackgroundSprite: {fileID: -7325392394351658567, guid: d9ea9c04fa822394e834fbf266bab34a, type: 3}
   _eliteFallbackColor: {r: 0.05, g: 0.03, b: 0.02, a: 1}
 --- !u!1 &2092145380
 GameObject:

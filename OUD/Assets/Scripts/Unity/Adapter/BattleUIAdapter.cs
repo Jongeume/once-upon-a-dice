@@ -55,6 +55,7 @@ namespace OUD.Unity.Adapter
         [SerializeField] private UnityEngine.UI.Image _battleBackgroundImage;
         [SerializeField] private Sprite               _combatBackgroundSprite;
         [SerializeField] private Sprite               _eliteBackgroundSprite;
+        [SerializeField] private Sprite               _bossBackgroundSprite;
         [SerializeField] private Color                _eliteFallbackColor = new Color(0.05f, 0.03f, 0.02f, 1f);
 
         private PlayerPresenter           _playerPresenter;
@@ -740,13 +741,20 @@ namespace OUD.Unity.Adapter
         }
 
         /// <summary>현재 노드 타입에 맞춰 전투 배경 스프라이트/색을 적용.
-        /// Combat / Boss / Shop → 숲 배경 (Combat sprite).
+        /// Combat / Shop → 숲 배경 (Combat sprite).
+        /// Boss → 보스 배경 sprite 있으면 사용, 없으면 숲 배경 fallback.
         /// Elite → 별도 sprite 있으면 사용, 없으면 어두운 단색.</summary>
         public void SetBattleBackground(NodeType nodeType)
         {
             if (_battleBackgroundImage == null) return;
 
-            if (nodeType == NodeType.Elite)
+            if (nodeType == NodeType.Boss)
+            {
+                Sprite boss = _bossBackgroundSprite != null ? _bossBackgroundSprite : _combatBackgroundSprite;
+                _battleBackgroundImage.sprite = boss;
+                _battleBackgroundImage.color  = boss != null ? Color.white : _eliteFallbackColor;
+            }
+            else if (nodeType == NodeType.Elite)
             {
                 if (_eliteBackgroundSprite != null)
                 {
