@@ -130,11 +130,11 @@ namespace OUD.Unity.Battle.View
             int previewHp = Math.Min(_currentHp + previewHeal, _maxHp);
 
             if (_hpText != null)
-                _hpText.text = $"HP: {_currentHp}/{_maxHp} → {previewHp}";
+                _hpText.text = $"HP: {_currentHp}/{_maxHp} >> {previewHp}";
             if (_goldText != null)
                 _goldText.text = $"Gold: {_totalGold - _investGold - _xpBuyCount * XP_COST}";
             if (_investText != null)
-                _investText.text = $"투자: {_investGold} Gold → +{previewHeal} HP";
+                _investText.text = $"투자: {_investGold} Gold >> +{previewHeal} HP";
 
             // HP 만피 시 회복 패널은 시각적으로 유지하되 모든 버튼 클릭 비활성.
             bool hpFull = _currentHp >= _maxHp;
@@ -151,9 +151,9 @@ namespace OUD.Unity.Battle.View
             int xpCapByGold = xpRemaining / XP_COST;
 
             if (_xpInfoText != null)
-                _xpInfoText.text = $"XP: {_currentXp} → {xpPreview}";
+                _xpInfoText.text = $"XP: {_currentXp} >> {xpPreview}";
             if (_xpInvestText != null)
-                _xpInvestText.text = $"투자: {xpCost} Gold → +{_xpBuyCount} XP";
+                _xpInvestText.text = $"투자: {xpCost} Gold >> +{_xpBuyCount} XP";
 
             if (_xpMinusButton != null) _xpMinusButton.interactable = _xpBuyCount > 0;
             if (_xpPlusButton != null)  _xpPlusButton.interactable  = xpCapByGold > 0;
