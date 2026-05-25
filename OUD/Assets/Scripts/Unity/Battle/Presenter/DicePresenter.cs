@@ -98,12 +98,17 @@ namespace OUD.Unity.Battle.Presenter
             if (_totalRollsThisTurn < 2) return; // 리롤 전에는 Keep 불가
             _keepMask[index] = !_keepMask[index];
             _entryViews[index].SetKept(_keepMask[index]);
+
+            // 전부 Keep이면 리롤 비활성화 → 기술 선택 또는 Keep 해제 유도
+            bool canReroll = _rerollsLeft > 0 && !IsAllKept();
+            _diceView.UpdateRerollInfo(_rerollsLeft, canReroll);
         }
 
         public void RequestReroll()
         {
             if (_isRolling) return;
             if (_rerollsLeft <= 0) return;
+            if (IsAllKept()) return; // 전부 Keep이면 리롤 무의미
 
             // 응답 도착 전 중복 요청 차단: 즉시 롤링 상태로 전환 + UI 잠금
             _isRolling = true;
@@ -116,6 +121,13 @@ namespace OUD.Unity.Battle.Presenter
         public int    RerollsLeft   => _rerollsLeft;
         public bool[] GetKeepMask() => _keepMask;
         public bool   IsRolling     => _isRolling;
+
+        private bool IsAllKept()
+        {
+            for (int i = 0; i < DICE_COUNT; i++)
+                if (!_keepMask[i]) return false;
+            return true;
+        }
 
         public void ResetKeep()
         {

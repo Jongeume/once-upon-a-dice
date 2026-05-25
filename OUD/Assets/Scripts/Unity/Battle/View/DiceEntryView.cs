@@ -31,8 +31,8 @@ namespace OUD.Unity.Battle.View
         [SerializeField] private float _dropHeight = 250f;
         [SerializeField] private float _zGravity = 2000f;
         [SerializeField] private float _zBounceCoeff = 0.45f;
-        [SerializeField] private float _scaleOnTable = 0.5f;
-        [SerializeField] private float _rollingScale = 0.65f;
+        [SerializeField] private float _scaleOnTable = 0.6f;
+        [SerializeField] private float _rollingScale = 0.75f;
         [SerializeField] private float _impactSquash = 1.15f;
         [SerializeField] private float _squashDuration = 0.06f;
 
@@ -58,7 +58,7 @@ namespace OUD.Unity.Battle.View
         private static readonly bool[] s_active = new bool[5];
         private const float DICE_COLLISION_RADIUS = 30f;
         private const float COLLISION_REPULSION   = 1200f;
-        private const float KEEP_SCALE            = 0.75f;
+        private const float KEEP_SCALE            = 0.85f;
 
         // KeepSlot 동적 할당 (첫 번째 빈 슬롯부터 채움)
         private static readonly bool[] _slotOccupied = new bool[5];
