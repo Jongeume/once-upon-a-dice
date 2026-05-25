@@ -1,3 +1,4 @@
+using System.Linq;
 using NUnit.Framework;
 using OUD.BattleEngine.Core;
 using OUD.BattleEngine.Run;
@@ -20,6 +21,8 @@ namespace OUD.Tests
             Assert.AreEqual(RunMap.START_NODE_ID, sut.CurrentNodeId);
             Assert.IsFalse(sut.IsLastNode);
             Assert.IsFalse(sut.IsRunComplete);
+            Assert.IsTrue(sut.VisitedNodeIds.Contains(RunMap.START_NODE_ID));
+            Assert.AreEqual(1, sut.VisitedNodeIds.Count);
         }
 
         [Test]
@@ -39,6 +42,9 @@ namespace OUD.Tests
             Assert.AreEqual(1, sut.CurrentNodeIndex);
             Assert.AreEqual(1, sut.CurrentNodeId);
             Assert.IsFalse(sut.IsLastNode);
+            Assert.IsTrue(sut.VisitedNodeIds.Contains(0));
+            Assert.IsTrue(sut.VisitedNodeIds.Contains(1));
+            Assert.AreEqual(2, sut.VisitedNodeIds.Count);
         }
 
         [Test]
@@ -94,6 +100,26 @@ namespace OUD.Tests
             Assert.AreEqual(RunMap.START_NODE_ID, sut.CurrentNodeId);
             Assert.IsFalse(sut.IsRunComplete);
             Assert.IsFalse(sut.IsLastNode);
+            Assert.AreEqual(1, sut.VisitedNodeIds.Count);
+            Assert.IsTrue(sut.VisitedNodeIds.Contains(RunMap.START_NODE_ID));
+        }
+
+        [Test]
+        public void VisitedNodeIds_TracksFullPath()
+        {
+            var sut = new RunState(NewPlayer());
+
+            sut.MoveTo(2, 1);
+            sut.MoveTo(4, 2);
+            sut.MoveTo(5, 3);
+
+            Assert.AreEqual(4, sut.VisitedNodeIds.Count);
+            Assert.IsTrue(sut.VisitedNodeIds.Contains(0));
+            Assert.IsTrue(sut.VisitedNodeIds.Contains(2));
+            Assert.IsTrue(sut.VisitedNodeIds.Contains(4));
+            Assert.IsTrue(sut.VisitedNodeIds.Contains(5));
+            Assert.IsFalse(sut.VisitedNodeIds.Contains(1));
+            Assert.IsFalse(sut.VisitedNodeIds.Contains(3));
         }
     }
 }

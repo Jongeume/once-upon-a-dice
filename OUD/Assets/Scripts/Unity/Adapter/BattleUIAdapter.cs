@@ -176,7 +176,7 @@ namespace OUD.Unity.Adapter
             int[] nextIds = new int[nextCandidates.Count];
             for (int i = 0; i < nextCandidates.Count; i++) nextIds[i] = nextCandidates[i].Id;
 
-            _nodeMapView.Bind(_runManager.Map, currentNodeId, nextIds);
+            _nodeMapView.Bind(_runManager.Map, currentNodeId, nextIds, _runManager.State.VisitedNodeIds);
             _nodeMapView.Show();
             _nodeMapView.SetAllButtonsEnabled(false);  // peek: 클릭 모션 차단
             _mapPeekMode = true;
@@ -533,7 +533,7 @@ namespace OUD.Unity.Adapter
                 return;
             }
             int startId = _runManager.State.CurrentNodeId;
-            _nodeMapView.Bind(_runManager.Map, -1, new int[] { startId });
+            _nodeMapView.Bind(_runManager.Map, -1, new int[] { startId }, _runManager.State.VisitedNodeIds);
             _nodeMapView.Show();
             SetMapButtonEnabled(false);  // 노드 선택 모드 — peek 버튼 비활성
         }
@@ -554,7 +554,7 @@ namespace OUD.Unity.Adapter
             int[] nextIds = new int[nextCandidates.Count];
             for (int i = 0; i < nextCandidates.Count; i++) nextIds[i] = nextCandidates[i].Id;
 
-            _nodeMapView.Bind(_runManager.Map, currentNodeId, nextIds);
+            _nodeMapView.Bind(_runManager.Map, currentNodeId, nextIds, _runManager.State.VisitedNodeIds, animateIcon: true);
             _nodeMapView.Show();
             SetMapButtonEnabled(false);  // 노드 선택 모드 — peek 버튼 비활성
         }
@@ -594,9 +594,25 @@ namespace OUD.Unity.Adapter
                 return;
             }
 
-            if (_nodeMapView != null) _nodeMapView.Hide();
-            SetMapButtonEnabled(true);  // 선택 종료 — peek 버튼 복원
-            _onContinueRequested?.Invoke();
+            _nodeMapView.SetAllButtonsEnabled(false);
+
+            int newNodeId = _runManager.State.CurrentNodeId;
+            IReadOnlyList<MapNode> nextCandidates = _runManager.GetAvailableNextNodes();
+            int[] nextIds = new int[nextCandidates.Count];
+            for (int i = 0; i < nextCandidates.Count; i++) nextIds[i] = nextCandidates[i].Id;
+
+            _nodeMapView.Bind(_runManager.Map, newNodeId, nextIds,
+                _runManager.State.VisitedNodeIds, animateIcon: true,
+                onIconMoveComplete: () =>
+                {
+                    if (_nodeMapView != null)
+                    {
+                        _nodeMapView.SetAllButtonsEnabled(true);
+                        _nodeMapView.Hide();
+                    }
+                    SetMapButtonEnabled(true);
+                    _onContinueRequested?.Invoke();
+                });
         }
 
         private void BuildPresenters()
