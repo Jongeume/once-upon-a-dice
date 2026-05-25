@@ -246,7 +246,8 @@ namespace OUD.BattleEngine.Combat
         {
             _state.Phase = BattlePhase.EnemyTurn;
 
-            for (int i = 0; i < _state.Enemies.Count; i++)
+            int enemyCount = _state.Enemies.Count;
+            for (int i = 0; i < enemyCount; i++)
             {
                 MonsterInstance enemy = _state.Enemies[i];
                 if (enemy.IsDead) continue;
@@ -259,12 +260,12 @@ namespace OUD.BattleEngine.Combat
                 IntentType intent = enemy.GetCurrentIntent();
                 int        value  = enemy.GetIntentValue();
 
+                _ui.OnEnemyAction(i, intent, value);
+
                 if (intent == IntentType.Summon)
                     SpawnClone(enemy);
                 else
                     ExecuteEnemyAction(enemy, intent, value);
-
-                _ui.OnEnemyAction(i, intent, value);
 
                 enemy.AdvancePattern();
             }

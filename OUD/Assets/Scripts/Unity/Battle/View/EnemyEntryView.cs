@@ -88,10 +88,6 @@ namespace OUD.Unity.Battle.View
         private Coroutine _atkPulseCoroutine;
         private Coroutine _defPulseCoroutine;
 
-        // Summon 토스트 타이밍
-        private const float SUMMON_FADE_IN  = 0.2f;
-        private const float SUMMON_HOLD     = 1.2f;
-        private const float SUMMON_FADE_OUT = 0.4f;
         private Coroutine _summonToastCoroutine;
 
         // 현재 ATK 캐시 — StrongAttack 의도가 들어올 때 임시로 강공격 데미지를 표시한 뒤
@@ -186,31 +182,35 @@ namespace OUD.Unity.Battle.View
                 case IntentType.RageWarning:
                     SetAtkHighlight(true);
                     SetDefHighlight(false);
+                    SetSummonHighlight(false);
                     RestoreAtkValueText();
                     break;
 
                 case IntentType.StrongAttack:
                     SetAtkHighlight(true);
                     SetDefHighlight(false);
+                    SetSummonHighlight(false);
                     if (_atkValueText) _atkValueText.text = value.ToString();
                     break;
 
                 case IntentType.Shield:
                     SetAtkHighlight(false);
                     SetDefHighlight(true);
+                    SetSummonHighlight(false);
                     RestoreAtkValueText();
                     break;
 
                 case IntentType.Summon:
                     SetAtkHighlight(false);
                     SetDefHighlight(false);
+                    SetSummonHighlight(true);
                     RestoreAtkValueText();
-                    PlaySummonToast();
                     break;
 
                 default:
                     SetAtkHighlight(false);
                     SetDefHighlight(false);
+                    SetSummonHighlight(false);
                     RestoreAtkValueText();
                     break;
             }
@@ -295,44 +295,35 @@ namespace OUD.Unity.Battle.View
         //     }
         // }
 
-        private void PlaySummonToast()
+        private void SetSummonHighlight(bool active)
         {
-            if (_summonToast == null) return;          // EnemyEntry(일반 적)는 null — 무시.
-            if (_summonToastCoroutine != null) return; // 이미 표시 중이면 중복 트리거 무시.
-            if (_summonToastText) _summonToastText.text = "Summon";
-            _summonToastCoroutine = StartCoroutine(SummonToastRoutine());
+            if (_summonToast == null) return;
+            if (active && isActiveAndEnabled)
+            {
+                if (_summonToastText) _summonToastText.text = "Summon";
+                _summonToast.SetActive(true);
+                if (_summonToastCoroutine == null)
+                    _summonToastCoroutine = StartCoroutine(PulseSummonToast());
+            }
+            else
+            {
+                if (_summonToastCoroutine != null) { StopCoroutine(_summonToastCoroutine); _summonToastCoroutine = null; }
+                _summonToast.SetActive(false);
+            }
         }
 
-        private IEnumerator SummonToastRoutine()
+        private IEnumerator PulseSummonToast()
         {
-            _summonToast.SetActive(true);
             CanvasGroup cg = _summonToast.GetComponent<CanvasGroup>();
             if (cg == null) cg = _summonToast.AddComponent<CanvasGroup>();
-
-            // 페이드인
             float t = 0f;
-            while (t < SUMMON_FADE_IN)
+            while (_summonToast != null)
             {
-                t += Time.deltaTime;
-                cg.alpha = Mathf.Clamp01(t / SUMMON_FADE_IN);
+                t += Time.deltaTime / PULSE_PERIOD;
+                float wave = 0.5f - 0.5f * Mathf.Cos(t * Mathf.PI * 2f);
+                cg.alpha = Mathf.Lerp(PULSE_MIN_ALPHA, 1f, wave);
                 yield return null;
             }
-            cg.alpha = 1f;
-
-            // 유지
-            yield return new WaitForSeconds(SUMMON_HOLD);
-
-            // 페이드아웃
-            t = 0f;
-            while (t < SUMMON_FADE_OUT)
-            {
-                t += Time.deltaTime;
-                cg.alpha = 1f - Mathf.Clamp01(t / SUMMON_FADE_OUT);
-                yield return null;
-            }
-            cg.alpha = 0f;
-            _summonToast.SetActive(false);
-            _summonToastCoroutine = null;
         }
 
         private void StopAllIntentEffects()
@@ -342,7 +333,7 @@ namespace OUD.Unity.Battle.View
             if (_summonToastCoroutine != null) { StopCoroutine(_summonToastCoroutine); _summonToastCoroutine = null; }
             RestoreImageAlpha(_atkSwordImage);
             RestoreImageAlpha(_defShieldImage);
-            if (_summonToast) _summonToast.SetActive(false);
+            SetSummonHighlight(false);
         }
 
         public void SetTargetSelectable(bool selectable)
@@ -350,6 +341,7 @@ namespace OUD.Unity.Battle.View
             _selectable = selectable;
             if (_targetButton) _targetButton.interactable = selectable;
             if (_targetableHint) _targetableHint.SetActive(selectable);
+            if (_summonToast) _summonToast.SetActive(!selectable && _summonToastCoroutine != null);
             ApplyTargetVisual();
         }
 
