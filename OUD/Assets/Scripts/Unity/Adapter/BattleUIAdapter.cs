@@ -52,11 +52,9 @@ namespace OUD.Unity.Adapter
         [SerializeField] private UnityEngine.UI.Button _mapButton;     // 지도 버튼 — 노드맵 토글
 
         [Header("전투 배경")]
-        [SerializeField] private UnityEngine.UI.Image _battleBackgroundImage;
         [SerializeField] private Sprite               _combatBackgroundSprite;
         [SerializeField] private Sprite               _eliteBackgroundSprite;
         [SerializeField] private Sprite               _bossBackgroundSprite;
-        [SerializeField] private Color                _eliteFallbackColor = new Color(0.05f, 0.03f, 0.02f, 1f);
 
         private PlayerPresenter           _playerPresenter;
         private EnemyPresenter            _enemyPresenter;
@@ -740,38 +738,21 @@ namespace OUD.Unity.Adapter
                 _uiManager.ShowScreen(UIManager.BattleScreen.B_DiceTable);
         }
 
-        /// <summary>현재 노드 타입에 맞춰 전투 배경 스프라이트/색을 적용.
+        /// <summary>현재 노드 타입에 맞춰 전투 배경 스프라이트를 UIManager에 전달.
         /// Combat / Shop → 숲 배경 (Combat sprite).
         /// Boss → 보스 배경 sprite 있으면 사용, 없으면 숲 배경 fallback.
-        /// Elite → 별도 sprite 있으면 사용, 없으면 어두운 단색.</summary>
+        /// Elite → 엘리트 sprite 있으면 사용, 없으면 숲 배경 fallback.</summary>
         public void SetBattleBackground(NodeType nodeType)
         {
-            if (_battleBackgroundImage == null) return;
-
+            Sprite chosen;
             if (nodeType == NodeType.Boss)
-            {
-                Sprite boss = _bossBackgroundSprite != null ? _bossBackgroundSprite : _combatBackgroundSprite;
-                _battleBackgroundImage.sprite = boss;
-                _battleBackgroundImage.color  = boss != null ? Color.white : _eliteFallbackColor;
-            }
+                chosen = _bossBackgroundSprite != null ? _bossBackgroundSprite : _combatBackgroundSprite;
             else if (nodeType == NodeType.Elite)
-            {
-                if (_eliteBackgroundSprite != null)
-                {
-                    _battleBackgroundImage.sprite = _eliteBackgroundSprite;
-                    _battleBackgroundImage.color  = Color.white;
-                }
-                else
-                {
-                    _battleBackgroundImage.sprite = null;
-                    _battleBackgroundImage.color  = _eliteFallbackColor;
-                }
-            }
+                chosen = _eliteBackgroundSprite != null ? _eliteBackgroundSprite : _combatBackgroundSprite;
             else
-            {
-                _battleBackgroundImage.sprite = _combatBackgroundSprite;
-                _battleBackgroundImage.color  = _combatBackgroundSprite != null ? Color.white : _eliteFallbackColor;
-            }
+                chosen = _combatBackgroundSprite;
+
+            _uiManager.SetBattleBackground(chosen);
         }
 
         private void OnUseSkillButtonClicked()
