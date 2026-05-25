@@ -110,7 +110,7 @@ namespace OUD.Tests
         }
 
         [Test]
-        public void GetNextBattle_AtEliteNode_ReturnsEliteGolem()
+        public void GetNextBattle_AtEliteNode_ReturnsCrowKnight()
         {
             var sut = NewManager();
             sut.StartRun(NewPlayer());
@@ -119,7 +119,7 @@ namespace OUD.Tests
             List<MonsterData> result = sut.GetNextBattle();
 
             Assert.AreEqual(1, result.Count);
-            Assert.AreEqual(MonsterDatabase.ID_ELITE_GOLEM, result[0].Id);
+            Assert.AreEqual(MonsterDatabase.ID_CROW_KNIGHT, result[0].Id);
         }
 
         [Test]

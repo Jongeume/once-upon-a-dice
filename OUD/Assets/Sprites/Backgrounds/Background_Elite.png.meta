@@ -1,10 +1,10 @@
 fileFormatVersion: 2
-guid: d9ea9c04fa822394e834fbf266bab34a
+guid: 3f242507301366a4f83a10156183f79b
 TextureImporter:
   internalIDToNameTable:
   - first:
-      213: -7325392394351658567
-    second: Boss_Background_0
+      213: 1344301484200612879
+    second: Background_Map_0
   externalObjects: {}
   serializedVersion: 13
   mipmaps:
@@ -46,7 +46,7 @@ TextureImporter:
   nPOTScale: 0
   lightmap: 0
   compressionQuality: 50
-  spriteMode: 2
+  spriteMode: 1
   spriteExtrude: 1
   spriteMeshType: 1
   alignment: 0
@@ -126,7 +126,7 @@ TextureImporter:
     serializedVersion: 2
     sprites:
     - serializedVersion: 2
-      name: Boss_Background_0
+      name: Background_Map_0
       rect:
         serializedVersion: 2
         x: 0
@@ -141,8 +141,8 @@ TextureImporter:
       physicsShape: []
       tessellationDetail: -1
       bones: []
-      spriteID: 9b9325ecd6af65a90800000000000000
-      internalID: -7325392394351658567
+      spriteID: f04dec4d31be7a210800000000000000
+      internalID: 1344301484200612879
       vertices: []
       indices: 
       edges: []
@@ -151,7 +151,7 @@ TextureImporter:
     customData: 
     physicsShape: []
     bones: []
-    spriteID: 
+    spriteID: 5e97eb03825dee720800000000000000
     internalID: 0
     vertices: []
     indices: 
@@ -161,7 +161,7 @@ TextureImporter:
     spriteCustomMetadata:
       entries: []
     nameFileIdTable:
-      Boss_Background_0: -7325392394351658567
+      Background_Map_0: 1344301484200612879
   mipmapLimitGroupName: 
   pSDRemoveMatte: 0
   userData: 

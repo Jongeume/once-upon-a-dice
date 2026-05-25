@@ -21,3 +21,5 @@ MonoBehaviour:
     sprite: {fileID: 4693792977596894205, guid: 29c2ee352859ea64bbca0878f667d46d, type: 3}
   - monsterId: EvilQueen
     sprite: {fileID: 4433771596148729838, guid: 26a1ed7f7ae78ae439c93a9822aaf9c7, type: 3}
+  - monsterId: CrowKnight
+    sprite: {fileID: 8299622140500035369, guid: ebe3b177594f1fb45826dc40754e43ed, type: 3}

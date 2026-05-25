@@ -62,8 +62,10 @@ namespace OUD.Unity.Battle.Presenter
             _view.SetExecuteButtonActive(false);
             _view.SetSlotClickable(true);
 
-            // AllEnemies / Self 자동 배정 뱃지
-            ShowAutoAssignedBadges();
+            // Self(수비) 뱃지 자동 배정
+            ShowDefenseBadges();
+            // AllEnemies + 데미지 프리뷰 표시
+            RefreshAllTargetBadges();
 
             AdvanceToNextAttackSlot(0);
         }
@@ -154,25 +156,14 @@ namespace OUD.Unity.Battle.Presenter
         /// <summary>현재까지 확정된 타겟 인덱스 배열 반환. Execute 버튼 클릭 시 Confirm()에 전달.</summary>
         public int[] GetTargetIndices() => _targetIndices;
 
-        private void ShowAutoAssignedBadges()
+        private void ShowDefenseBadges()
         {
-            if (_slots == null) return;
+            if (_slots == null || _playerView == null) return;
             for (int i = 0; i < _slots.Length; i++)
             {
                 if (_slots[i] == null) continue;
-
-                if (_slots[i].Target == TargetType.AllEnemies && _enemyPresenter != null)
-                {
-                    for (int e = 0; e < _aliveEnemies.Count; e++)
-                    {
-                        if (_aliveEnemies[e].IsDead) continue;
-                        _enemyPresenter.ShowTargetBadge(e, _slots[i].Name, SkillCategory.Attack, isAoe: true);
-                    }
-                }
-                else if (_slots[i].Target == TargetType.Self && _playerView != null)
-                {
+                if (_slots[i].Target == TargetType.Self)
                     _playerView.ShowDefenseBadge(_slots[i].Name);
-                }
             }
         }
 
@@ -182,9 +173,22 @@ namespace OUD.Unity.Battle.Presenter
             _enemyPresenter.ClearAllTargetBadges();
             if (_slots == null || _targetIndices == null) return;
 
+            // 적별 예상 총 데미지 누적 배열 — 타겟 인덱스는 EnemyPresenter 기준이므로
+            // _aliveEnemies.Count + 타겟 최댓값 중 큰 값으로 안전하게 크기 설정
+            int arraySize = _aliveEnemies.Count;
+            for (int i = 0; i < _targetIndices.Length; i++)
+                if (_targetIndices[i] >= arraySize) arraySize = _targetIndices[i] + 1;
+            int[] rawDamagePerEnemy = new int[arraySize];
+
+            int playerAtk = _playerState != null ? _playerState.Atk : 0;
+
             for (int i = 0; i < _slots.Length; i++)
             {
                 if (_slots[i] == null) continue;
+                if (_slots[i].Category != SkillCategory.Attack) continue;
+
+                int enhLv = _playerState != null ? _playerState.GetEnhanceLevel(_slots[i].Hand) : 0;
+                int mainDmg = DamageCalculator.CalcValue(playerAtk, _slots[i].GetMultiplier(0, enhLv));
 
                 if (_slots[i].Target == TargetType.AllEnemies)
                 {
@@ -192,12 +196,38 @@ namespace OUD.Unity.Battle.Presenter
                     {
                         if (_aliveEnemies[e].IsDead) continue;
                         _enemyPresenter.ShowTargetBadge(e, _slots[i].Name, SkillCategory.Attack, isAoe: true);
+                        rawDamagePerEnemy[e] += mainDmg * _slots[i].HitCount;
                     }
                 }
                 else if (_slots[i].Target == TargetType.Single && _targetIndices[i] >= 0)
                 {
-                    _enemyPresenter.ShowTargetBadge(_targetIndices[i], _slots[i].Name, SkillCategory.Attack, isAoe: false);
+                    int target = _targetIndices[i];
+                    _enemyPresenter.ShowTargetBadge(target, _slots[i].Name, SkillCategory.Attack, isAoe: false);
+                    rawDamagePerEnemy[target] += mainDmg * _slots[i].HitCount;
+
+                    // 스플래시 데미지 (Crushing Wave 등)
+                    if (_slots[i].Multipliers.Length >= 2)
+                    {
+                        int splashDmg = DamageCalculator.CalcValue(playerAtk, _slots[i].GetMultiplier(1, enhLv));
+                        for (int e = 0; e < _aliveEnemies.Count; e++)
+                        {
+                            if (_aliveEnemies[e].IsDead || e == target) continue;
+                            rawDamagePerEnemy[e] += splashDmg;
+                        }
+                    }
                 }
+            }
+
+            // 데미지 프리뷰 표시
+            for (int e = 0; e < _aliveEnemies.Count; e++)
+            {
+                if (_aliveEnemies[e].IsDead || rawDamagePerEnemy[e] <= 0) continue;
+                var enemy = _aliveEnemies[e];
+                int effectiveHpDmg = System.Math.Max(0, rawDamagePerEnemy[e] - enemy.Shield);
+                int predictedHp    = System.Math.Max(0, enemy.Hp - effectiveHpDmg);
+                float predictedRatio = enemy.Data.MaxHp > 0
+                    ? (float)predictedHp / enemy.Data.MaxHp : 0f;
+                _enemyPresenter.ShowDamagePreview(e, predictedRatio);
             }
         }
 

@@ -164,16 +164,16 @@ namespace OUD.Tests
             Assert.AreEqual(MonsterDatabase.ID_EVIL_QUEEN, result[0].Id);
         }
 
-        // ── Elite: EliteGolem ──────────────────────────────────────────
+        // ── Elite: CrowKnight ─────────────────────────────────────────
 
         [Test]
-        public void EliteNode_ReturnsEliteGolem()
+        public void EliteNode_ReturnsCrowKnight()
         {
             var sut = new EncounterTable(new ScriptedRandom(0));
             List<MonsterData> result = sut.GenerateEncounter(EliteNode());
 
             Assert.AreEqual(1, result.Count);
-            Assert.AreEqual(MonsterDatabase.ID_ELITE_GOLEM, result[0].Id);
+            Assert.AreEqual(MonsterDatabase.ID_CROW_KNIGHT, result[0].Id);
         }
 
         // ── Shop: Throws ──────────────────────────────────────────────

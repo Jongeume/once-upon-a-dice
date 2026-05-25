@@ -53,6 +53,7 @@ namespace OUD.Unity.Adapter
 
         [Header("전투 배경")]
         [SerializeField] private Sprite               _combatBackgroundSprite;
+        [SerializeField] private Sprite               _combatBackground2Sprite;
         [SerializeField] private Sprite               _eliteBackgroundSprite;
         [SerializeField] private Sprite               _bossBackgroundSprite;
 
@@ -752,13 +753,17 @@ namespace OUD.Unity.Adapter
         /// Combat / Shop → 숲 배경 (Combat sprite).
         /// Boss → 보스 배경 sprite 있으면 사용, 없으면 숲 배경 fallback.
         /// Elite → 엘리트 sprite 있으면 사용, 없으면 숲 배경 fallback.</summary>
-        public void SetBattleBackground(NodeType nodeType)
+        /// <summary>노드 타입 + 레이어에 따라 전투 배경 스프라이트 선택.
+        /// Combat 노드는 layer 4 이상이면 2스테이지 배경 사용.</summary>
+        public void SetBattleBackground(NodeType nodeType, int layer = 0)
         {
             Sprite chosen;
             if (nodeType == NodeType.Boss)
                 chosen = _bossBackgroundSprite != null ? _bossBackgroundSprite : _combatBackgroundSprite;
             else if (nodeType == NodeType.Elite)
                 chosen = _eliteBackgroundSprite != null ? _eliteBackgroundSprite : _combatBackgroundSprite;
+            else if (layer >= 4 && _combatBackground2Sprite != null)
+                chosen = _combatBackground2Sprite;
             else
                 chosen = _combatBackgroundSprite;
 
