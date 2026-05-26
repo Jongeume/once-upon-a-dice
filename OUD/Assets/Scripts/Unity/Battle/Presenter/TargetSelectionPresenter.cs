@@ -211,8 +211,8 @@ namespace OUD.Unity.Battle.Presenter
                     _enemyPresenter.ShowTargetBadge(target, _slots[i].Name, SkillCategory.Attack, isAoe: false);
                     rawDamagePerEnemy[target] += mainDmg * _slots[i].HitCount;
 
-                    // 스플래시 데미지 (Crushing Wave 등)
-                    if (_slots[i].Multipliers.Length >= 2)
+                    // 스플래시 데미지 (Crushing Wave 등 — 다중 히트 스킬 제외)
+                    if (_slots[i].Multipliers.Length >= 2 && _slots[i].HitCount == 1)
                     {
                         int splashDmg = DamageCalculator.CalcValue(playerAtk, _slots[i].GetMultiplier(1, enhLv));
                         for (int e = 0; e < _aliveEnemies.Count; e++)
