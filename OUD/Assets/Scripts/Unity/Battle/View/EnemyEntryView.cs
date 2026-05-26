@@ -30,6 +30,10 @@ namespace OUD.Unity.Battle.View
         [SerializeField] private GameObject _shieldGroup;
         [SerializeField] private TMP_Text   _shieldText;
 
+        // HP 바 왼쪽에 동적 생성되는 방패 아이콘+수치
+        private GameObject _shieldDisplay;
+        private TMP_Text   _shieldValueText;
+
         // === 구 구조 (UI 방향 변경 시 복원용, 결정 후 정리 예정) ===
         // [Header("공격력 (좌상단)")]
         // [SerializeField] private TMP_Text   _atkText;
@@ -119,6 +123,7 @@ namespace OUD.Unity.Battle.View
             if (_targetButton) _targetButton.onClick.AddListener(() => OnClicked?.Invoke());
             EnsureOutline();
             EnsureHpTrail();
+            EnsureShieldDisplay();
             ApplyTargetVisual();
         }
 
@@ -148,6 +153,80 @@ namespace OUD.Unity.Battle.View
             if (_hpFill == null) return;
 
             CreatePreviewBar();
+        }
+
+        /// <summary>
+        /// HP 바 왼쪽에 방패 아이콘+수치를 동적 생성.
+        /// Prefab의 기존 ShieldGroup(텍스트만, 잘못된 위치)을 숨기고
+        /// HPBg 자식으로 새 표시를 만든다.
+        /// </summary>
+        private void EnsureShieldDisplay()
+        {
+            if (_hpFill == null || _shieldDisplay != null) return;
+
+            if (_shieldGroup != null)
+                _shieldGroup.SetActive(false);
+
+            Transform hpBg = _hpFill.transform.parent;
+            if (hpBg == null) return;
+
+            _shieldDisplay = new GameObject("ShieldDisplay");
+            _shieldDisplay.transform.SetParent(hpBg, false);
+            _shieldDisplay.transform.SetAsLastSibling();
+
+            var containerRt = _shieldDisplay.AddComponent<RectTransform>();
+            containerRt.anchorMin        = new Vector2(0f, 0.5f);
+            containerRt.anchorMax        = new Vector2(0f, 0.5f);
+            containerRt.pivot            = new Vector2(0.5f, 0.5f);
+            containerRt.anchoredPosition = new Vector2(0f, 0f);
+            containerRt.sizeDelta        = new Vector2(36f, 36f);
+
+            // 방패 아이콘 (배경)
+            var iconGo = new GameObject("ShieldIcon");
+            iconGo.transform.SetParent(_shieldDisplay.transform, false);
+            var iconRt = iconGo.AddComponent<RectTransform>();
+            iconRt.anchorMin        = Vector2.zero;
+            iconRt.anchorMax        = Vector2.one;
+            iconRt.anchoredPosition = Vector2.zero;
+            iconRt.sizeDelta        = Vector2.zero;
+
+            iconGo.AddComponent<CanvasRenderer>();
+            var iconImage = iconGo.AddComponent<Image>();
+            if (_defShieldImage != null && _defShieldImage.sprite != null)
+                iconImage.sprite = _defShieldImage.sprite;
+            iconImage.color          = new Color(0.15f, 0.4f, 0.85f, 1f);
+            iconImage.preserveAspect = true;
+            iconImage.raycastTarget  = false;
+
+            // 방패 수치 텍스트
+            var textGo = new GameObject("ShieldValue");
+            textGo.transform.SetParent(_shieldDisplay.transform, false);
+            var textRt = textGo.AddComponent<RectTransform>();
+            textRt.anchorMin        = Vector2.zero;
+            textRt.anchorMax        = Vector2.one;
+            textRt.anchoredPosition = new Vector2(0f, -1f);
+            textRt.sizeDelta        = Vector2.zero;
+
+            textGo.AddComponent<CanvasRenderer>();
+            _shieldValueText = textGo.AddComponent<TextMeshProUGUI>();
+            _shieldValueText.text              = "0";
+            _shieldValueText.fontSize          = 22;
+            _shieldValueText.fontStyle         = FontStyles.Bold;
+            _shieldValueText.color             = Color.white;
+            _shieldValueText.alignment         = TextAlignmentOptions.Center;
+            _shieldValueText.textWrappingMode = TextWrappingModes.NoWrap;
+            _shieldValueText.raycastTarget     = false;
+            if (_nameText != null)
+            {
+                _shieldValueText.font               = _nameText.font;
+                _shieldValueText.fontSharedMaterial = _nameText.fontSharedMaterial;
+            }
+
+            var textOutline = textGo.AddComponent<Outline>();
+            textOutline.effectColor    = new Color(0f, 0f, 0f, 0.8f);
+            textOutline.effectDistance = new Vector2(1.5f, -1.5f);
+
+            _shieldDisplay.SetActive(false);
         }
 
         private void CreatePreviewBar()
@@ -308,8 +387,16 @@ namespace OUD.Unity.Battle.View
 
         public void UpdateShield(int shield, bool visible)
         {
-            if (_shieldGroup) _shieldGroup.SetActive(visible);
-            if (_shieldText)  _shieldText.text = shield.ToString();
+            if (_shieldDisplay != null)
+            {
+                _shieldDisplay.SetActive(visible);
+                if (_shieldValueText != null) _shieldValueText.text = shield.ToString();
+            }
+            else
+            {
+                if (_shieldGroup) _shieldGroup.SetActive(visible);
+                if (_shieldText)  _shieldText.text = shield.ToString();
+            }
         }
 
         /// <summary>좌상단 공격력(현재 실효 ATK) 표시. 분노 등으로 ATK 변동 시 갱신.</summary>
