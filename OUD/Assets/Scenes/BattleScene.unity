@@ -3189,7 +3189,7 @@ MonoBehaviour:
   m_OnCullStateChanged:
     m_PersistentCalls:
       m_Calls: []
-  m_text: "\uACF5\uACA9"
+  m_text: Attack
   m_isRightToLeft: 0
   m_fontAsset: {fileID: 11400000, guid: 0bab88640a1677d4596db5e478e5a01e, type: 2}
   m_sharedMaterial: {fileID: 8315090994651466644, guid: 0bab88640a1677d4596db5e478e5a01e, type: 2}
@@ -3198,8 +3198,8 @@ MonoBehaviour:
   m_fontMaterials: []
   m_fontColor32:
     serializedVersion: 2
-    rgba: 4281352384
-  m_fontColor: {r: 0.7529412, g: 0.2509804, b: 0.1882353, a: 1}
+    rgba: 4280226572
+  m_fontColor: {r: 0.55, g: 0.15, b: 0.12, a: 1}
   m_enableVertexGradient: 0
   m_colorMode: 3
   m_fontColorGradient:
@@ -6779,15 +6779,15 @@ RectTransform:
   m_GameObject: {fileID: 423317912}
   m_LocalRotation: {x: -0, y: -0, z: -0, w: 1}
   m_LocalPosition: {x: 0, y: 0, z: 0}
-  m_LocalScale: {x: 1.4000001, y: 1.4000001, z: 1}
+  m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children:
   - {fileID: 1404718349}
   - {fileID: 560197275}
   m_Father: {fileID: 567287873}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
-  m_AnchorMin: {x: 0.18, y: 0.1}
-  m_AnchorMax: {x: 0.82, y: 0.25}
+  m_AnchorMin: {x: 0.052, y: 0.07}
+  m_AnchorMax: {x: 0.948, y: 0.28}
   m_AnchoredPosition: {x: 0, y: 0}
   m_SizeDelta: {x: 0, y: 0}
   m_Pivot: {x: 0.5, y: 0.5}
@@ -8144,7 +8144,7 @@ MonoBehaviour:
   m_OnCullStateChanged:
     m_PersistentCalls:
       m_Calls: []
-  m_text: "\uD68C\uBCF5"
+  m_text: "Heal(10G)"
   m_isRightToLeft: 0
   m_fontAsset: {fileID: 11400000, guid: 0bab88640a1677d4596db5e478e5a01e, type: 2}
   m_sharedMaterial: {fileID: 8315090994651466644, guid: 0bab88640a1677d4596db5e478e5a01e, type: 2}
@@ -16177,15 +16177,15 @@ RectTransform:
   m_GameObject: {fileID: 1049903353}
   m_LocalRotation: {x: -0, y: -0, z: -0, w: 1}
   m_LocalPosition: {x: 0, y: 0, z: 0}
-  m_LocalScale: {x: 1.4, y: 1.4, z: 1}
+  m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children:
   - {fileID: 1722711766}
   - {fileID: 1934241792}
   m_Father: {fileID: 1216900468}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
-  m_AnchorMin: {x: 0.18, y: 0.1}
-  m_AnchorMax: {x: 0.82, y: 0.25}
+  m_AnchorMin: {x: 0.052, y: 0.07}
+  m_AnchorMax: {x: 0.948, y: 0.28}
   m_AnchoredPosition: {x: 0, y: 0}
   m_SizeDelta: {x: 0, y: 0}
   m_Pivot: {x: 0.5, y: 0.5}
@@ -18320,7 +18320,7 @@ MonoBehaviour:
   m_OnCullStateChanged:
     m_PersistentCalls:
       m_Calls: []
-  m_text: "\uC218\uBE44"
+  m_text: Defence
   m_isRightToLeft: 0
   m_fontAsset: {fileID: 11400000, guid: 0bab88640a1677d4596db5e478e5a01e, type: 2}
   m_sharedMaterial: {fileID: 8315090994651466644, guid: 0bab88640a1677d4596db5e478e5a01e, type: 2}
@@ -18329,8 +18329,8 @@ MonoBehaviour:
   m_fontMaterials: []
   m_fontColor32:
     serializedVersion: 2
-    rgba: 4290797608
-  m_fontColor: {r: 0.15686275, g: 0.3764706, b: 0.7529412, a: 1}
+    rgba: 4287335193
+  m_fontColor: {r: 0.10, g: 0.25, b: 0.55, a: 1}
   m_enableVertexGradient: 0
   m_colorMode: 3
   m_fontColorGradient:
@@ -18658,7 +18658,7 @@ MonoBehaviour:
   m_OnCullStateChanged:
     m_PersistentCalls:
       m_Calls: []
-  m_text: "\uB808\uBCA8 \uC5C5! \uC2A4\uD0EF\uC744 \uC120\uD0DD\uD558\uC138\uC694"
+  m_text: "Level Up!"
   m_isRightToLeft: 0
   m_fontAsset: {fileID: 11400000, guid: 0bab88640a1677d4596db5e478e5a01e, type: 2}
   m_sharedMaterial: {fileID: 8315090994651466644, guid: 0bab88640a1677d4596db5e478e5a01e, type: 2}
@@ -25944,7 +25944,7 @@ MonoBehaviour:
   m_OnCullStateChanged:
     m_PersistentCalls:
       m_Calls: []
-  m_text: "\uC871\uBCF4 \uD574\uAE08"
+  m_text: "Unlock Hand"
   m_isRightToLeft: 0
   m_fontAsset: {fileID: 11400000, guid: 0bab88640a1677d4596db5e478e5a01e, type: 2}
   m_sharedMaterial: {fileID: 8315090994651466644, guid: 0bab88640a1677d4596db5e478e5a01e, type: 2}
@@ -27568,7 +27568,7 @@ MonoBehaviour:
   m_OnCullStateChanged:
     m_PersistentCalls:
       m_Calls: []
-  m_text: "XP \uAD6C\uB9E4 (20G)"
+  m_text: "XP(20G)"
   m_isRightToLeft: 0
   m_fontAsset: {fileID: 11400000, guid: 0bab88640a1677d4596db5e478e5a01e, type: 2}
   m_sharedMaterial: {fileID: 8315090994651466644, guid: 0bab88640a1677d4596db5e478e5a01e, type: 2}
