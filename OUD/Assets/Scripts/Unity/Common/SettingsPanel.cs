@@ -1,4 +1,5 @@
 using UnityEngine;
+using UnityEngine.InputSystem;
 using UnityEngine.UI;
 
 namespace OUD.Unity.Common
@@ -37,8 +38,8 @@ namespace OUD.Unity.Common
 
         private void Update()
         {
-            // ESC 키 또는 모바일 뒤로가기 버튼
-            if (Input.GetKeyDown(KeyCode.Escape))
+            // ESC 키 또는 모바일 뒤로가기 버튼 (New Input System)
+            if (Keyboard.current != null && Keyboard.current.escapeKey.wasPressedThisFrame)
             {
                 // 패널이 열려있으면 닫기
                 if (_panelRoot != null && _panelRoot.activeSelf)
