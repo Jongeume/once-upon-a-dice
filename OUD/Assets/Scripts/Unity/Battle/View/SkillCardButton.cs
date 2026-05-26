@@ -1,4 +1,5 @@
 using System;
+using OUD.BattleEngine.Core;
 using OUD.Unity.Battle;
 using TMPro;
 using UnityEngine;
@@ -15,7 +16,8 @@ namespace OUD.Unity.Battle.View
         [SerializeField] private Image    _background;
 
         [Header("색상")]
-        [SerializeField] private Color _enabledColor  = new Color(0.18f, 0.12f, 0.08f, 0.95f);
+        [SerializeField] private Color _atkEnabledColor = new Color(0.55f, 0.15f, 0.12f, 0.95f);
+        [SerializeField] private Color _defEnabledColor = new Color(0.10f, 0.25f, 0.55f, 0.95f);
         [SerializeField] private Color _disabledColor = new Color(0.10f, 0.08f, 0.06f, 0.45f);
 
         [Header("외곽선")]
@@ -24,6 +26,7 @@ namespace OUD.Unity.Battle.View
 
         private string _skillId;
         private Outline _outline;
+        private Color _resolvedEnabledColor;
         private TMP_Text _valueText;
 
         private void Awake()
@@ -42,11 +45,19 @@ namespace OUD.Unity.Battle.View
         public void Setup(SkillCardData card, Action<string> onClick)
         {
             _skillId = card.SkillId;
-            if (_nameText) _nameText.text = card.DisplayName;
+            _resolvedEnabledColor = card.Category == SkillCategory.Attack
+                ? _atkEnabledColor
+                : _defEnabledColor;
+            if (_nameText)
+            {
+                _nameText.text = card.DisplayName;
+                _nameText.color = Color.white;
+            }
             if (_handText)
             {
                 _handText.text = $"({card.RequiredHand})";
                 _handText.alignment = TextAlignmentOptions.MidlineLeft;
+                _handText.color = Color.white;
             }
             SetValueText(card.ValueText);
             SetEnabled(card.IsEnabled);
@@ -91,7 +102,8 @@ namespace OUD.Unity.Battle.View
         public void SetEnabled(bool enabled)
         {
             if (_button)     _button.interactable = enabled;
-            if (_background) _background.color    = enabled ? _enabledColor : _disabledColor;
+            var bgColor = _resolvedEnabledColor.a > 0 ? _resolvedEnabledColor : _atkEnabledColor;
+            if (_background) _background.color    = enabled ? bgColor : _disabledColor;
             EnsureOutline();
             if (_outline)
             {

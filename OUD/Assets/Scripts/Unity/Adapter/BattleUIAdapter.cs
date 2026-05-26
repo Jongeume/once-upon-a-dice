@@ -1228,7 +1228,7 @@ namespace OUD.Unity.Adapter
                 xpText = "MAX";
             else
                 xpText = $"{player.Xp}/{LevelUpSystem.GetXpThreshold(player.Level)}";
-            _topBarText.text = $"{nameText}  HP {hp}/{maxHp}  XP {xpText}  돈 {player.Gold}";
+            _topBarText.text = $"{nameText}  HP {hp}/{maxHp}  XP {xpText}  Gold {player.Gold}";
         }
 
         private void StartQueuePlayback()
@@ -1355,7 +1355,7 @@ namespace OUD.Unity.Adapter
                 xpText = $"{player.Xp}/{threshold}";
             }
 
-            _topBarText.text = $"{nameText}  HP {player.Hp}/{player.MaxHp}  XP {xpText}  돈 {player.Gold}";
+            _topBarText.text = $"{nameText}  HP {player.Hp}/{player.MaxHp}  XP {xpText}  Gold {player.Gold}";
         }
     }
 }
