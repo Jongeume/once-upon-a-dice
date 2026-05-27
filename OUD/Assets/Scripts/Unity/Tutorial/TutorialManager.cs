@@ -25,6 +25,10 @@ namespace OUD.Unity.Tutorial
         // Step 10 조건부 — 적이 실제로 쉴드를 획득한 경우에만 표시
         private bool _enemyShieldedThisBattle;
 
+        // 이벤트 버퍼 — Auto Step 진행 중 유저가 먼저 행동하면
+        // 해당 이벤트를 기록해 두었다가, 이벤트 기반 Step 활성화 시 즉시 매칭
+        private readonly HashSet<string> _receivedEvents = new();
+
         // ── 13단계 Step 정의 (설계 문서 기준) ────────────────────────────────
 
         private static TutorialStep[] BuildSteps()
@@ -212,7 +216,38 @@ namespace OUD.Unity.Tutorial
             }
             else
             {
+                // 이벤트 버퍼에 이미 매칭 가능한 이벤트가 있으면 즉시 진행
+                // (Auto Step 진행 중 유저가 먼저 행동한 경우)
+                if (CheckBufferedEvents(step))
+                {
+                    _overlayView.HideGuide();
+                    _overlayView.ClearAllGlows();
+                    Advance();
+                    return;
+                }
                 _waitingForTrigger = true;
+            }
+        }
+
+        /// <summary>버퍼링된 이벤트 중 step 트리거와 매칭되는 것이 있는지 확인.</summary>
+        private bool CheckBufferedEvents(TutorialStep step)
+        {
+            switch (step.Trigger)
+            {
+                case TutorialTrigger.ButtonClicked:
+                    return _receivedEvents.Contains("DiceRolled")
+                        || _receivedEvents.Contains("UseSkillClicked")
+                        || _receivedEvents.Contains("ExecuteClicked");
+                case TutorialTrigger.DiceKept:
+                    return _receivedEvents.Contains("DiceKept");
+                case TutorialTrigger.SkillSelected:
+                    return _receivedEvents.Contains("SkillSelected");
+                case TutorialTrigger.TargetSelected:
+                    return _receivedEvents.Contains("TargetSelected");
+                case TutorialTrigger.BattleWon:
+                    return _receivedEvents.Contains("BattleWon");
+                default:
+                    return false;
             }
         }
 
@@ -247,6 +282,9 @@ namespace OUD.Unity.Tutorial
         private void HandleTutorialEvent(string eventName)
         {
             if (!_isActive) return;
+
+            // 이벤트 버퍼에 기록 (Auto Step 중 유저가 먼저 행동하면 나중에 매칭)
+            _receivedEvents.Add(eventName);
 
             // EnemyShielded 플래그 추적
             if (eventName == "EnemyShielded")
