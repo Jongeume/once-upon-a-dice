@@ -8,10 +8,6 @@ using UnityEngine.UI;
 
 namespace OUD.Unity.Tutorial
 {
-    /// <summary>
-    /// 튜토리얼 가이드 패널 + 글로우 이펙트 제어.
-    /// BattleScene Canvas 최상위에 배치하여 모든 UI 위에 표시.
-    /// </summary>
     public class TutorialOverlayView : ViewBase
     {
         [Header("가이드 패널")]
@@ -19,46 +15,42 @@ namespace OUD.Unity.Tutorial
         [SerializeField] private TMP_Text   _guideText;
         [SerializeField] private CanvasGroup _guidePanelCanvasGroup;
 
-        private const float FADE_DURATION = 0.3f;
+        public const float FADE_DURATION = 0.3f;
 
-        // 글로우 펄스 상수 — EnemyEntryView 패턴 재사용
         private static readonly Color GLOW_COLOR = new Color(0.95f, 0.78f, 0.18f, 1f);
         private const float GLOW_PULSE_PERIOD    = 1.0f;
         private const float GLOW_PULSE_MIN_ALPHA = 0.3f;
 
-        // 글로우 대상 참조 — TutorialManager가 주입
         private DiceView            _diceView;
         private SlotAssignmentView  _slotAssignmentView;
         private TargetSelectionView _targetSelectionView;
         private List<DiceEntryView> _diceEntries;
         private List<EnemyEntryView> _enemyEntryViews;
+        private GameObject           _rollDiceButtonRef;
 
-        // 활성 글로우 코루틴 추적
         private readonly List<Coroutine> _activeGlowCoroutines = new();
         private readonly List<Outline>   _activeGlowOutlines   = new();
 
         private Coroutine _fadeCoroutine;
 
-        // ── 초기화 ─────────────────────────────────────────────────────────
-
-        /// <summary>글로우 대상 View 참조를 주입한다. TutorialManager.Begin()에서 호출.</summary>
         public void InjectViews(
             DiceView diceView,
             SlotAssignmentView slotAssignmentView,
             TargetSelectionView targetSelectionView,
             List<DiceEntryView> diceEntries,
-            List<EnemyEntryView> enemyEntryViews)
+            List<EnemyEntryView> enemyEntryViews,
+            GameObject rollDiceButton = null)
         {
             _diceView            = diceView;
             _slotAssignmentView  = slotAssignmentView;
             _targetSelectionView = targetSelectionView;
             _diceEntries         = diceEntries;
             _enemyEntryViews     = enemyEntryViews;
+            _rollDiceButtonRef   = rollDiceButton;
         }
 
         // ── 가이드 텍스트 ──────────────────────────────────────────────────
 
-        /// <summary>가이드 텍스트를 페이드인으로 표시.</summary>
         public void ShowGuide(string text)
         {
             if (_guideText != null) _guideText.text = text;
@@ -67,7 +59,6 @@ namespace OUD.Unity.Tutorial
             _fadeCoroutine = StartCoroutine(FadeCanvasGroup(_guidePanelCanvasGroup, 1f));
         }
 
-        /// <summary>가이드 텍스트를 페이드아웃으로 숨김.</summary>
         public void HideGuide()
         {
             if (_fadeCoroutine != null) StopCoroutine(_fadeCoroutine);
@@ -77,7 +68,6 @@ namespace OUD.Unity.Tutorial
             }));
         }
 
-        /// <summary>즉시 숨김 (전투 종료 시 등).</summary>
         public void HideGuideImmediate()
         {
             if (_fadeCoroutine != null) { StopCoroutine(_fadeCoroutine); _fadeCoroutine = null; }
@@ -87,7 +77,6 @@ namespace OUD.Unity.Tutorial
 
         // ── 글로우 제어 ──────────────────────────────────────────────────
 
-        /// <summary>지정 대상에 골드색 Outline 펄스를 시작.</summary>
         public void SetGlow(GlowTarget target, bool active)
         {
             if (!active)
@@ -115,8 +104,8 @@ namespace OUD.Unity.Tutorial
                         foreach (var entry in _diceEntries)
                             if (entry != null) AddOutlineGlow(entry.gameObject);
                     break;
-                case GlowTarget.SkillCards:
-                    AddGlowToSkillCards();
+                case GlowTarget.SkillList:
+                    AddGlowToSkillList();
                     break;
                 case GlowTarget.EnemyCards:
                     if (_enemyEntryViews != null)
@@ -127,7 +116,6 @@ namespace OUD.Unity.Tutorial
             }
         }
 
-        /// <summary>모든 글로우 이펙트 정지 + Outline 정리.</summary>
         public void ClearAllGlows()
         {
             foreach (var co in _activeGlowCoroutines)
@@ -150,7 +138,7 @@ namespace OUD.Unity.Tutorial
 
             var outline = go.GetComponent<Outline>();
             if (outline == null) outline = go.AddComponent<Outline>();
-            outline.effectDistance = new Vector2(3f, -3f);
+            outline.effectDistance = new Vector2(2f, -2f);
             outline.enabled = true;
             _activeGlowOutlines.Add(outline);
 
@@ -161,28 +149,15 @@ namespace OUD.Unity.Tutorial
             }
         }
 
-        private void AddGlowToSkillCards()
+        private void AddGlowToSkillList()
         {
             if (_slotAssignmentView == null) return;
-            // 기술 카드는 동적 생성이므로 공격/수비 컬럼 하위 자식을 탐색
-            var columns = new Transform[]
-            {
-                FindDescendantByName(_slotAssignmentView.transform, "AttackColumn"),
-                FindDescendantByName(_slotAssignmentView.transform, "DefenseColumn"),
-            };
-            foreach (var col in columns)
-            {
-                if (col == null) continue;
-                for (int i = 0; i < col.childCount; i++)
-                {
-                    var child = col.GetChild(i);
-                    if (child != null && child.gameObject.activeSelf)
-                        AddOutlineGlow(child.gameObject);
-                }
-            }
+            var attackCol  = _slotAssignmentView.SkillListAttackColumn;
+            var defenseCol = _slotAssignmentView.SkillListDefenseColumn;
+            if (attackCol != null)  AddOutlineGlow(attackCol.gameObject);
+            if (defenseCol != null) AddOutlineGlow(defenseCol.gameObject);
         }
 
-        /// <summary>Outline effectColor alpha를 코사인 파동으로 깜빡임.</summary>
         private IEnumerator PulseOutline(Outline outline)
         {
             if (outline == null) yield break;
@@ -201,11 +176,11 @@ namespace OUD.Unity.Tutorial
 
         private GameObject GetRollDiceButton()
         {
+            if (_rollDiceButtonRef != null) return _rollDiceButtonRef;
             if (_diceView == null) return null;
-            // BattleBootstrapper의 _rollDiceButton은 BattlePanel 하위에 있음
-            // DiceView 상위 Canvas에서 "ActionButtonA" 또는 "RollDiceButton" 탐색
             Transform root = _diceView.transform.root;
             var t = FindDescendantByName(root, "ActionButtonA");
+            if (t == null) t = FindDescendantByName(root, "RollDiceButton");
             return t != null ? t.gameObject : null;
         }
 
@@ -214,7 +189,6 @@ namespace OUD.Unity.Tutorial
             if (_diceView == null) return null;
             var t = FindDescendantByName(_diceView.transform, "RerollButton");
             if (t != null) return t.gameObject;
-            // SlotAssignmentView에도 리롤 버튼이 있음
             if (_slotAssignmentView == null) return null;
             t = FindDescendantByName(_slotAssignmentView.transform, "RerollButton");
             return t != null ? t.gameObject : null;

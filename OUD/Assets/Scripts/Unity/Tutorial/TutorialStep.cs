@@ -11,6 +11,8 @@ namespace OUD.Unity.Tutorial
         TurnEnded,
         EnemyShielded,
         BattleWon,
+        RerollExhaustedOrSlotsFull,
+        TurnStartedIfShielded,
     }
 
     public enum GlowTarget
@@ -21,7 +23,7 @@ namespace OUD.Unity.Tutorial
         UseSkillButton,
         ExecuteButton,
         DiceEntries,
-        SkillCards,
+        SkillList,
         EnemyCards,
     }
 
@@ -32,19 +34,22 @@ namespace OUD.Unity.Tutorial
         public GlowTarget[] GlowTargets { get; }
         public float DelayBefore { get; }
         public bool IsConditional { get; }
+        public string ExpectedEvent { get; }
 
         public TutorialStep(
             string guideText,
             TutorialTrigger trigger,
             GlowTarget[] glowTargets = null,
             float delayBefore = 0f,
-            bool isConditional = false)
+            bool isConditional = false,
+            string expectedEvent = null)
         {
             GuideText = guideText;
             Trigger = trigger;
             GlowTargets = glowTargets ?? System.Array.Empty<GlowTarget>();
             DelayBefore = delayBefore;
             IsConditional = isConditional;
+            ExpectedEvent = expectedEvent;
         }
     }
 }

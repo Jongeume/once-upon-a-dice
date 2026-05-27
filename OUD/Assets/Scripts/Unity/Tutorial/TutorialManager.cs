@@ -6,11 +6,6 @@ using UnityEngine;
 
 namespace OUD.Unity.Tutorial
 {
-    /// <summary>
-    /// 튜토리얼 진행 관리자.
-    /// BattleUIAdapter 이벤트를 구독하여 TutorialStep[] 순차 실행.
-    /// 기존 전투 코드를 수정하지 않고 관찰자로 동작한다.
-    /// </summary>
     public class TutorialManager : MonoBehaviour
     {
         private BattleUIAdapter     _adapter;
@@ -22,14 +17,11 @@ namespace OUD.Unity.Tutorial
         private bool           _waitingForTrigger;
         private Coroutine      _autoAdvanceCoroutine;
 
-        // Step 10 조건부 — 적이 실제로 쉴드를 획득한 경우에만 표시
         private bool _enemyShieldedThisBattle;
 
-        // 이벤트 버퍼 — Auto Step 진행 중 유저가 먼저 행동하면
-        // 해당 이벤트를 기록해 두었다가, 이벤트 기반 Step 활성화 시 즉시 매칭
         private readonly HashSet<string> _receivedEvents = new();
 
-        // ── 13단계 Step 정의 (설계 문서 기준) ────────────────────────────────
+        // ── 14단계 Step 정의 (설계 문서 v2 기준) ──────────────────────────
 
         private static TutorialStep[] BuildSteps()
         {
@@ -51,14 +43,16 @@ namespace OUD.Unity.Tutorial
                 // Step 2: Roll Dice 안내
                 new TutorialStep(
                     "Roll Dice 버튼을 눌러 주사위를 굴리세요",
-                    TutorialTrigger.ButtonClicked, // DiceRolled 이벤트로 진행
-                    new[] { GlowTarget.RollDiceButton }),
+                    TutorialTrigger.ButtonClicked,
+                    new[] { GlowTarget.RollDiceButton },
+                    expectedEvent: "DiceRolled"),
 
                 // Step 3: Reroll 안내
                 new TutorialStep(
-                    "Reroll 버튼으로 주사위를 다시 굴릴 수 있습니다",
-                    TutorialTrigger.ButtonClicked, // DiceRolled (reroll) 이벤트로 진행
-                    new[] { GlowTarget.RerollButton }),
+                    "리롤 버튼을 눌러 주사위를 다시 굴리세요",
+                    TutorialTrigger.ButtonClicked,
+                    new[] { GlowTarget.RerollButton },
+                    expectedEvent: "DiceRolled"),
 
                 // Step 4: Keep 안내
                 new TutorialStep(
@@ -76,39 +70,45 @@ namespace OUD.Unity.Tutorial
                 new TutorialStep(
                     "활성화된 기술을 선택하세요!",
                     TutorialTrigger.SkillSelected,
-                    new[] { GlowTarget.SkillCards }),
+                    new[] { GlowTarget.SkillList }),
 
-                // Step 7: Use Skill 버튼 안내
+                // Step 7: 리롤/슬롯 유도
                 new TutorialStep(
-                    "기술사용 버튼을 누르세요",
-                    TutorialTrigger.ButtonClicked, // UseSkillClicked 이벤트로 진행
-                    new[] { GlowTarget.UseSkillButton }),
+                    "남은 리롤을 모두 사용하거나 기술 슬롯을 채우세요!",
+                    TutorialTrigger.RerollExhaustedOrSlotsFull,
+                    new[] { GlowTarget.RerollButton }),
 
-                // Step 8: 타겟 지정 안내
+                // Step 8: Use Skill 버튼 안내
+                new TutorialStep(
+                    "기술 사용 버튼을 눌러 적들을 물리치러 가세요!",
+                    TutorialTrigger.ButtonClicked,
+                    new[] { GlowTarget.UseSkillButton },
+                    expectedEvent: "UseSkillClicked"),
+
+                // Step 9: 타겟 지정 안내
                 new TutorialStep(
                     "공격할 적을 선택하세요!",
                     TutorialTrigger.TargetSelected,
                     new[] { GlowTarget.EnemyCards }),
 
-                // Step 9: Execute 안내
+                // Step 10: Execute 안내
                 new TutorialStep(
                     "Execute 버튼으로 기술을 발동하세요!",
-                    TutorialTrigger.ButtonClicked, // ExecuteClicked 이벤트로 진행
-                    new[] { GlowTarget.ExecuteButton }),
+                    TutorialTrigger.ButtonClicked,
+                    new[] { GlowTarget.ExecuteButton },
+                    expectedEvent: "ExecuteClicked"),
 
-                // Step 10: 적 쉴드 안내 (조건부)
+                // Step 11: 적 쉴드 안내 (조건부 — End Turn 후 적 쉴드 보유 시)
                 new TutorialStep(
                     "적이 방어를 올렸습니다! 쉴드를 먼저 깎아야 합니다",
-                    TutorialTrigger.Auto,
-                    delayBefore: 2.0f,
-                    isConditional: true),
+                    TutorialTrigger.TurnStartedIfShielded),
 
-                // Step 11: 자유 플레이 (가이드 없음, 승리 대기)
+                // Step 12: 자유 플레이 (가이드 없음, 승리 대기)
                 new TutorialStep(
                     "",
                     TutorialTrigger.BattleWon),
 
-                // Step 12: 승리 축하
+                // Step 13: 승리 축하
                 new TutorialStep(
                     "축하합니다! 튜토리얼을 완료했습니다!",
                     TutorialTrigger.Auto,
@@ -118,8 +118,8 @@ namespace OUD.Unity.Tutorial
 
         // ── 초기화 & 시작 ──────────────────────────────────────────────────
 
-        /// <summary>BattleBootstrapper에서 호출. 튜토리얼 시퀀스를 시작한다.</summary>
-        public void Begin(BattleUIAdapter adapter, TutorialOverlayView overlayView)
+        public void Begin(BattleUIAdapter adapter, TutorialOverlayView overlayView,
+            GameObject rollDiceButton = null)
         {
             _adapter    = adapter;
             _overlayView = overlayView;
@@ -129,20 +129,18 @@ namespace OUD.Unity.Tutorial
             _waitingForTrigger = false;
             _enemyShieldedThisBattle = false;
 
-            // View 참조 주입
             _overlayView.InjectViews(
                 _adapter.DiceViewRef,
                 _adapter.SlotAssignmentViewRef,
                 _adapter.TargetSelectionViewRef,
                 _adapter.DiceEntries,
-                _adapter.GetEnemyEntryViews());
+                _adapter.GetEnemyEntryViews(),
+                rollDiceButton);
 
-            // 이벤트 구독
             _adapter.OnTutorialEvent += HandleTutorialEvent;
 
-            Debug.Log("[TutorialManager] 튜토리얼 시작 — 13단계 가이드 시퀀스");
+            Debug.Log("[TutorialManager] 튜토리얼 시작 — 14단계 가이드 시퀀스");
 
-            // BattleStart 이벤트는 Begin() 호출 전에 이미 발생하므로 직접 첫 Step 시작
             ExecuteCurrentStep();
         }
 
@@ -154,7 +152,6 @@ namespace OUD.Unity.Tutorial
 
         // ── Step 실행 ──────────────────────────────────────────────────────
 
-        /// <summary>현재 Step 가이드 표시 + 글로우 시작 + 트리거 대기.</summary>
         private void ExecuteCurrentStep()
         {
             if (!_isActive) return;
@@ -166,16 +163,19 @@ namespace OUD.Unity.Tutorial
 
             TutorialStep step = _steps[_currentStepIndex];
 
-            // 조건부 Step 10: 적이 쉴드를 획득하지 않았으면 스킵
-            if (step.IsConditional && !_enemyShieldedThisBattle)
+            // TurnStartedIfShielded: 가이드를 바로 표시하지 않고 이벤트 대기
+            if (step.Trigger == TutorialTrigger.TurnStartedIfShielded)
             {
-                Debug.Log($"[TutorialManager] Step {_currentStepIndex} 스킵 — 조건 미충족 (적 쉴드 없음)");
-                _currentStepIndex++;
-                ExecuteCurrentStep();
+                _overlayView.ClearAllGlows();
+                if (CheckBufferedEvents(step))
+                {
+                    HandleShieldStep(step);
+                    return;
+                }
+                _waitingForTrigger = true;
                 return;
             }
 
-            // 가이드 텍스트 표시
             _overlayView.ClearAllGlows();
 
             if (!string.IsNullOrEmpty(step.GuideText))
@@ -204,11 +204,9 @@ namespace OUD.Unity.Tutorial
 
         private void ApplyGlowAndWait(TutorialStep step)
         {
-            // 글로우 적용
             foreach (var target in step.GlowTargets)
                 _overlayView.SetGlow(target, true);
 
-            // Auto 트리거: 딜레이 후 자동 진행
             if (step.Trigger == TutorialTrigger.Auto)
             {
                 float autoDelay = string.IsNullOrEmpty(step.GuideText) ? 1.0f : 2.0f;
@@ -216,36 +214,40 @@ namespace OUD.Unity.Tutorial
             }
             else
             {
-                // 이벤트 버퍼에 이미 매칭 가능한 이벤트가 있으면 즉시 진행
-                // (Auto Step 진행 중 유저가 먼저 행동한 경우)
                 if (CheckBufferedEvents(step))
                 {
-                    _overlayView.HideGuide();
-                    _overlayView.ClearAllGlows();
-                    Advance();
+                    StartCoroutine(FadeOutThenAdvance());
                     return;
                 }
                 _waitingForTrigger = true;
             }
         }
 
-        /// <summary>버퍼링된 이벤트 중 step 트리거와 매칭되는 것이 있는지 확인.</summary>
         private bool CheckBufferedEvents(TutorialStep step)
         {
             switch (step.Trigger)
             {
                 case TutorialTrigger.ButtonClicked:
-                    return _receivedEvents.Contains("DiceRolled")
-                        || _receivedEvents.Contains("UseSkillClicked")
-                        || _receivedEvents.Contains("ExecuteClicked");
+                    if (step.ExpectedEvent != null)
+                        return _receivedEvents.Remove(step.ExpectedEvent);
+                    if (_receivedEvents.Remove("DiceRolled")) return true;
+                    if (_receivedEvents.Remove("UseSkillClicked")) return true;
+                    if (_receivedEvents.Remove("ExecuteClicked")) return true;
+                    return false;
                 case TutorialTrigger.DiceKept:
-                    return _receivedEvents.Contains("DiceKept");
+                    return _receivedEvents.Remove("DiceKept");
                 case TutorialTrigger.SkillSelected:
-                    return _receivedEvents.Contains("SkillSelected");
+                    return _receivedEvents.Remove("SkillSelected");
                 case TutorialTrigger.TargetSelected:
-                    return _receivedEvents.Contains("TargetSelected");
+                    return _receivedEvents.Remove("TargetSelected");
                 case TutorialTrigger.BattleWon:
-                    return _receivedEvents.Contains("BattleWon");
+                    return _receivedEvents.Remove("BattleWon");
+                case TutorialTrigger.RerollExhaustedOrSlotsFull:
+                    if (_receivedEvents.Remove("RerollsExhausted")) return true;
+                    if (_receivedEvents.Remove("AllSlotsFilled")) return true;
+                    return false;
+                case TutorialTrigger.TurnStartedIfShielded:
+                    return _receivedEvents.Remove("PlayerTurnStarted");
                 default:
                     return false;
             }
@@ -262,7 +264,16 @@ namespace OUD.Unity.Tutorial
             Advance();
         }
 
-        /// <summary>다음 Step으로 진행.</summary>
+        private IEnumerator FadeOutThenAdvance()
+        {
+            _waitingForTrigger = false;
+            _overlayView.HideGuide();
+            _overlayView.ClearAllGlows();
+            yield return new WaitForSeconds(TutorialOverlayView.FADE_DURATION);
+            if (!_isActive) yield break;
+            Advance();
+        }
+
         private void Advance()
         {
             _waitingForTrigger = false;
@@ -283,14 +294,11 @@ namespace OUD.Unity.Tutorial
         {
             if (!_isActive) return;
 
-            // 이벤트 버퍼에 기록 (Auto Step 중 유저가 먼저 행동하면 나중에 매칭)
             _receivedEvents.Add(eventName);
 
-            // EnemyShielded 플래그 추적
             if (eventName == "EnemyShielded")
                 _enemyShieldedThisBattle = true;
 
-            // 트리거 대기 중이 아니면 무시
             if (!_waitingForTrigger) return;
             if (_currentStepIndex >= _steps.Length) return;
 
@@ -300,13 +308,12 @@ namespace OUD.Unity.Tutorial
             switch (step.Trigger)
             {
                 case TutorialTrigger.ButtonClicked:
-                    // Step 2: RollDice → DiceRolled
-                    // Step 3: Reroll → DiceRolled
-                    // Step 7: UseSkill → UseSkillClicked
-                    // Step 9: Execute → ExecuteClicked
-                    matched = eventName == "DiceRolled"
-                           || eventName == "UseSkillClicked"
-                           || eventName == "ExecuteClicked";
+                    if (step.ExpectedEvent != null)
+                        matched = eventName == step.ExpectedEvent;
+                    else
+                        matched = eventName == "DiceRolled"
+                               || eventName == "UseSkillClicked"
+                               || eventName == "ExecuteClicked";
                     break;
 
                 case TutorialTrigger.DiceKept:
@@ -324,12 +331,40 @@ namespace OUD.Unity.Tutorial
                 case TutorialTrigger.BattleWon:
                     matched = eventName == "BattleWon";
                     break;
+
+                case TutorialTrigger.RerollExhaustedOrSlotsFull:
+                    matched = eventName == "RerollsExhausted"
+                           || eventName == "AllSlotsFilled";
+                    break;
+
+                case TutorialTrigger.TurnStartedIfShielded:
+                    if (eventName == "PlayerTurnStarted")
+                    {
+                        _receivedEvents.Remove(eventName);
+                        HandleShieldStep(step);
+                        return;
+                    }
+                    break;
             }
 
             if (matched)
             {
-                _overlayView.HideGuide();
-                _overlayView.ClearAllGlows();
+                _receivedEvents.Remove(eventName);
+                StartCoroutine(FadeOutThenAdvance());
+            }
+        }
+
+        private void HandleShieldStep(TutorialStep step)
+        {
+            _waitingForTrigger = false;
+            if (_enemyShieldedThisBattle)
+            {
+                _overlayView.ShowGuide(step.GuideText);
+                _autoAdvanceCoroutine = StartCoroutine(AutoAdvance(2.0f));
+            }
+            else
+            {
+                Debug.Log($"[TutorialManager] Step {_currentStepIndex} 스킵 — 적 쉴드 없음");
                 Advance();
             }
         }

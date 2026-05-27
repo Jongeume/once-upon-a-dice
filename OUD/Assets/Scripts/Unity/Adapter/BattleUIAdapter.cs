@@ -701,6 +701,11 @@ namespace OUD.Unity.Adapter
             {
                 _slotAssignmentPresenter.OnSkillClicked(id);
                 OnTutorialEvent?.Invoke("SkillSelected");
+                var slots = _slotAssignmentPresenter.GetSlots();
+                int filled = 0;
+                foreach (var s in slots) if (s != null) filled++;
+                if (filled >= SlotManager.MAX_SLOTS)
+                    OnTutorialEvent?.Invoke("AllSlotsFilled");
             };
             _slotAssignmentView.OnRerollClicked    += _dicePresenter.RequestReroll;
 
@@ -943,6 +948,8 @@ namespace OUD.Unity.Adapter
 
             SetBackButtonEnabled(!_dicePresenter.IsRolling);
             OnTutorialEvent?.Invoke("DiceRolled");
+            if (rerollsLeft == 0)
+                OnTutorialEvent?.Invoke("RerollsExhausted");
         }
 
         public void OnHandsEvaluated(List<HandType> hands, List<SkillData> usableSkills) { }
@@ -985,6 +992,9 @@ namespace OUD.Unity.Adapter
 
         public void OnEnemyAction(int enemyIndex, IntentType intent, int value)
         {
+            if (intent == IntentType.Shield)
+                OnTutorialEvent?.Invoke("EnemyShielded");
+
             if (_isQueueMode)
             {
                 _actionQueue.Enqueue(new QueuedBattleAction
@@ -1002,8 +1012,6 @@ namespace OUD.Unity.Adapter
             _playerPresenter.SyncView();
             RefreshTopBar();
 
-            if (intent == IntentType.Shield)
-                OnTutorialEvent?.Invoke("EnemyShielded");
             if (intent == IntentType.Attack || intent == IntentType.StrongAttack)
                 SoundManager.Instance?.PlayMonsterAttack();
         }

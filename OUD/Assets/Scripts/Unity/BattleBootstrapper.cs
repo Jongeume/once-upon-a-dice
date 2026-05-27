@@ -157,7 +157,8 @@ namespace OUD.Unity
             if (_isTutorialBattle && _tutorialOverlayView != null)
             {
                 _tutorialManager = gameObject.AddComponent<TutorialManager>();
-                _tutorialManager.Begin(_adapter, _tutorialOverlayView);
+                _tutorialManager.Begin(_adapter, _tutorialOverlayView,
+                    _rollDiceButton != null ? _rollDiceButton.gameObject : null);
             }
         }
 
