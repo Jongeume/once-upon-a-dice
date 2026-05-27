@@ -137,6 +137,9 @@ namespace OUD.Unity.Tutorial
             _adapter.OnTutorialEvent += HandleTutorialEvent;
 
             Debug.Log("[TutorialManager] 튜토리얼 시작 — 13단계 가이드 시퀀스");
+
+            // BattleStart 이벤트는 Begin() 호출 전에 이미 발생하므로 직접 첫 Step 시작
+            ExecuteCurrentStep();
         }
 
         private void OnDestroy()
@@ -244,13 +247,6 @@ namespace OUD.Unity.Tutorial
         private void HandleTutorialEvent(string eventName)
         {
             if (!_isActive) return;
-
-            // BattleStart 이벤트 → 첫 Step 실행
-            if (eventName == "BattleStart" && _currentStepIndex == 0)
-            {
-                ExecuteCurrentStep();
-                return;
-            }
 
             // EnemyShielded 플래그 추적
             if (eventName == "EnemyShielded")
