@@ -68,7 +68,7 @@ enum GlowTarget
     UseSkillButton,
     ExecuteButton,
     DiceEntries,
-    SkillCards,
+    SkillList,      // 기술 목록 컨테이너 (개별 카드가 아닌 목록 전체)
     EnemyCards,
 }
 ```
@@ -101,22 +101,25 @@ HasRage: false
 | 0 | 전투 시작 | "적의 의도를 확인하세요! 검 아이콘은 공격, 방패 아이콘은 수비입니다" | EnemyCards | 2초 후 자동 |
 | 1 | | "적들의 공격을 방어하거나, 먼저 물리치세요!" | — | 2초 후 자동 |
 | 2 | 주사위 단계 | "Roll Dice 버튼을 눌러 주사위를 굴리세요" | RollDiceButton | RollDice 클릭 |
-| 3 | 주사위 결과 | "Reroll 버튼으로 주사위를 다시 굴릴 수 있습니다" | RerollButton | Reroll 클릭 |
+| 3 | 주사위 결과 | "리롤 버튼을 눌러 주사위를 다시 굴리세요" | RerollButton | Reroll 클릭 |
 | 4 | 리롤 후 | "원하는 주사위를 터치해서 Keep하세요" | DiceEntries | 주사위 Keep 시 |
 | 5 | | "같은 숫자가 모이면 스킬이 활성화됩니다!" | — | 1.5초 후 자동 |
-| 6 | 스킬 선택 | "활성화된 기술을 선택하세요!" | SkillCards | 스킬 카드 클릭 |
-| 7 | 기술 사용 | "기술사용 버튼을 누르세요" | UseSkillButton | UseSkill 클릭 |
-| 8 | 타겟 지정 | "공격할 적을 선택하세요!" | EnemyCards | 타겟 선택 |
-| 9 | 실행 | "Execute 버튼으로 기술을 발동하세요!" | ExecuteButton | Execute 클릭 |
-| 10 | 적 턴 후 | "적이 방어를 올렸습니다! 쉴드를 먼저 깎아야 합니다" | — | 2초 후 자동 (조건부: 적이 쉴드 획득 시에만) |
-| 11 | 2턴째~ | (가이드 없음, 자유 플레이) | — | BattleWon |
-| 12 | 승리 | "축하합니다! 튜토리얼을 완료했습니다!" | — | 2초 후 자동 종료 |
+| 6 | 스킬 선택 | "활성화된 기술을 선택하세요!" | SkillList | 스킬 카드 클릭 |
+| 7 | 리롤/슬롯 유도 | "남은 리롤을 모두 사용하거나 기술 슬롯을 채우세요!" | RerollButton | 리롤 전부 소모 또는 슬롯 3개 채움 |
+| 8 | 기술 사용 | "기술 사용 버튼을 눌러 적들을 물리치러 가세요!" | UseSkillButton | UseSkill 클릭 |
+| 9 | 타겟 지정 | "공격할 적을 선택하세요!" | EnemyCards | 타겟 선택 |
+| 10 | 실행 | "Execute 버튼으로 기술을 발동하세요!" | ExecuteButton | Execute 클릭 |
+| 11 | End Turn 후 | "적이 방어를 올렸습니다! 쉴드를 먼저 깎아야 합니다" | — | 2초 후 자동 (조건부: End Turn 클릭 후 적이 쉴드 보유 시) |
+| 12 | 2턴째~ | (가이드 없음, 자유 플레이) | — | BattleWon |
+| 13 | 승리 | "축하합니다! 튜토리얼을 완료했습니다!" | — | 2초 후 자동 종료 |
 
 ### Flow Rules
 
 - **힌트 방식**: 글로우 + 텍스트 표시, 다른 행동 차단하지 않음
-- **Step 10 조건부**: 적이 실제로 쉴드를 획득한 경우에만 표시. 첫 턴에 쉴드 패턴 허수아비를 이미 처치했으면 스킵
-- **2턴째 이후**: 가이드 없이 자유 플레이. 승리 시 Step 12로 점프
+- **Step 2 텍스트**: RollDice 클릭 전까지 FadeOut하지 않고 유지 (다른 Step은 정상 FadeOut)
+- **Step 7 분기**: 스킬 선택 후 리롤이 남아있으면 리롤 소모 유도, 슬롯이 모두 차있으면 바로 Step 8로
+- **Step 11 조건부**: End Turn 버튼 클릭 후 적이 쉴드를 보유하고 있는지 판단. 적의 수비 행동은 현재 턴에 실행되고 쉴드는 다음 턴에 적용되므로, End Turn 이후에 체크해야 정확함. 쉴드 보유 적이 없으면 스킵.
+- **2턴째 이후**: 가이드 없이 자유 플레이. 승리 시 Step 13으로 점프
 - **패배 시**: ATK=1이라 사실상 불가능하지만, 패배 시 튜토리얼 미완료 유지 → 재시작 시 다시 튜토리얼
 
 ## UI Components
@@ -141,6 +144,7 @@ TutorialOverlay (GameObject)
 기존 EnemyEntryView의 Outline 펄스 패턴 재사용:
 - 골드색 Outline `(0.95, 0.78, 0.18)`, alpha 0.3↔1.0 코사인 펄스 (1초 주기)
 - `TutorialOverlayView.SetGlow(GlowTarget, bool)` 메서드로 제어
+- **글로우 크기 제약**: effectDistance를 작게 유지 (2~3px), 인접 오브젝트 영역을 침범하지 않도록. 불가피한 경우 최소한으로 허용.
 
 | GlowTarget | 접근 경로 | 방식 |
 |------------|----------|------|
@@ -149,7 +153,7 @@ TutorialOverlay (GameObject)
 | UseSkillButton | SlotAssignmentView UseSkill 버튼 | Outline 펄스 |
 | ExecuteButton | TargetSelectionView Execute 버튼 | Outline 펄스 |
 | DiceEntries | DiceEntryView 5개 | Border 색상 펄스 |
-| SkillCards | SkillCardButton들 | Outline 펄스 |
+| SkillList | 기술 목록 컨테이너 | Outline 펄스 (컨테이너 전체, 개별 카드 아님) |
 | EnemyCards | EnemyEntryView들 | 기존 _targetOutline 활용 |
 
 ## Tutorial State Persistence
