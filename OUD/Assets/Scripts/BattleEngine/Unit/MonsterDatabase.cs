@@ -23,6 +23,8 @@ namespace OUD.BattleEngine.Unit
         public const string ID_CROW_KNIGHT = "CrowKnight";
         public const string ID_EVIL_QUEEN  = "EvilQueen";
         public const string ID_EVIL_QUEEN_CLONE = "EvilQueenClone";
+        public const string ID_SCARECROW_A     = "ScarecrowA";
+        public const string ID_SCARECROW_B     = "ScarecrowB";
 
         // ── 내부 테이블 ───────────────────────────────────────────────────────
         private static readonly Dictionary<string, MonsterData> _table;
@@ -41,6 +43,8 @@ namespace OUD.BattleEngine.Unit
                 [ID_CROW_KNIGHT]      = BuildCrowKnight(),
                 [ID_EVIL_QUEEN]       = BuildEvilQueen(),
                 [ID_EVIL_QUEEN_CLONE] = BuildEvilQueenClone(),
+                [ID_SCARECROW_A]     = BuildScarecrowA(),
+                [ID_SCARECROW_B]     = BuildScarecrowB(),
             };
         }
 
@@ -254,5 +258,29 @@ namespace OUD.BattleEngine.Unit
             baseAtk:     10,
             shieldValue: 0,
             pattern:     new[] { IntentType.Attack, IntentType.Attack, IntentType.Attack });
+
+        private static MonsterData BuildScarecrowA() => new MonsterData(
+            id:          ID_SCARECROW_A,
+            name:        "Scarecrow",
+            maxHp:       10,
+            baseAtk:     1,
+            shieldValue: 1,
+            pattern:     new[]
+            {
+                IntentType.Attack,
+                IntentType.Shield,
+            });
+
+        private static MonsterData BuildScarecrowB() => new MonsterData(
+            id:          ID_SCARECROW_B,
+            name:        "Scarecrow",
+            maxHp:       10,
+            baseAtk:     1,
+            shieldValue: 1,
+            pattern:     new[]
+            {
+                IntentType.Shield,
+                IntentType.Attack,
+            });
     }
 }
