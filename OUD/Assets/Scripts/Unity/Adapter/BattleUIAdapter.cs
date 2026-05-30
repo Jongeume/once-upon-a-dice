@@ -211,8 +211,9 @@ namespace OUD.Unity.Adapter
             int[] nextIds = new int[nextCandidates.Count];
             for (int i = 0; i < nextCandidates.Count; i++) nextIds[i] = nextCandidates[i].Id;
 
-            _nodeMapView.Bind(_runManager.Map, currentNodeId, nextIds, _runManager.State.VisitedNodeIds);
+            // Show() 먼저 (Awake 선행) → Bind. ShowInitialNodeMap 주석 참조.
             _nodeMapView.Show();
+            _nodeMapView.Bind(_runManager.Map, currentNodeId, nextIds, _runManager.State.VisitedNodeIds);
             _nodeMapView.SetAllButtonsEnabled(false);  // peek: 클릭 모션 차단
             _mapPeekMode = true;
         }
@@ -580,8 +581,11 @@ namespace OUD.Unity.Adapter
             int[] nextIds = new int[nextCandidates.Count];
             for (int i = 0; i < nextCandidates.Count; i++) nextIds[i] = nextCandidates[i].Id;
 
-            _nodeMapView.Bind(_runManager.Map, currentNodeId, nextIds, _runManager.State.VisitedNodeIds);
+            // Show() 먼저 — 패널이 비활성 상태로 시작하므로, Bind 전에 활성화해
+            // NodeView.Awake(노드를 투명/숨김으로 리셋)가 먼저 돌게 한다.
+            // 순서가 바뀌면 Awake가 Bind 직후에 실행되어 노드 비주얼을 지워버린다.
             _nodeMapView.Show();
+            _nodeMapView.Bind(_runManager.Map, currentNodeId, nextIds, _runManager.State.VisitedNodeIds);
             SetMapButtonEnabled(false);  // 노드 선택 모드 — peek 버튼 비활성
         }
 
@@ -601,8 +605,9 @@ namespace OUD.Unity.Adapter
             int[] nextIds = new int[nextCandidates.Count];
             for (int i = 0; i < nextCandidates.Count; i++) nextIds[i] = nextCandidates[i].Id;
 
-            _nodeMapView.Bind(_runManager.Map, currentNodeId, nextIds, _runManager.State.VisitedNodeIds, animateIcon: true);
+            // Show() 먼저 (Awake 선행) → Bind. ShowInitialNodeMap 주석 참조.
             _nodeMapView.Show();
+            _nodeMapView.Bind(_runManager.Map, currentNodeId, nextIds, _runManager.State.VisitedNodeIds, animateIcon: true);
             SetMapButtonEnabled(false);  // 노드 선택 모드 — peek 버튼 비활성
         }
 
