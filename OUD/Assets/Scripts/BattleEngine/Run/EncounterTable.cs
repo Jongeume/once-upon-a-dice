@@ -51,6 +51,10 @@ namespace OUD.BattleEngine.Run
                     throw new InvalidOperationException(
                         "Shop 노드에서는 GenerateEncounter를 호출할 수 없습니다.");
 
+                case NodeType.Start:
+                    throw new InvalidOperationException(
+                        "Start 노드에서는 GenerateEncounter를 호출할 수 없습니다. (전투 없음)");
+
                 case NodeType.Combat:
                     return GenerateCombatEncounter(node.Layer);
 

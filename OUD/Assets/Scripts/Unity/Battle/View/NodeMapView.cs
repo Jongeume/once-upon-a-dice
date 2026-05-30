@@ -245,6 +245,7 @@ namespace OUD.Unity.Battle.View
                 case NodeType.Boss:   return _bossNodeSprite;
                 case NodeType.Shop:   return _shopNodeSprite;
                 case NodeType.Elite:  return _eliteNodeSprite;
+                case NodeType.Start:  return null;  // 빈 시작 노드 — 아이콘 없음
                 default:              return _combatNodeSprite;
             }
         }
