@@ -37,6 +37,9 @@ namespace OUD.Unity.Adapter
         [SerializeField] private ClearView  _clearView;
         [SerializeField] private DefeatView _defeatView;
 
+        [Header("턴 전환 배너")]
+        [SerializeField] private TurnBannerView _turnBannerView;
+
         [Header("화면 관리")]
         [SerializeField] private UIManager            _uiManager;
 
@@ -128,6 +131,11 @@ namespace OUD.Unity.Adapter
 
         private const float ACTION_DELAY = 0.6f;
         private const float INTENT_DELAY = 0.15f;
+
+        // "Enemy Turn" 배너가 페이드인할 짧은 리드 타임 — 첫 적 행동 직전 1회.
+        private const float ENEMY_BANNER_LEAD = 0.35f;
+        // 큐 재생당 "Enemy Turn" 배너 1회 제한 플래그.
+        private bool _enemyTurnBannerShown;
 
         private enum BattleActionType
         {
@@ -960,12 +968,19 @@ namespace OUD.Unity.Adapter
 
             var allLearned = SkillDatabase.GetSkillsByUnlockedHands(_playerPresenter.Player.UnlockedHands);
             _slotAssignmentPresenter.ShowAllSkillsDisabled(allLearned, _playerPresenter.Player);
+
+            // 턴 전환 배너 + Roll Dice 글로우. 글로우는 튜토리얼 전투에선 생략한다
+            // (TutorialOverlayView가 같은 버튼 글로우를 직접 제어 → 중복/충돌 방지).
+            _turnBannerView?.ShowYourTurn();
+            if (!_isTutorialBattle) _turnBannerView?.SetRollDiceGlow(true);
+
             OnTutorialEvent?.Invoke("PlayerTurnStarted");
         }
 
         public void OnDiceRolled(int[] values, int rerollsLeft)
         {
             _hasUsableSkills = false;
+            _turnBannerView?.SetRollDiceGlow(false); // 주사위를 굴리면 "지금 네 턴" 글로우 해제.
             _uiManager.ShowScreen(UIManager.BattleScreen.B_DiceTable);
             _dicePresenter.UpdateDice(values, rerollsLeft);
             _slotAssignmentPresenter.OnRerollCountChanged(rerollsLeft);
@@ -1336,6 +1351,7 @@ namespace OUD.Unity.Adapter
                 IsPlayingQueue = false;
                 return;
             }
+            _enemyTurnBannerShown = false; // 이번 큐 재생에서 "Enemy Turn" 배너 1회 허용.
             IsPlayingQueue = true;
             _playbackCoroutine = StartCoroutine(PlayActionQueue());
         }
@@ -1345,6 +1361,16 @@ namespace OUD.Unity.Adapter
             while (_actionQueue.Count > 0)
             {
                 var action = _actionQueue.Dequeue();
+
+                // 플레이어 스킬 해소가 모두 끝나고 첫 적 행동이 나오기 직전에 "Enemy Turn" 배너 1회.
+                // (적 행동이 없는 큐 — 적 전멸 등 — 에선 자동으로 표시되지 않는다.)
+                if (action.Type == BattleActionType.EnemyAction && !_enemyTurnBannerShown)
+                {
+                    _enemyTurnBannerShown = true;
+                    _turnBannerView?.ShowEnemyTurn();
+                    yield return new WaitForSeconds(ENEMY_BANNER_LEAD);
+                }
+
                 ExecuteQueuedAction(action);
 
                 if (action.Type == BattleActionType.BattleWon || action.Type == BattleActionType.BattleLost)
