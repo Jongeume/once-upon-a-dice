@@ -955,7 +955,18 @@ namespace OUD.Unity.Adapter
             _hasUsableSkills = false;
 
             RefreshTopBar();
+            ShowPlayerTurnReady(); // 전투 시작 직후 첫 턴 — 플레이어가 Roll Dice 입력을 기다리는 시점.
             OnTutorialEvent?.Invoke("BattleStart");
+        }
+
+        /// <summary>플레이어가 조작권을 얻어 Roll Dice 입력을 기다리는 시점에 "Your Turn" 배너를 띄우고
+        /// Roll Dice 버튼에 글로우를 건다. 실제 StartPlayerTurn()은 Roll Dice 클릭이 호출하므로,
+        /// 체감상 "내 턴 시작"은 전투 시작 직후 / 적 턴 큐 재생 종료 후 이 시점이다.
+        /// 글로우는 튜토리얼 전투에선 생략한다(TutorialOverlayView가 같은 버튼을 직접 제어 → 충돌 방지).</summary>
+        private void ShowPlayerTurnReady()
+        {
+            _turnBannerView?.ShowYourTurn();
+            if (!_isTutorialBattle) _turnBannerView?.SetRollDiceGlow(true);
         }
 
         public void OnPlayerTurnStarted()
@@ -968,12 +979,6 @@ namespace OUD.Unity.Adapter
 
             var allLearned = SkillDatabase.GetSkillsByUnlockedHands(_playerPresenter.Player.UnlockedHands);
             _slotAssignmentPresenter.ShowAllSkillsDisabled(allLearned, _playerPresenter.Player);
-
-            // 턴 전환 배너 + Roll Dice 글로우. 글로우는 튜토리얼 전투에선 생략한다
-            // (TutorialOverlayView가 같은 버튼 글로우를 직접 제어 → 중복/충돌 방지).
-            _turnBannerView?.ShowYourTurn();
-            if (!_isTutorialBattle) _turnBannerView?.SetRollDiceGlow(true);
-
             OnTutorialEvent?.Invoke("PlayerTurnStarted");
         }
 
@@ -1349,6 +1354,7 @@ namespace OUD.Unity.Adapter
             if (_actionQueue.Count == 0)
             {
                 IsPlayingQueue = false;
+                ShowPlayerTurnReady(); // 큐가 비어 바로 플레이어 입력 대기로 돌아가는 경우(드묾).
                 return;
             }
             _enemyTurnBannerShown = false; // 이번 큐 재생에서 "Enemy Turn" 배너 1회 허용.
@@ -1358,6 +1364,7 @@ namespace OUD.Unity.Adapter
 
         private System.Collections.IEnumerator PlayActionQueue()
         {
+            bool battleEnded = false;
             while (_actionQueue.Count > 0)
             {
                 var action = _actionQueue.Dequeue();
@@ -1375,6 +1382,7 @@ namespace OUD.Unity.Adapter
 
                 if (action.Type == BattleActionType.BattleWon || action.Type == BattleActionType.BattleLost)
                 {
+                    battleEnded = true;
                     _actionQueue.Clear();
                     break;
                 }
@@ -1397,6 +1405,10 @@ namespace OUD.Unity.Adapter
 
             IsPlayingQueue = false;
             _playbackCoroutine = null;
+
+            // 적 턴 큐 재생이 끝나고 전투가 계속되면 → 플레이어가 다시 Roll Dice를 기다리는 시점.
+            // 승리/패배로 끝난 경우엔 결과 화면과 겹치지 않도록 "Your Turn"을 띄우지 않는다.
+            if (!battleEnded) ShowPlayerTurnReady();
         }
 
         private void ExecuteQueuedAction(QueuedBattleAction action)
