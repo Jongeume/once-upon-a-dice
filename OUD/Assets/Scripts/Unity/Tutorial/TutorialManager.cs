@@ -17,8 +17,6 @@ namespace OUD.Unity.Tutorial
         private bool           _waitingForTrigger;
         private Coroutine      _autoAdvanceCoroutine;
 
-        private bool _enemyShieldedThisBattle;
-
         private readonly HashSet<string> _receivedEvents = new();
 
         // ── 14단계 Step 정의 (설계 문서 v2 기준) ──────────────────────────
@@ -49,7 +47,7 @@ namespace OUD.Unity.Tutorial
 
                 // Step 3: Reroll 안내
                 new TutorialStep(
-                    "리롤 버튼을 눌러 주사위를 다시 굴리세요",
+                    "리롤 버튼을 눌러 주사위를 굴리세요",
                     TutorialTrigger.ButtonClicked,
                     new[] { GlowTarget.RerollButton },
                     expectedEvent: "DiceRolled"),
@@ -127,7 +125,6 @@ namespace OUD.Unity.Tutorial
             _currentStepIndex = 0;
             _isActive = true;
             _waitingForTrigger = false;
-            _enemyShieldedThisBattle = false;
 
             _overlayView.InjectViews(
                 _adapter.DiceViewRef,
@@ -296,9 +293,6 @@ namespace OUD.Unity.Tutorial
 
             _receivedEvents.Add(eventName);
 
-            if (eventName == "EnemyShielded")
-                _enemyShieldedThisBattle = true;
-
             if (!_waitingForTrigger) return;
             if (_currentStepIndex >= _steps.Length) return;
 
@@ -357,7 +351,8 @@ namespace OUD.Unity.Tutorial
         private void HandleShieldStep(TutorialStep step)
         {
             _waitingForTrigger = false;
-            if (_enemyShieldedThisBattle)
+            // 내 턴 시작 시점에 적이 '현재' 쉴드를 보유 중일 때만 안내 (과거 쉴드 행동 여부가 아님).
+            if (_adapter != null && _adapter.AnyAliveEnemyHasShield())
             {
                 _overlayView.ShowGuide(step.GuideText);
                 _autoAdvanceCoroutine = StartCoroutine(AutoAdvance(2.0f));

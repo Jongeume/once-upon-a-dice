@@ -108,7 +108,7 @@ namespace OUD.Unity.Tutorial
                 case GlowTarget.DiceEntries:
                     if (_diceEntries != null)
                         foreach (var entry in _diceEntries)
-                            if (entry != null) AddGlow(entry.gameObject);
+                            if (entry != null) AddGlow(entry.gameObject, useScalePulse: false);
                     break;
                 case GlowTarget.SkillList:
                     AddGlowToSkillList();
@@ -146,7 +146,7 @@ namespace OUD.Unity.Tutorial
 
         // ── 글로우 헬퍼 ──────────────────────────────────────────────────
 
-        private void AddGlow(GameObject go)
+        private void AddGlow(GameObject go, bool useScalePulse = true)
         {
             if (go == null) return;
 
@@ -164,12 +164,16 @@ namespace OUD.Unity.Tutorial
 
                 // 2) 스케일 펄스 — Graphic 유무와 무관하게 항상 보이는 주 효과.
                 //    localScale은 레이아웃 계산 이후 적용되므로 LayoutGroup 형제 재배치 없음.
-                var rt = go.GetComponent<RectTransform>();
-                if (rt != null)
+                //    단, 주사위·기술목록은 크기 변동이 거슬려 비활성화(useScalePulse=false).
+                if (useScalePulse)
                 {
-                    Vector3 baseScale = rt.localScale;
-                    _activeGlowScales.Add((rt, baseScale));
-                    _activeGlowCoroutines.Add(StartCoroutine(PulseScale(rt, baseScale)));
+                    var rt = go.GetComponent<RectTransform>();
+                    if (rt != null)
+                    {
+                        Vector3 baseScale = rt.localScale;
+                        _activeGlowScales.Add((rt, baseScale));
+                        _activeGlowCoroutines.Add(StartCoroutine(PulseScale(rt, baseScale)));
+                    }
                 }
             }
         }
@@ -179,8 +183,8 @@ namespace OUD.Unity.Tutorial
             if (_slotAssignmentView == null) return;
             var attackCol  = _slotAssignmentView.SkillListAttackColumn;
             var defenseCol = _slotAssignmentView.SkillListDefenseColumn;
-            if (attackCol != null)  AddGlow(attackCol.gameObject);
-            if (defenseCol != null) AddGlow(defenseCol.gameObject);
+            if (attackCol != null)  AddGlow(attackCol.gameObject, useScalePulse: false);
+            if (defenseCol != null) AddGlow(defenseCol.gameObject, useScalePulse: false);
         }
 
         private IEnumerator PulseOutline(Outline outline)
