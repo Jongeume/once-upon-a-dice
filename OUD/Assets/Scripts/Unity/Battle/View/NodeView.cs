@@ -53,6 +53,7 @@ namespace OUD.Unity.Battle.View
         private static readonly Color FRAME_COLOR_BOSS    = new Color(0.55f, 0.10f, 0.10f, 1f);
         private static readonly Color FRAME_COLOR_SHOP    = new Color(0.10f, 0.45f, 0.20f, 1f);
         private static readonly Color FRAME_COLOR_ELITE   = new Color(0.60f, 0.15f, 0.15f, 1f);
+        private static readonly Color FRAME_COLOR_START   = new Color(0.30f, 0.30f, 0.35f, 1f); // 중립 회색 (빈 시작 노드)
         private static readonly Color OUTLINE_AVAILABLE   = new Color(0.00f, 0.85f, 1.00f, 1f); // 밝은 시안 (#00D8FF)
         private static readonly Color OUTLINE_CURRENT     = new Color(1.00f, 1.00f, 1.00f, 1f); // 흰색
         private static readonly Color OUTLINE_CLEARED     = new Color(0.40f, 0.40f, 0.40f, 1f); // 회색
@@ -62,6 +63,7 @@ namespace OUD.Unity.Battle.View
         private static readonly Color LABEL_COLOR_BOSS   = new Color(1.00f, 0.85f, 0.20f, 1f);
         private static readonly Color LABEL_COLOR_SHOP   = new Color(0.40f, 1.00f, 0.50f, 1f);
         private static readonly Color LABEL_COLOR_ELITE  = new Color(1.00f, 0.40f, 0.40f, 1f);
+        private static readonly Color LABEL_COLOR_START  = new Color(0.85f, 0.85f, 0.90f, 1f);
 
         // Outline 두께 (px) ─ Available 시 두껍게 강조
         private static readonly Vector2 OUTLINE_THICK = new Vector2(5f, 5f);
@@ -77,6 +79,7 @@ namespace OUD.Unity.Battle.View
         private const string LABEL_BOSS   = "보스";
         private const string LABEL_SHOP   = "상점";
         private const string LABEL_ELITE  = "엘리트";
+        private const string LABEL_START  = "시작";
         private const string LABEL_LOCKED = "?";
         private const string OVERLAY_CHECK = "V";
 
@@ -151,6 +154,12 @@ namespace OUD.Unity.Battle.View
                     label = LABEL_ELITE;
                     labelColor = LABEL_COLOR_ELITE;
                     bold = true;
+                    break;
+                case NodeType.Start:
+                    frameColor = FRAME_COLOR_START;
+                    label = LABEL_START;
+                    labelColor = LABEL_COLOR_START;
+                    bold = false;
                     break;
                 default:
                     frameColor = FRAME_COLOR_COMBAT;

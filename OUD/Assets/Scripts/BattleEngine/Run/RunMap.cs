@@ -10,6 +10,7 @@ namespace OUD.BattleEngine.Run
         Boss,
         Shop,
         Elite,
+        Start,  // 전투 없는 시작 노드 (맵 좌측 끝). EncounterTable 조회 대상 아님.
     }
 
     public readonly struct MapNode
@@ -35,7 +36,9 @@ namespace OUD.BattleEngine.Run
     {
         public const int TOTAL_LAYERS  = 9;
         public const int LAST_LAYER    = 8;
-        public const int START_NODE_ID = 0;
+        // 시작 노드(전투 없음). node 0~12 레이어를 재번호하지 않기 위해 새 ID(13)로 추가.
+        public const int START_NODE_ID = 13;
+        public const int FIRST_COMBAT_NODE_ID = 0;
         public const int LAST_NODE_ID  = 12;
 
         private readonly Dictionary<int, MapNode> _nodes;
@@ -50,7 +53,10 @@ namespace OUD.BattleEngine.Run
 
             _nodes = new Dictionary<int, MapNode>
             {
-                // Col 0: 시작 (단일)
+                // 시작 노드(전투 없음) — node 0 좌측. 진입 시 node 0(첫 전투)으로만 이어짐.
+                // layer는 EncounterTable이 Start 타입을 조회하지 않으므로 의미 없음(0으로 둠).
+                [13] = new MapNode(13, NodeType.Start,  layer: 0, column: -1, new[] { 0 }),
+                // Col 0: 첫 전투 (단일)
                 [0]  = new MapNode(0,  NodeType.Combat, layer: 0, column: 0, new[] { 1, 2 }),
                 // Col 1: 1차 분기 (상/하) — 선택한 행 유지
                 [1]  = new MapNode(1,  NodeType.Combat, layer: 1, column: 0, new[] { 3 }),

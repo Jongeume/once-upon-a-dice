@@ -87,6 +87,9 @@ namespace OUD.Unity.Adapter
         private bool _hasUsableSkills = false;
         private UnityEngine.UI.Button _backButton;
 
+        // 튜토리얼 전투 여부. true면 승리 시 보상/레벨업을 건너뛰고 곧바로 노드맵을 표시한다.
+        private bool _isTutorialBattle;
+
         private PostBattleFlow _pendingFlow;
 
         // ── Tutorial 이벤트 — TutorialManager가 구독 ────────────────────────
@@ -255,6 +258,13 @@ namespace OUD.Unity.Adapter
                     _defeatView.OnRestartClicked += HandleRestartClicked;
                 _endRunViewsWired = true;
             }
+        }
+
+        /// <summary>현재 전투가 튜토리얼 전투인지 설정. 튜토리얼이면 승리 시
+        /// 보상/레벨업을 건너뛰고 곧바로 노드맵(시작 노드)을 표시한다.</summary>
+        public void SetTutorialBattle(bool isTutorial)
+        {
+            _isTutorialBattle = isTutorial;
         }
 
         // ── Shop node direct entry (no battle) ─────────────────────────────
@@ -553,8 +563,8 @@ namespace OUD.Unity.Adapter
         }
 
         /// <summary>
-        /// 게임 시작 시 최초 노드맵 표시. currentNodeId=-1(아직 아무 노드도 진행 안 함),
-        /// availableIds={시작노드id}로 바인딩하여 시작 노드만 클릭 가능하게 한다.
+        /// 게임 시작 시 최초 노드맵 표시. 플레이어를 시작 노드(현재 위치)에 두고,
+        /// 시작 노드의 다음 노드(node 0 = 첫 전투)를 클릭 가능(Available)으로 강조한다.
         /// </summary>
         public void ShowInitialNodeMap()
         {
@@ -564,8 +574,13 @@ namespace OUD.Unity.Adapter
                 _onContinueRequested?.Invoke();
                 return;
             }
-            int startId = _runManager.State.CurrentNodeId;
-            _nodeMapView.Bind(_runManager.Map, -1, new int[] { startId }, _runManager.State.VisitedNodeIds);
+
+            int currentNodeId = _runManager.State.CurrentNodeId;  // 시작 노드(START_NODE_ID)
+            IReadOnlyList<MapNode> nextCandidates = _runManager.GetAvailableNextNodes();
+            int[] nextIds = new int[nextCandidates.Count];
+            for (int i = 0; i < nextCandidates.Count; i++) nextIds[i] = nextCandidates[i].Id;
+
+            _nodeMapView.Bind(_runManager.Map, currentNodeId, nextIds, _runManager.State.VisitedNodeIds);
             _nodeMapView.Show();
             SetMapButtonEnabled(false);  // 노드 선택 모드 — peek 버튼 비활성
         }
@@ -607,9 +622,14 @@ namespace OUD.Unity.Adapter
 
             int currentNodeId = _runManager.State.CurrentNodeId;
 
-            // 게임 시작 시 노드맵: 현재 상태가 start노드이고 그 노드를 클릭 → 첫 전투 진입
+            // 현재 서 있는 노드를 클릭한 경우.
             if (nodeId == currentNodeId)
             {
+                // 시작 노드(전투 없음)는 자기 자신 클릭 시 아무 동작 안 함 — node 0을 눌러 진행한다.
+                if (_runManager.GetCurrentNode().Type == NodeType.Start)
+                    return;
+
+                // (레거시) 그 외 현재 노드 클릭 → 해당 노드 전투 진입.
                 if (_nodeMapView != null) _nodeMapView.Hide();
                 SetMapButtonEnabled(true);  // 선택 종료 — peek 버튼 복원
                 _onContinueRequested?.Invoke();
@@ -1140,6 +1160,17 @@ namespace OUD.Unity.Adapter
                 _battleLogView.OnWinScreenClicked -= HandleWinScreenClicked;
                 _battleLogView.HideResultScreens();
             }
+
+            // 튜토리얼 전투: 보상/레벨업을 건너뛰고 곧바로 노드맵 표시.
+            // CurrentNodeId는 시작 노드 그대로이므로 ShowNodeMap이 시작 노드(현재) +
+            // node 0(다음 진입 가능)을 바인딩한다.
+            if (_isTutorialBattle)
+            {
+                _isTutorialBattle = false;
+                ShowNodeMap();
+                return;
+            }
+
             GrantReward();
         }
 

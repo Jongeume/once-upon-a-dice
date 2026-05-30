@@ -71,7 +71,7 @@ namespace OUD.Tests
         {
             var sut = NewManager();
             sut.StartRun(NewPlayer());
-            for (int i = 0; i < 9; i++) sut.AdvanceNode();
+            for (int i = 0; i < 10; i++) sut.AdvanceNode();
             Assert.IsTrue(sut.IsRunComplete());
 
             var newPlayer = NewPlayer();
@@ -83,10 +83,11 @@ namespace OUD.Tests
         }
 
         [Test]
-        public void GetNextBattle_AtStart_ReturnsSpider()
+        public void GetNextBattle_AtFirstCombat_ReturnsSpider()
         {
             var sut = NewManager();
             sut.StartRun(NewPlayer());
+            sut.SelectNextNode(RunMap.FIRST_COMBAT_NODE_ID);  // 시작 노드 → 첫 전투(node 0)
 
             List<MonsterData> result = sut.GetNextBattle();
 
@@ -101,7 +102,7 @@ namespace OUD.Tests
         {
             var sut = NewManager();
             sut.StartRun(NewPlayer());
-            for (int i = 0; i < 8; i++) sut.AdvanceNode();
+            for (int i = 0; i < 9; i++) sut.AdvanceNode();
 
             List<MonsterData> result = sut.GetNextBattle();
 
@@ -114,7 +115,7 @@ namespace OUD.Tests
         {
             var sut = NewManager();
             sut.StartRun(NewPlayer());
-            for (int i = 0; i < 6; i++) sut.AdvanceNode();
+            for (int i = 0; i < 7; i++) sut.AdvanceNode();
 
             List<MonsterData> result = sut.GetNextBattle();
 
@@ -155,7 +156,7 @@ namespace OUD.Tests
             var player = NewPlayer();
             player.AddXp(99);
             sut.StartRun(player);
-            for (int i = 0; i < 8; i++) sut.AdvanceNode();
+            for (int i = 0; i < 9; i++) sut.AdvanceNode();
 
             PostBattleFlow flow = sut.GetPostBattleFlow();
 
@@ -164,7 +165,7 @@ namespace OUD.Tests
         }
 
         [Test]
-        public void GetCurrentNode_AtStart_IsCombatLayer0()
+        public void GetCurrentNode_AtStart_IsStartNode()
         {
             var sut = NewManager();
             sut.StartRun(NewPlayer());
@@ -172,14 +173,27 @@ namespace OUD.Tests
             MapNode node = sut.GetCurrentNode();
 
             Assert.AreEqual(RunMap.START_NODE_ID, node.Id);
-            Assert.AreEqual(NodeType.Combat, node.Type);
+            Assert.AreEqual(NodeType.Start, node.Type);
         }
 
         [Test]
-        public void GetAvailableNextNodes_FromStart_HasTwo()
+        public void GetAvailableNextNodes_FromStart_HasOne_FirstCombat()
         {
             var sut = NewManager();
             sut.StartRun(NewPlayer());
+
+            IReadOnlyList<MapNode> next = sut.GetAvailableNextNodes();
+
+            Assert.AreEqual(1, next.Count);
+            Assert.AreEqual(RunMap.FIRST_COMBAT_NODE_ID, next[0].Id);
+        }
+
+        [Test]
+        public void GetAvailableNextNodes_FromFirstCombat_HasTwo()
+        {
+            var sut = NewManager();
+            sut.StartRun(NewPlayer());
+            sut.SelectNextNode(RunMap.FIRST_COMBAT_NODE_ID);
 
             IReadOnlyList<MapNode> next = sut.GetAvailableNextNodes();
 
@@ -193,7 +207,7 @@ namespace OUD.Tests
         {
             var sut = NewManager();
             sut.StartRun(NewPlayer());
-            for (int i = 0; i < 8; i++) sut.AdvanceNode();
+            for (int i = 0; i < 9; i++) sut.AdvanceNode();
 
             IReadOnlyList<MapNode> next = sut.GetAvailableNextNodes();
 
@@ -206,10 +220,10 @@ namespace OUD.Tests
             var sut = NewManager();
             sut.StartRun(NewPlayer());
 
-            sut.SelectNextNode(1);
+            sut.SelectNextNode(RunMap.FIRST_COMBAT_NODE_ID);  // 시작 노드 → node 0
 
-            Assert.AreEqual(1, sut.State.CurrentNodeId);
-            Assert.AreEqual(1, sut.State.CurrentNodeIndex);
+            Assert.AreEqual(0, sut.State.CurrentNodeId);
+            Assert.AreEqual(0, sut.State.CurrentNodeIndex);
         }
 
         [Test]
@@ -226,7 +240,7 @@ namespace OUD.Tests
         {
             var sut = NewManager();
             sut.StartRun(NewPlayer());
-            for (int i = 0; i < 9; i++) sut.AdvanceNode();
+            for (int i = 0; i < 10; i++) sut.AdvanceNode();
 
             Assert.Throws<InvalidOperationException>(() => sut.SelectNextNode(0));
         }
@@ -237,9 +251,9 @@ namespace OUD.Tests
             var sut = NewManager();
             sut.StartRun(NewPlayer());
 
-            sut.AdvanceNode();
+            sut.AdvanceNode();  // 시작 노드(13) → 첫 전투(node 0)
 
-            Assert.AreEqual(1, sut.State.CurrentNodeId);
+            Assert.AreEqual(RunMap.FIRST_COMBAT_NODE_ID, sut.State.CurrentNodeId);
         }
 
         [Test]
@@ -247,7 +261,7 @@ namespace OUD.Tests
         {
             var sut = NewManager();
             sut.StartRun(NewPlayer());
-            for (int i = 0; i < 8; i++) sut.AdvanceNode();
+            for (int i = 0; i < 9; i++) sut.AdvanceNode();
             Assert.IsFalse(sut.IsRunComplete());
 
             sut.AdvanceNode();
@@ -260,7 +274,7 @@ namespace OUD.Tests
         {
             var sut = NewManager();
             sut.StartRun(NewPlayer());
-            for (int i = 0; i < 9; i++) sut.AdvanceNode();
+            for (int i = 0; i < 10; i++) sut.AdvanceNode();
 
             sut.AdvanceNode();
             sut.AdvanceNode();
