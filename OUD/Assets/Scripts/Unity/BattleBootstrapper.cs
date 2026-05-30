@@ -117,8 +117,10 @@ namespace OUD.Unity
                 return;
             }
 
-            // ── 튜토리얼 분기: Node 0(layer 0) + 미완료 → 허수아비 전투 ────
-            _isTutorialBattle = node.Layer == 0 && !TutorialState.IsCompleted;
+            // ── 튜토리얼 분기: Node 0(layer 0) 에서만 ────────────────────────
+            //   Tutorial 버튼(강제) 또는 New Game + 미완료 → 허수아비 전투
+            _isTutorialBattle = node.Layer == 0
+                && (TutorialEntry.ForceTutorial || !TutorialState.IsCompleted);
 
             List<MonsterInstance> enemyInstances;
             if (_isTutorialBattle)
