@@ -133,7 +133,7 @@ namespace OUD.BattleEngine.Skill
                     hand:        HandType.TwoPair,
                     category:    SkillCategory.Defense,
                     target:      TargetType.Self,
-                    multipliers: new[] { 0.5 }, // MVP: 현재 턴만. 다음 턴 0.5x는 Post-Sprint TODO.
+                    multipliers: new[] { 1.4 }, // 단일 턴 실드. OnePair(1.0)~Triple(1.8) 사다리 균등 중간값 [경험 기반]
                     hitCount:    1,
                     hpRecover:   0,
                     unlockCost:  0,

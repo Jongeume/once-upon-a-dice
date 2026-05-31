@@ -217,6 +217,19 @@ namespace OUD.Tests
         }
 
         [Test]
+        public void DualGuard_DEF5_Mult1_4_Gives7Shield()
+        {
+            // Two Pair 수비: floor(5 × 1.4) = 7 실드 (OnePair 5 < TwoPair 7 < Triple 9)
+            var skill   = SkillDatabase.Get(HandType.TwoPair, SkillCategory.Defense);
+            var player  = MakePlayer();
+
+            var result = _executor.ExecuteDefense(skill, 0, TEST_DEF, player);
+
+            Assert.AreEqual(7, result.ShieldGained);
+            Assert.AreEqual(7, player.Shield);
+        }
+
+        [Test]
         public void IronWall_GivesShieldAndHpRecover()
         {
             // Iron Wall: floor(5 × 2.0) = 10 실드 + HP 3 회복
