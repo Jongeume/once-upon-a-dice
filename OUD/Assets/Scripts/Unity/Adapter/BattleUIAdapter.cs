@@ -46,6 +46,11 @@ namespace OUD.Unity.Adapter
         [Header("MonsterSpriteMap")]
         [SerializeField] private MonsterSpriteMap     _spriteMap;
 
+        [Header("Hit Effect — 적 공격 피격 연출")]
+        [SerializeField] private HitEffectLibrary     _hitEffectLibrary;
+        [SerializeField] private HitEffectPlayer      _hitEffectPrefab;
+        [SerializeField] private Transform            _hitEffectOverlay;  // 비우면 플레이어 카드에 부모
+
         [Header("주사위 Entry Views (5개)")]
         [SerializeField] private List<DiceEntryView>  _diceEntries;
 
@@ -140,6 +145,9 @@ namespace OUD.Unity.Adapter
 
         private const float ACTION_DELAY = 0.6f;
         private const float INTENT_DELAY = 0.15f;
+
+        // 피격 이펙트 크기 = 플레이어 카드의 1.5배 (경계 살짝 넘침, 클리핑 없음).
+        private const float HIT_EFFECT_SCALE = 1.5f;
 
         // "Enemy Turn" 배너가 페이드인할 짧은 리드 타임 — 첫 적 행동 직전 1회.
         private const float ENEMY_BANNER_LEAD = 0.35f;
@@ -1065,6 +1073,7 @@ namespace OUD.Unity.Adapter
             }
             _enemyPresenter.ShowAction(enemyIndex, intent, value);
             _battleLogPresenter.ShowEnemyAction(enemyIndex, intent, value);
+            SpawnHitEffectOnPlayer(enemyIndex, intent);
             _playerPresenter.SyncView();
             RefreshTopBar();
 
@@ -1450,6 +1459,7 @@ namespace OUD.Unity.Adapter
                 case BattleActionType.EnemyAction:
                     _enemyPresenter.ShowAction(action.Index, action.Intent, action.Value);
                     _battleLogPresenter.ShowEnemyAction(action.Index, action.Intent, action.Value);
+                    SpawnHitEffectOnPlayer(action.Index, action.Intent);
                     if (action.Intent == IntentType.Attack || action.Intent == IntentType.StrongAttack)
                         SoundManager.Instance?.PlayMonsterAttack();
                     break;
@@ -1480,6 +1490,57 @@ namespace OUD.Unity.Adapter
             }
             _actionQueue.Clear();
             IsPlayingQueue = false;
+        }
+
+        // ── Hit Effect — 적 공격 피격 연출 ────────────────────────────────
+        //
+        // 적 공격(Attack/StrongAttack) 적중 시 플레이어 카드 중심에 피격 이펙트를 1회 스폰한다.
+        // 공격자 몬스터 id로 HitEffectLibrary에서 프레임/틴트를 조회한다.
+        // 비큐(OnEnemyAction) / 큐 재생(ExecuteQueuedAction) 양쪽에서 ShowEnemyAction 직후 호출되어
+        // 큐 타이밍과 자동 동기화된다.
+        private void SpawnHitEffectOnPlayer(int enemyIndex, IntentType intent)
+        {
+            // 공격 의도일 때만 — 수비/소환 등은 피격 연출 없음.
+            if (intent != IntentType.Attack && intent != IntentType.StrongAttack) return;
+            if (_hitEffectLibrary == null || _hitEffectPrefab == null) return;
+            if (_battleEnemies == null || enemyIndex < 0 || enemyIndex >= _battleEnemies.Count) return;
+
+            MonsterInstance attacker = _battleEnemies[enemyIndex];
+            if (attacker == null) return;
+
+            if (!_hitEffectLibrary.TryGet(attacker.Data.Id, out Sprite[] frames, out Color tint))
+                return;
+
+            RectTransform playerCard = _playerView != null ? _playerView.transform as RectTransform : null;
+            if (playerCard == null) return;
+
+            Transform parent = _hitEffectOverlay != null ? _hitEffectOverlay : playerCard;
+            HitEffectPlayer effect = Instantiate(_hitEffectPrefab, parent);
+
+            RectTransform rt = effect.transform as RectTransform;
+            if (rt != null)
+            {
+                rt.anchorMin = rt.anchorMax = new Vector2(0.5f, 0.5f);
+                rt.pivot     = new Vector2(0.5f, 0.5f);
+
+                // 위치: 플레이어 카드 중심 (피벗 무관).
+                rt.position = playerCard.TransformPoint(playerCard.rect.center);
+
+                // 크기: 카드 월드 사이즈의 HIT_EFFECT_SCALE 배 — 부모 캔버스 스케일을 보정해
+                // 실제 렌더 크기가 카드 1.5배가 되도록 sizeDelta를 역산한다.
+                Vector2 cardWorld = new Vector2(
+                    playerCard.rect.width  * playerCard.lossyScale.x,
+                    playerCard.rect.height * playerCard.lossyScale.y);
+                Vector2 targetWorld = cardWorld * HIT_EFFECT_SCALE;
+                Vector3 ls = rt.lossyScale;
+                rt.sizeDelta = new Vector2(
+                    Mathf.Approximately(ls.x, 0f) ? targetWorld.x : targetWorld.x / ls.x,
+                    Mathf.Approximately(ls.y, 0f) ? targetWorld.y : targetWorld.y / ls.y);
+
+                rt.SetAsLastSibling();  // 카드보다 위에 그림 (클리핑 없는 오버레이 부모 전제)
+            }
+
+            effect.Play(frames, tint);
         }
 
         private void RefreshTopBar()

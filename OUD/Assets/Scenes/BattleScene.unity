@@ -30985,6 +30985,9 @@ MonoBehaviour:
   _turnBannerView: {fileID: 2046756498}
   _uiManager: {fileID: 2088485958}
   _spriteMap: {fileID: 11400000, guid: 008f9bde8b84fad4c84e85f979671327, type: 2}
+  _hitEffectLibrary: {fileID: 11400000, guid: 9185628762e872d4eb252c02c001688b, type: 2}
+  _hitEffectPrefab: {fileID: 6500000000000000005, guid: 5ad33f594b86ab44193c077898686cdf, type: 3}
+  _hitEffectOverlay: {fileID: 1176908185}
   _diceEntries:
   - {fileID: 725812529}
   - {fileID: 150188610}
