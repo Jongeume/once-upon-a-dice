@@ -110,6 +110,15 @@ namespace OUD.Unity.Adapter
         public List<DiceEntryView> DiceEntries            => _diceEntries;
         public EnemyPresenter      EnemyPresenterRef      => _enemyPresenter;
 
+        /// <summary>현재 살아있는 적 중 쉴드를 보유한 적이 있는지. 튜토리얼 쉴드 안내 조건 판정용.</summary>
+        public bool AnyAliveEnemyHasShield()
+        {
+            if (_battleEnemies == null) return false;
+            foreach (var e in _battleEnemies)
+                if (e != null && !e.IsDead && e.Shield > 0) return true;
+            return false;
+        }
+
         /// <summary>현재 전투의 적 EnemyEntryView 목록. EnemyPresenter의 내부 뷰를 반환.</summary>
         public List<EnemyEntryView> GetEnemyEntryViews()
         {
@@ -967,6 +976,8 @@ namespace OUD.Unity.Adapter
         {
             _turnBannerView?.ShowYourTurn();
             if (!_isTutorialBattle) _turnBannerView?.SetRollDiceGlow(true);
+            // "Your Turn" 배너가 실제로 뜨는 시점 — 튜토리얼 쉴드 안내가 이 신호 이후에 나오도록.
+            OnTutorialEvent?.Invoke("PlayerTurnReady");
         }
 
         public void OnPlayerTurnStarted()

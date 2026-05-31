@@ -17,8 +17,6 @@ namespace OUD.Unity.Tutorial
         private bool           _waitingForTrigger;
         private Coroutine      _autoAdvanceCoroutine;
 
-        private bool _enemyShieldedThisBattle;
-
         private readonly HashSet<string> _receivedEvents = new();
 
         // ── 14단계 Step 정의 (설계 문서 v2 기준) ──────────────────────────
@@ -49,7 +47,7 @@ namespace OUD.Unity.Tutorial
 
                 // Step 3: Reroll 안내
                 new TutorialStep(
-                    "리롤 버튼을 눌러 주사위를 다시 굴리세요",
+                    "리롤 버튼을 눌러 주사위를 굴리세요",
                     TutorialTrigger.ButtonClicked,
                     new[] { GlowTarget.RerollButton },
                     expectedEvent: "DiceRolled"),
@@ -127,7 +125,6 @@ namespace OUD.Unity.Tutorial
             _currentStepIndex = 0;
             _isActive = true;
             _waitingForTrigger = false;
-            _enemyShieldedThisBattle = false;
 
             _overlayView.InjectViews(
                 _adapter.DiceViewRef,
@@ -163,15 +160,12 @@ namespace OUD.Unity.Tutorial
 
             TutorialStep step = _steps[_currentStepIndex];
 
-            // TurnStartedIfShielded: 가이드를 바로 표시하지 않고 이벤트 대기
+            // TurnStartedIfShielded: 가이드를 바로 표시하지 않고 '다음' 턴 시작 신호를 대기.
+            // 이전 턴에 버퍼된 PlayerTurnReady는 무시(제거)해야 즉시 오발동하지 않는다.
             if (step.Trigger == TutorialTrigger.TurnStartedIfShielded)
             {
                 _overlayView.ClearAllGlows();
-                if (CheckBufferedEvents(step))
-                {
-                    HandleShieldStep(step);
-                    return;
-                }
+                _receivedEvents.Remove("PlayerTurnReady");
                 _waitingForTrigger = true;
                 return;
             }
@@ -246,8 +240,7 @@ namespace OUD.Unity.Tutorial
                     if (_receivedEvents.Remove("RerollsExhausted")) return true;
                     if (_receivedEvents.Remove("AllSlotsFilled")) return true;
                     return false;
-                case TutorialTrigger.TurnStartedIfShielded:
-                    return _receivedEvents.Remove("PlayerTurnStarted");
+                // TurnStartedIfShielded는 버퍼된 신호를 쓰지 않고 다음 PlayerTurnReady를 직접 대기한다.
                 default:
                     return false;
             }
@@ -296,9 +289,6 @@ namespace OUD.Unity.Tutorial
 
             _receivedEvents.Add(eventName);
 
-            if (eventName == "EnemyShielded")
-                _enemyShieldedThisBattle = true;
-
             if (!_waitingForTrigger) return;
             if (_currentStepIndex >= _steps.Length) return;
 
@@ -338,10 +328,18 @@ namespace OUD.Unity.Tutorial
                     break;
 
                 case TutorialTrigger.TurnStartedIfShielded:
-                    if (eventName == "PlayerTurnStarted")
+                    // "Your Turn" 배너 시점(PlayerTurnReady) 이후에 쉴드 안내를 띄운다.
+                    if (eventName == "PlayerTurnReady")
                     {
                         _receivedEvents.Remove(eventName);
                         HandleShieldStep(step);
+                        return;
+                    }
+                    // 이 턴에 전투가 끝나 다음 턴 신호가 오지 않는 경우 — 안내 스킵하고 진행(행 방지).
+                    if (eventName == "BattleWon")
+                    {
+                        _receivedEvents.Remove(eventName);
+                        Advance();
                         return;
                     }
                     break;
@@ -357,16 +355,25 @@ namespace OUD.Unity.Tutorial
         private void HandleShieldStep(TutorialStep step)
         {
             _waitingForTrigger = false;
-            if (_enemyShieldedThisBattle)
+            // 내 턴 시작 시점에 적이 '현재' 쉴드를 보유 중일 때만 안내 (과거 쉴드 행동 여부가 아님).
+            if (_adapter != null && _adapter.AnyAliveEnemyHasShield())
             {
-                _overlayView.ShowGuide(step.GuideText);
-                _autoAdvanceCoroutine = StartCoroutine(AutoAdvance(2.0f));
+                _autoAdvanceCoroutine = StartCoroutine(ShowShieldGuideAfterBanner(step));
             }
             else
             {
                 Debug.Log($"[TutorialManager] Step {_currentStepIndex} 스킵 — 적 쉴드 없음");
                 Advance();
             }
+        }
+
+        /// <summary>"Your Turn" 배너가 끝난 뒤에 쉴드 안내를 띄운다 (배너와 겹치지 않도록).</summary>
+        private IEnumerator ShowShieldGuideAfterBanner(TutorialStep step)
+        {
+            yield return new WaitForSeconds(TurnBannerView.TOTAL_DURATION);
+            if (!_isActive) yield break;
+            _overlayView.ShowGuide(step.GuideText);
+            _autoAdvanceCoroutine = StartCoroutine(AutoAdvance(2.0f));
         }
 
         // ── 완료 ──────────────────────────────────────────────────────────
