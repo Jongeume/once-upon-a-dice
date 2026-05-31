@@ -7,7 +7,7 @@ using TMPro;
 
 public static class FixKoreanFont
 {
-    private const string FONT_PATH = "Assets/Fonts/NotoSansKR-Regular SDF.asset";
+    private const string FONT_PATH = "Assets/Fonts/NEXON Lv2 Gothic SDF.asset";
 
     [MenuItem("OUD/Fix Korean Font")]
     public static void Execute()

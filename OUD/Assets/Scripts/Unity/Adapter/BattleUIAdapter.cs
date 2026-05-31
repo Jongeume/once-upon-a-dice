@@ -922,8 +922,18 @@ namespace OUD.Unity.Adapter
 
             // _battleEnemies(전체 목록)를 전달해야 인덱스가 EnemyPresenter와 일치.
             // BattleState.AliveEnemies는 필터된 리스트라 인덱스 불일치 → 프리뷰 미표시 버그 발생.
+            var slots = _slotAssignmentPresenter.GetSlots();
+
+            // DEBUG: 슬롯 비어있는 버그 추적
+            int filled = 0;
+            for (int i = 0; i < slots.Length; i++)
+                if (slots[i] != null) filled++;
+            Debug.Log($"[HandleUseSkillClicked] slots={slots.Length}, filled={filled}");
+            if (filled == 0)
+                Debug.LogWarning("[HandleUseSkillClicked] 슬롯이 모두 비어있습니다! 기술 선택이 유실된 것 같습니다.");
+
             _targetSelectionPresenter.Begin(
-                _slotAssignmentPresenter.GetSlots(),
+                slots,
                 _battleEnemies,
                 targetIndices => { },
                 _playerPresenter.Player);

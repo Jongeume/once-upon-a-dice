@@ -1,3 +1,4 @@
+using System.Collections;
 using OUD.Unity.Battle;
 using OUD.Unity.Common;
 using TMPro;
@@ -38,17 +39,54 @@ namespace OUD.Unity.Battle.View
         private static readonly int _atkHash    = Animator.StringToHash("Damage");
         private static readonly int _healHash   = Animator.StringToHash("Heal");
 
+        // ── HP 바 anchorMax.x 방식 (EnemyEntryView 패턴) ──
+        private const float HP_DRAIN_SPEED = 1.2f;
+        private RectTransform _hpFillRect;
+        private float _currentHpRatio = 1f;
+        private Coroutine _hpDrainCoroutine;
+
+        private void Awake()
+        {
+            if (_hpFill != null)
+                _hpFillRect = _hpFill.GetComponent<RectTransform>();
+        }
+
+        /// <summary>anchorMax.x를 이용한 HP바 너비 설정 (HPBg 빨간 배경 노출).</summary>
+        private void SetHpBarRatio(RectTransform rt, float ratio)
+        {
+            if (rt == null) return;
+            Vector2 aMax = rt.anchorMax;
+            aMax.x = Mathf.Clamp01(ratio);
+            rt.anchorMax = aMax;
+        }
+
         public void UpdateHp(float fillAmount, string hpText)
         {
-            if (_hpFill)  _hpFill.fillAmount = fillAmount;
+            float previousRatio = _currentHpRatio;
+            _currentHpRatio = Mathf.Clamp01(fillAmount);
+
             if (_hpText)
             {
                 _hpText.text      = hpText;
                 _hpText.alignment = TextAlignmentOptions.Center;
             }
 
+            // anchorMax.x 방식: HPFill이 줄어들면 뒤의 HPBg(빨간 배경) 노출
+            if (_currentHpRatio < previousRatio)
+            {
+                // 데미지 — 서서히 줄어드는 애니메이션
+                if (_hpDrainCoroutine != null) StopCoroutine(_hpDrainCoroutine);
+                if (isActiveAndEnabled)
+                    _hpDrainCoroutine = StartCoroutine(AnimateHpDrain(_currentHpRatio));
+            }
+            else
+            {
+                // 힐 또는 초기 설정 — 즉시 반영
+                if (_hpDrainCoroutine != null) { StopCoroutine(_hpDrainCoroutine); _hpDrainCoroutine = null; }
+                SetHpBarRatio(_hpFillRect, _currentHpRatio);
+            }
+
             // 체력 비율(0~1)에 따라 Life 아이콘 sprite 교체.
-            // 100~81%: Full / 80~51%: Mid / 50~1%: Low
             if (_lifeImage != null)
             {
                 Sprite next;
@@ -57,6 +95,19 @@ namespace OUD.Unity.Battle.View
                 else                          next = _lifeLow;
                 if (next != null) _lifeImage.sprite = next;
             }
+        }
+
+        private IEnumerator AnimateHpDrain(float targetRatio)
+        {
+            while (_hpFillRect != null && _hpFillRect.anchorMax.x > targetRatio)
+            {
+                float current = _hpFillRect.anchorMax.x;
+                float next = Mathf.MoveTowards(current, targetRatio, HP_DRAIN_SPEED * Time.deltaTime);
+                SetHpBarRatio(_hpFillRect, next);
+                yield return null;
+            }
+            SetHpBarRatio(_hpFillRect, targetRatio);
+            _hpDrainCoroutine = null;
         }
 
         public void UpdateShield(int shield, bool visible)
