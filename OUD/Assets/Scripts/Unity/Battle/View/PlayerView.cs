@@ -23,6 +23,11 @@ namespace OUD.Unity.Battle.View
         [SerializeField] private GameObject _shieldGroup;
         [SerializeField] private TMP_Text   _shieldText;
 
+        [Header("실드 (HP 바 옆)")]
+        [SerializeField] private GameObject _shieldDisplay;
+        [SerializeField] private Image      _shieldIcon;
+        [SerializeField] private TMP_Text   _shieldValueText;
+
         [Header("스탯")]
         [SerializeField] private TMP_Text _atkText;
         [SerializeField] private TMP_Text _defText;
@@ -36,7 +41,11 @@ namespace OUD.Unity.Battle.View
         public void UpdateHp(float fillAmount, string hpText)
         {
             if (_hpFill)  _hpFill.fillAmount = fillAmount;
-            if (_hpText)  _hpText.text        = hpText;
+            if (_hpText)
+            {
+                _hpText.text      = hpText;
+                _hpText.alignment = TextAlignmentOptions.Center;
+            }
 
             // 체력 비율(0~1)에 따라 Life 아이콘 sprite 교체.
             // 100~81%: Full / 80~51%: Mid / 50~1%: Low
@@ -54,6 +63,9 @@ namespace OUD.Unity.Battle.View
         {
             if (_shieldGroup) _shieldGroup.SetActive(visible);
             if (_shieldText)  _shieldText.text = shield.ToString();
+            // HP 바 옆 방어 아이콘 (EnemyEntry 프리팹과 동일 패턴)
+            if (_shieldDisplay) _shieldDisplay.SetActive(visible);
+            if (_shieldValueText) _shieldValueText.text = shield.ToString();
         }
 
         public void UpdateStats(int atk, int def)

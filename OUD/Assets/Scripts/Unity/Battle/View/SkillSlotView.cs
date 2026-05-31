@@ -109,12 +109,15 @@ namespace OUD.Unity.Battle.View
             if (_handText) _handText.color = Color.white;
         }
 
+        // 빈 슬롯 텍스트 색: 어두운 회색 (배경과 구분되되 눈에 띄지 않게)
+        private static readonly Color EmptyTextColor = new Color(0.35f, 0.28f, 0.22f, 1f);
+
         public void Clear()
         {
             Init();
             _isEmpty = true;
-            if (_nameText)   _nameText.text   = "Empty Slot";
-            if (_handText)   _handText.text   = "";
+            if (_nameText)   { _nameText.text = "Empty Slot"; _nameText.color = EmptyTextColor; }
+            if (_handText)   { _handText.text = "";           _handText.color = EmptyTextColor; }
             if (_valueText)  _valueText.text  = "";
             _baseColor = ResolveColor(_emptyColor, FallbackEmpty);
             SetHighlight(false);
