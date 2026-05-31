@@ -88,6 +88,21 @@ MonoBehaviour:
     - {fileID: 1066973145570436873, guid: d932e0ff0193cfe47aba5d14a799f79d, type: 3}
     - {fileID: -1350082840735012725, guid: d932e0ff0193cfe47aba5d14a799f79d, type: 3}
     tint: {r: 1, g: 1, b: 1, a: 1}
+  - monsterId: EvilQueenClone
+    frames:
+    - {fileID: -2609867610430255451, guid: d932e0ff0193cfe47aba5d14a799f79d, type: 3}
+    - {fileID: 4619539489902505408, guid: d932e0ff0193cfe47aba5d14a799f79d, type: 3}
+    - {fileID: -4563118848298233304, guid: d932e0ff0193cfe47aba5d14a799f79d, type: 3}
+    - {fileID: -1323900039427750994, guid: d932e0ff0193cfe47aba5d14a799f79d, type: 3}
+    - {fileID: -1713800843647642147, guid: d932e0ff0193cfe47aba5d14a799f79d, type: 3}
+    - {fileID: -1151791173868996077, guid: d932e0ff0193cfe47aba5d14a799f79d, type: 3}
+    - {fileID: 5644946116950402587, guid: d932e0ff0193cfe47aba5d14a799f79d, type: 3}
+    - {fileID: -5096167960170986877, guid: d932e0ff0193cfe47aba5d14a799f79d, type: 3}
+    - {fileID: -483450746561099731, guid: d932e0ff0193cfe47aba5d14a799f79d, type: 3}
+    - {fileID: 4213965991553903715, guid: d932e0ff0193cfe47aba5d14a799f79d, type: 3}
+    - {fileID: 1066973145570436873, guid: d932e0ff0193cfe47aba5d14a799f79d, type: 3}
+    - {fileID: -1350082840735012725, guid: d932e0ff0193cfe47aba5d14a799f79d, type: 3}
+    tint: {r: 1, g: 1, b: 1, a: 1}
   _fallbackFrames:
     - {fileID: 5841207328799194009, guid: 2b5588a079e25b741b97f78242e7cf2a, type: 3}
     - {fileID: 8471382040937519085, guid: 2b5588a079e25b741b97f78242e7cf2a, type: 3}
