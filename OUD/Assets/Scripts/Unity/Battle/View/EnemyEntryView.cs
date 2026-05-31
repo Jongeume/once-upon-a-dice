@@ -392,18 +392,18 @@ namespace OUD.Unity.Battle.View
             if (_atkValueText) _atkValueText.text = _cachedAtk.ToString();
         }
 
-        /// <summary>공격 의도: 검 아이콘 표시, 방어 의도가 아니면 방패 숨김.</summary>
+        /// <summary>공격 의도: 검 아이콘 + 수치 표시/숨김 (메달 프레임은 항상 표시).</summary>
         private void SetAtkHighlight(bool active)
         {
-            if (_atkSwordImage != null)
-                _atkSwordImage.gameObject.SetActive(active);
+            if (_atkValueText != null)   _atkValueText.gameObject.SetActive(active);
+            if (_atkSwordImage != null)  _atkSwordImage.gameObject.SetActive(active);
         }
 
-        /// <summary>방어 의도: 방패 아이콘 표시, 공격 의도가 아니면 검 숨김.</summary>
+        /// <summary>방어 의도: 방패 아이콘 + 수치 표시/숨김 (메달 프레임은 항상 표시).</summary>
         private void SetDefHighlight(bool active)
         {
-            if (_defShieldImage != null)
-                _defShieldImage.gameObject.SetActive(active);
+            if (_defValueText != null)    _defValueText.gameObject.SetActive(active);
+            if (_defShieldImage != null)  _defShieldImage.gameObject.SetActive(active);
         }
 
         private void SetSummonHighlight(bool active)
@@ -442,9 +442,9 @@ namespace OUD.Unity.Battle.View
             if (_summonToastCoroutine != null) { StopCoroutine(_summonToastCoroutine); _summonToastCoroutine = null; }
             if (_hpDrainCoroutine     != null) { StopCoroutine(_hpDrainCoroutine);     _hpDrainCoroutine     = null; }
             if (_previewPulseCoroutine != null) { StopCoroutine(_previewPulseCoroutine); _previewPulseCoroutine = null; }
-            // 의도 아이콘 양쪽 모두 비활성화 (기본 상태)
-            if (_atkSwordImage)  _atkSwordImage.gameObject.SetActive(false);
-            if (_defShieldImage) _defShieldImage.gameObject.SetActive(false);
+            // 의도 메달 양쪽 모두 비활성화 (기본 상태)
+            SetAtkHighlight(false);
+            SetDefHighlight(false);
             SetSummonHighlight(false);
         }
 

@@ -917,6 +917,7 @@ namespace OUD.Unity.Adapter
         private void HandleUseSkillClicked()
         {
             _uiManager.ShowScreen(UIManager.BattleScreen.C_Targeting);
+            _enemyPresenter.RefreshAll();
             _enemyPresenter.SetTargetSelectable(true);
 
             // _battleEnemies(전체 목록)를 전달해야 인덱스가 EnemyPresenter와 일치.
