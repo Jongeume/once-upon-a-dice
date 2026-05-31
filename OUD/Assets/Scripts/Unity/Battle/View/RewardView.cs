@@ -40,10 +40,10 @@ namespace OUD.Unity.Battle.View
         /// </summary>
         public void SetReward(int gainedXp, int gainedGold, int totalXp, int totalGold)
         {
-            if (_gainedXpText)   _gainedXpText.text   = $"+{gainedXp} XP";
-            if (_gainedGoldText) _gainedGoldText.text = $"+{gainedGold} Gold";
-            if (_totalXpText)    _totalXpText.text    = $"XP {totalXp}";
-            if (_totalGoldText)  _totalGoldText.text  = $"Gold {totalGold}";
+            if (_gainedXpText)   _gainedXpText.text   = $"<sprite name=\"xp\"> +{gainedXp} XP";
+            if (_gainedGoldText) _gainedGoldText.text = $"<sprite name=\"gold\"> +{gainedGold} Gold";
+            if (_totalXpText)    _totalXpText.text    = $"<sprite name=\"xp\"> {totalXp}";
+            if (_totalGoldText)  _totalGoldText.text  = $"<sprite name=\"gold\"> {totalGold}";
         }
     }
 }

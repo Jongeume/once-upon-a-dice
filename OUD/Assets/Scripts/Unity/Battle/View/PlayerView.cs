@@ -23,6 +23,11 @@ namespace OUD.Unity.Battle.View
         [SerializeField] private GameObject _shieldGroup;
         [SerializeField] private TMP_Text   _shieldText;
 
+        [Header("실드 (HP 바 옆)")]
+        [SerializeField] private GameObject _shieldDisplay;
+        [SerializeField] private Image      _shieldIcon;
+        [SerializeField] private TMP_Text   _shieldValueText;
+
         [Header("스탯")]
         [SerializeField] private TMP_Text _atkText;
         [SerializeField] private TMP_Text _defText;
@@ -36,7 +41,11 @@ namespace OUD.Unity.Battle.View
         public void UpdateHp(float fillAmount, string hpText)
         {
             if (_hpFill)  _hpFill.fillAmount = fillAmount;
-            if (_hpText)  _hpText.text        = hpText;
+            if (_hpText)
+            {
+                _hpText.text      = hpText;
+                _hpText.alignment = TextAlignmentOptions.Center;
+            }
 
             // 체력 비율(0~1)에 따라 Life 아이콘 sprite 교체.
             // 100~81%: Full / 80~51%: Mid / 50~1%: Low
@@ -54,6 +63,9 @@ namespace OUD.Unity.Battle.View
         {
             if (_shieldGroup) _shieldGroup.SetActive(visible);
             if (_shieldText)  _shieldText.text = shield.ToString();
+            // HP 바 옆 방어 아이콘 (EnemyEntry 프리팹과 동일 패턴)
+            if (_shieldDisplay) _shieldDisplay.SetActive(visible);
+            if (_shieldValueText) _shieldValueText.text = shield.ToString();
         }
 
         public void UpdateStats(int atk, int def)
@@ -75,6 +87,7 @@ namespace OUD.Unity.Battle.View
         // 방어 뱃지
         private GameObject _defenseBadgeContainer;
         private readonly System.Collections.Generic.List<GameObject> _defenseBadgeBoxes = new();
+        private TMP_FontAsset _cachedBadgeFont;
 
         public void ShowDefenseBadge(string skillName)
         {
@@ -85,7 +98,7 @@ namespace OUD.Unity.Battle.View
             box.transform.SetParent(_defenseBadgeContainer.transform, false);
 
             var rt = box.AddComponent<RectTransform>();
-            rt.sizeDelta = new Vector2(0f, 44f);
+            rt.sizeDelta = new Vector2(200f, 44f);
 
             var bg = box.AddComponent<Image>();
             bg.color         = new Color(0.02f, 0.05f, 0.11f, 0.95f);
@@ -104,7 +117,11 @@ namespace OUD.Unity.Battle.View
             textRt.offsetMax = new Vector2(-12f, -6f);
 
             var tmp = textGo.AddComponent<TextMeshProUGUI>();
-            tmp.fontSize           = 22f;
+            if (_cachedBadgeFont == null && _atkText != null)
+                _cachedBadgeFont = _atkText.font;
+            if (_cachedBadgeFont != null)
+                tmp.font = _cachedBadgeFont;
+            tmp.fontSize           = 30f;
             tmp.color              = new Color(0.58f, 0.77f, 0.99f, 1f);
             tmp.alignment          = TextAlignmentOptions.Center;
             tmp.text               = skillName;
@@ -117,23 +134,15 @@ namespace OUD.Unity.Battle.View
 
         private void NormalizeDefenseBadgeWidths()
         {
-            const float PADDING = 24f;
-            float maxWidth = 0f;
-            foreach (var box in _defenseBadgeBoxes)
-            {
-                if (box == null) continue;
-                var tmp = box.GetComponentInChildren<TextMeshProUGUI>();
-                if (tmp != null)
-                    maxWidth = Mathf.Max(maxWidth, tmp.GetPreferredValues(tmp.text).x + PADDING);
-            }
+            const float BADGE_WIDTH = 200f;
             foreach (var box in _defenseBadgeBoxes)
             {
                 if (box == null) continue;
                 var rt = box.GetComponent<RectTransform>();
-                if (rt != null) rt.sizeDelta = new Vector2(maxWidth, rt.sizeDelta.y);
+                if (rt != null) rt.sizeDelta = new Vector2(BADGE_WIDTH, rt.sizeDelta.y);
             }
             var containerRt = _defenseBadgeContainer?.GetComponent<RectTransform>();
-            if (containerRt != null) containerRt.sizeDelta = new Vector2(maxWidth, containerRt.sizeDelta.y);
+            if (containerRt != null) containerRt.sizeDelta = new Vector2(BADGE_WIDTH, containerRt.sizeDelta.y);
         }
 
         public void ClearDefenseBadges()
@@ -155,7 +164,7 @@ namespace OUD.Unity.Battle.View
             rt.anchorMin        = new Vector2(0.5f, 1f);
             rt.anchorMax        = new Vector2(0.5f, 1f);
             rt.pivot            = new Vector2(0.5f, 0f);
-            rt.anchoredPosition = new Vector2(0f, 4f);
+            rt.anchoredPosition = new Vector2(0f, -30f);
             rt.sizeDelta        = new Vector2(0f, 0f);
 
             var vlg = go.AddComponent<VerticalLayoutGroup>();

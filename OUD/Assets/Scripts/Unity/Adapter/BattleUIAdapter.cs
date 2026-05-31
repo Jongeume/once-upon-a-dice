@@ -917,6 +917,7 @@ namespace OUD.Unity.Adapter
         private void HandleUseSkillClicked()
         {
             _uiManager.ShowScreen(UIManager.BattleScreen.C_Targeting);
+            _enemyPresenter.RefreshAll();
             _enemyPresenter.SetTargetSelectable(true);
 
             // _battleEnemies(전체 목록)를 전달해야 인덱스가 EnemyPresenter와 일치.
@@ -1366,7 +1367,7 @@ namespace OUD.Unity.Adapter
                 xpText = "MAX";
             else
                 xpText = $"{player.Xp}/{LevelUpSystem.GetXpThreshold(player.Level)}";
-            _topBarText.text = $"{nameText}  HP {hp}/{maxHp}  XP {xpText}  Gold {player.Gold}";
+            _topBarText.text = $"{nameText}  HP {hp}/{maxHp}  <sprite name=\"xp\"> {xpText}  <sprite name=\"gold\"> {player.Gold}";
         }
 
         private void StartQueuePlayback()
@@ -1563,7 +1564,7 @@ namespace OUD.Unity.Adapter
                 xpText = $"{player.Xp}/{threshold}";
             }
 
-            _topBarText.text = $"{nameText}  HP {player.Hp}/{player.MaxHp}  XP {xpText}  Gold {player.Gold}";
+            _topBarText.text = $"{nameText}  HP {player.Hp}/{player.MaxHp}  <sprite name=\"xp\"> {xpText}  <sprite name=\"gold\"> {player.Gold}";
         }
     }
 }
