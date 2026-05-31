@@ -976,6 +976,8 @@ namespace OUD.Unity.Adapter
         {
             _turnBannerView?.ShowYourTurn();
             if (!_isTutorialBattle) _turnBannerView?.SetRollDiceGlow(true);
+            // "Your Turn" 배너가 실제로 뜨는 시점 — 튜토리얼 쉴드 안내가 이 신호 이후에 나오도록.
+            OnTutorialEvent?.Invoke("PlayerTurnReady");
         }
 
         public void OnPlayerTurnStarted()
