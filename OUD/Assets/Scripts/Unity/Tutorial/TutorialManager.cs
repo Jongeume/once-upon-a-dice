@@ -91,7 +91,7 @@ namespace OUD.Unity.Tutorial
 
                 // Step 10: Execute 안내
                 new TutorialStep(
-                    "Execute 버튼으로 기술을 발동하세요!",
+                    "End Turn 버튼을 눌러 기술을 발동하세요!",
                     TutorialTrigger.ButtonClicked,
                     new[] { GlowTarget.ExecuteButton },
                     expectedEvent: "ExecuteClicked"),
