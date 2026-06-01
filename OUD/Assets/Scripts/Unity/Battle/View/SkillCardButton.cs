@@ -60,6 +60,7 @@ namespace OUD.Unity.Battle.View
                 _handText.color = Color.white;
             }
             SetValueText(card.ValueText);
+            if (_valueText) _valueText.color = Color.white;
             SetEnabled(card.IsEnabled);
             if (_button) _button.onClick.AddListener(() => onClick?.Invoke(_skillId));
         }

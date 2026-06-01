@@ -62,15 +62,15 @@ namespace OUD.Unity.Battle.View
         [SerializeField] private Button     _button;
 
         [Header("색상")]
-        [SerializeField] private Color _emptyColor    = new Color(0.16f, 0.10f, 0.06f, 1f);
-        [SerializeField] private Color _atkColor      = new Color(0.55f, 0.15f, 0.12f, 0.95f);
-        [SerializeField] private Color _defColor      = new Color(0.10f, 0.25f, 0.55f, 0.95f);
+        [SerializeField] private Color _emptyColor = new Color(0.16f, 0.10f, 0.06f, 1f);
+        [SerializeField] private Color _atkColor = new Color(0.55f, 0.15f, 0.12f, 0.95f);
+        [SerializeField] private Color _defColor = new Color(0.10f, 0.25f, 0.55f, 0.95f);
         [SerializeField] private Color _highlightColor = new Color(0.95f, 0.78f, 0.18f, 1f);
 
         // 색상 fallback (SerializeField가 직렬화된 0,0,0,0으로 덮인 경우 대비)
-        private static readonly Color FallbackEmpty     = new Color(0.16f, 0.10f, 0.06f, 1f);
-        private static readonly Color FallbackAttack    = new Color(0.55f, 0.15f, 0.12f, 0.95f);
-        private static readonly Color FallbackDefense   = new Color(0.10f, 0.25f, 0.55f, 0.95f);
+        private static readonly Color FallbackEmpty = new Color(0.16f, 0.10f, 0.06f, 1f);
+        private static readonly Color FallbackAttack = new Color(0.55f, 0.15f, 0.12f, 0.95f);
+        private static readonly Color FallbackDefense = new Color(0.10f, 0.25f, 0.55f, 0.95f);
         private static readonly Color FallbackHighlight = new Color(0.95f, 0.78f, 0.18f, 1f);
 
         public event System.Action OnClicked;
@@ -107,6 +107,7 @@ namespace OUD.Unity.Battle.View
             ApplyBackground();
             if (_nameText) _nameText.color = Color.white;
             if (_handText) _handText.color = Color.white;
+            if (_valueText) _valueText.color = Color.white;
         }
 
         // 빈 슬롯 텍스트 색: 어두운 회색 (배경과 구분되되 눈에 띄지 않게)
