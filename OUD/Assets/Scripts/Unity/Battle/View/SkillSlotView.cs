@@ -27,6 +27,12 @@ namespace OUD.Unity.Battle.View
             foreach (var s in _slots) s.Clear();
         }
 
+        public void ClearSlot(int index)
+        {
+            if (index >= 0 && index < _slots.Count)
+                _slots[index].Clear();
+        }
+
         public void HighlightSlot(int index)
         {
             for (int i = 0; i < _slots.Count; i++)

@@ -69,12 +69,14 @@ MonoBehaviour:
   m_isRightToLeft: 0
   m_fontAsset: {fileID: 11400000, guid: 98ba7b7e1c9c3784daf64f4c0fad4931, type: 2}
   m_sharedMaterial: {fileID: -6307494146549791600, guid: 98ba7b7e1c9c3784daf64f4c0fad4931, type: 2}
-  m_fontSharedMaterials: []
+  m_fontSharedMaterials:
+  - {fileID: 0}
   m_fontMaterial: {fileID: 0}
-  m_fontMaterials: []
+  m_fontMaterials:
+  - {fileID: 0}
   m_fontColor32:
     serializedVersion: 2
-    rgba: 4294967295
+    rgba: 4283206834
   m_fontColor: {r: 0.7, g: 0.55, b: 0.3, a: 1}
   m_enableVertexGradient: 0
   m_colorMode: 3
@@ -87,7 +89,7 @@ MonoBehaviour:
   m_spriteAsset: {fileID: 0}
   m_tintAllSprites: 0
   m_StyleSheet: {fileID: 0}
-  m_TextStyleHashCode: 0
+  m_TextStyleHashCode: -1183493901
   m_overrideHtmlColors: 0
   m_faceColor:
     serializedVersion: 2
@@ -95,9 +97,9 @@ MonoBehaviour:
   m_fontSize: 16
   m_fontSizeBase: 16
   m_fontWeight: 400
-  m_enableAutoSizing: 0
-  m_fontSizeMin: 18
-  m_fontSizeMax: 72
+  m_enableAutoSizing: 1
+  m_fontSizeMin: 10
+  m_fontSizeMax: 16
   m_fontStyle: 0
   m_HorizontalAlignment: 1
   m_VerticalAlignment: 512
@@ -111,7 +113,7 @@ MonoBehaviour:
   m_charWidthMaxAdj: 0
   m_TextWrappingMode: 1
   m_wordWrappingRatios: 0.4
-  m_overflowMode: 0
+  m_overflowMode: 1
   m_linkedTextComponent: {fileID: 0}
   parentLinkedComponent: {fileID: 0}
   m_enableKerning: 0
@@ -206,12 +208,14 @@ MonoBehaviour:
   m_isRightToLeft: 0
   m_fontAsset: {fileID: 11400000, guid: 98ba7b7e1c9c3784daf64f4c0fad4931, type: 2}
   m_sharedMaterial: {fileID: -6307494146549791600, guid: 98ba7b7e1c9c3784daf64f4c0fad4931, type: 2}
-  m_fontSharedMaterials: []
+  m_fontSharedMaterials:
+  - {fileID: 0}
   m_fontMaterial: {fileID: 0}
-  m_fontMaterials: []
+  m_fontMaterials:
+  - {fileID: 0}
   m_fontColor32:
     serializedVersion: 2
-    rgba: 4294967295
+    rgba: 4289782000
   m_fontColor: {r: 0.9411765, g: 0.8784314, b: 0.6901961, a: 1}
   m_enableVertexGradient: 0
   m_colorMode: 3
@@ -224,7 +228,7 @@ MonoBehaviour:
   m_spriteAsset: {fileID: 0}
   m_tintAllSprites: 0
   m_StyleSheet: {fileID: 0}
-  m_TextStyleHashCode: 0
+  m_TextStyleHashCode: -1183493901
   m_overrideHtmlColors: 0
   m_faceColor:
     serializedVersion: 2
@@ -232,9 +236,9 @@ MonoBehaviour:
   m_fontSize: 24
   m_fontSizeBase: 24
   m_fontWeight: 400
-  m_enableAutoSizing: 0
-  m_fontSizeMin: 18
-  m_fontSizeMax: 72
+  m_enableAutoSizing: 1
+  m_fontSizeMin: 14
+  m_fontSizeMax: 24
   m_fontStyle: 0
   m_HorizontalAlignment: 1
   m_VerticalAlignment: 512
@@ -248,7 +252,7 @@ MonoBehaviour:
   m_charWidthMaxAdj: 0
   m_TextWrappingMode: 1
   m_wordWrappingRatios: 0.4
-  m_overflowMode: 0
+  m_overflowMode: 1
   m_linkedTextComponent: {fileID: 0}
   parentLinkedComponent: {fileID: 0}
   m_enableKerning: 0
@@ -414,7 +418,8 @@ MonoBehaviour:
   _handText: {fileID: 1514565563752430263}
   _button: {fileID: 5401107356300094856}
   _background: {fileID: 2696394562878546103}
-  _enabledColor: {r: 0.09, g: 0.06, b: 0.04, a: 0.9}
+  _atkEnabledColor: {r: 0.55, g: 0.15, b: 0.12, a: 0.95}
+  _defEnabledColor: {r: 0.1, g: 0.25, b: 0.55, a: 0.95}
   _disabledColor: {r: 0.16, g: 0.13, b: 0.09, a: 0.6}
   _enabledOutline: {r: 0.95, g: 0.78, b: 0.18, a: 1}
   _disabledOutline: {r: 0.3, g: 0.25, b: 0.18, a: 0.5}
