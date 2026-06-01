@@ -34,6 +34,9 @@ namespace OUD.Unity.Battle.Presenter
             _diceView          = diceView;
             _entryViews        = entryViews;
             _onRerollRequested = onRerollRequested;
+
+            // 새 전투 시작 시 이전 세션의 static 슬롯 잔여값 제거
+            DiceEntryView.ResetSlotOccupancy();
         }
 
         public void UpdateDice(int[] values, int rerollsLeft)
