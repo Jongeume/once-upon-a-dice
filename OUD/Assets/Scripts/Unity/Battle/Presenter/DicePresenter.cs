@@ -1,6 +1,7 @@
 using System;
 using System.Collections.Generic;
 using OUD.Unity.Battle;
+using OUD.Unity.Battle.View;
 
 namespace OUD.Unity.Battle.Presenter
 {
@@ -136,6 +137,10 @@ namespace OUD.Unity.Battle.Presenter
         {
             _isFirstRollOfTurn = true;
             _totalRollsThisTurn = 0;
+
+            // 개별 해제 전에 static 슬롯 배열을 일괄 초기화 — 동기화 누적 오류 방지
+            View.DiceEntryView.ResetSlotOccupancy();
+
             for (int i = 0; i < DICE_COUNT; i++)
             {
                 _keepMask[i] = false;

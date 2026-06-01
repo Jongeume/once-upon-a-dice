@@ -718,7 +718,7 @@ namespace OUD.Unity.Adapter
             _slotAssignmentPresenter = new SlotAssignmentPresenter(
                 _slotAssignmentView,
                 _dicePresenter,
-                HandleUseSkillClicked);
+                OnUseSkillButtonClicked);
 
             _targetSelectionPresenter = new TargetSelectionPresenter(_targetSelectionView);
             _targetSelectionPresenter.SetEnemyPresenter(_enemyPresenter);
