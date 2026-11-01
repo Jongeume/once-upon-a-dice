@@ -29,10 +29,13 @@ namespace OUD.Unity
         [SerializeField] private Button _rollDiceButton;
 
         // ── BattleEngine 코어 인스턴스 ────────────────────────────────────────
-        private IRandom        _random;
-        private RewardSystem   _rewardSystem;
-        private EncounterTable _encounterTable;
-        private RunManager     _runManager;
+        private IRandom          _random;
+        private RewardSystem     _rewardSystem;
+        private EncounterTable   _encounterTable;
+        private RunManager       _runManager;
+        private LevelUpSystem    _levelUpSystem;
+        private SkillPointSystem _skillPointSystem;
+        private RestSystem       _restSystem;
 
         // ── 매 전투마다 재생성 ────────────────────────────────────────────────
         private TurnManager _turnManager;
@@ -54,10 +57,13 @@ namespace OUD.Unity
             }
 
             // 코어 인스턴스 1회 생성
-            _random         = new UnityRandom();
-            _rewardSystem   = new RewardSystem(_random);
-            _encounterTable = new EncounterTable(_random);
-            _runManager     = new RunManager(_encounterTable, _random);
+            _random          = new UnityRandom();
+            _rewardSystem    = new RewardSystem(_random);
+            _encounterTable  = new EncounterTable(_random);
+            _runManager      = new RunManager(_encounterTable, _random);
+            _levelUpSystem   = new LevelUpSystem();
+            _skillPointSystem = new SkillPointSystem();
+            _restSystem      = new RestSystem();
 
             // 새 PlayerState로 런 시작 (Phase D-1: 패배 재시작 미구현)
             PlayerState player = new PlayerState(new PlayerStats(maxHp: 60, atk: 6, def: 5));
@@ -96,8 +102,11 @@ namespace OUD.Unity
             _state       = new BattleState(_runManager.State.Player, enemyInstances, diceHand);
             _turnManager = new TurnManager(_state, _adapter);
 
-            // Adapter 갱신 (TurnManager 새로 주입, RewardSystem/RunManager/콜백은 동일)
-            _adapter.Initialize(_turnManager, _rewardSystem, _runManager, OnContinueAfterReward);
+            // Adapter 갱신 (TurnManager 새로 주입, 기타 시스템/콜백은 동일)
+            _adapter.Initialize(
+                _turnManager, _rewardSystem, _runManager,
+                _levelUpSystem, _skillPointSystem, _restSystem,
+                OnContinueAfterReward);
 
             int nodeIndex = _runManager.State.CurrentNodeIndex;
             string enemyNames = string.Join(", ", enemyInstances.ConvertAll(e => e.Data.Name));

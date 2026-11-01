@@ -32,6 +32,11 @@ namespace OUD.Unity.Adapter
         [SerializeField] private RewardView           _rewardView;
         [SerializeField] private NodeMapView          _nodeMapView;
 
+        [Header("Growth Views (F-10/F-08/F-09)")]
+        [SerializeField] private LevelUpStatView      _levelUpStatView;
+        [SerializeField] private LevelUpSkillView     _levelUpSkillView;
+        [SerializeField] private RestView             _restView;
+
         [Header("화면 관리")]
         [SerializeField] private UIManager            _uiManager;
 
@@ -68,6 +73,11 @@ namespace OUD.Unity.Adapter
         // ── 런 매니저 (Phase D-1) — OnBattleWon 시 노드 진행 ──────────────────
         private RunManager _runManager;
 
+        // ── 성장 시스템 (F-08/F-09/F-10) ─────────────────────────────────────
+        private LevelUpSystem    _levelUpSystem;
+        private SkillPointSystem _skillPointSystem;
+        private RestSystem       _restSystem;
+
         // ── 보상 [계속] 클릭 시 외부에 통보할 콜백 (Bootstrapper에서 등록) ────
         private Action _onContinueRequested;
 
@@ -76,6 +86,9 @@ namespace OUD.Unity.Adapter
 
         // ── NodeMapView 이벤트 등록 1회 가드 ───────────────────────────────────
         private bool _nodeMapClickWired;
+
+        // ── Growth View 이벤트 등록 1회 가드 ─────────────────────────────────
+        private bool _growthViewsWired;
 
         // ── 사용 가능한 기술 존재 여부 ────────────────────────────────────────
         // true = RequestSlotAssignment 호출됨(기술 있음) / false = 잡패(기술 없음)
@@ -96,14 +109,20 @@ namespace OUD.Unity.Adapter
         /// RewardView 이벤트 등록은 1회만 (중복 누적 방지).
         /// </summary>
         public void Initialize(
-            TurnManager  turnManager,
-            RewardSystem rewardSystem,
-            RunManager   runManager,
-            Action       onContinueRequested)
+            TurnManager      turnManager,
+            RewardSystem     rewardSystem,
+            RunManager       runManager,
+            LevelUpSystem    levelUpSystem,
+            SkillPointSystem skillPointSystem,
+            RestSystem       restSystem,
+            Action           onContinueRequested)
         {
             _turnManager         = turnManager;
             _rewardSystem        = rewardSystem;
             _runManager          = runManager;
+            _levelUpSystem       = levelUpSystem;
+            _skillPointSystem    = skillPointSystem;
+            _restSystem          = restSystem;
             _onContinueRequested = onContinueRequested;
             _onRerollRequested   = keepMask => turnManager.RequestReroll(keepMask);
 
@@ -118,41 +137,179 @@ namespace OUD.Unity.Adapter
                 _nodeMapView.OnNodeClicked += HandleNodeMapClicked;
                 _nodeMapClickWired = true;
             }
+
+            WireGrowthViews();
         }
 
         /// <summary>
         /// 보상 [계속] 클릭 흐름.
-        /// <para>
-        /// Boss 노드(마지막) 클리어 → AdvanceNode(=MarkComplete) → Bootstrapper에 통보 → 런 클리어 처리.
-        /// 일반 노드 클리어 → 노드맵 표시 → 노드 클릭 시 SelectNextNode → Bootstrapper에 통보 → 다음 전투.
-        /// </para>
-        /// AdvanceNode 호출 시점이 Phase D-1과 다르다 — OnBattleWon에서 즉시 호출하지 않고 본 메서드에서 분기.
-        /// 이유: 노드맵 표시 시 "현재 노드"는 *방금 클리어한 노드*여야 함.
+        /// 전투 후 흐름: 보상 → (레벨업) → (SP 해금) → (휴식) → 노드맵/Boss클리어
         /// </summary>
         private void HandleRewardContinueClicked()
         {
             if (_rewardView != null) _rewardView.Hide();
 
-            // RunManager 미바인딩 시 ─ 단순 다음 전투 통보 (Phase D-1 호환 동작)
             if (_runManager == null)
             {
                 _onContinueRequested?.Invoke();
                 return;
             }
 
+            PostBattleFlow flow = _runManager.GetPostBattleFlow();
+            StartPostBattleFlow(flow);
+        }
+
+        private void StartPostBattleFlow(PostBattleFlow flow)
+        {
+            if (flow.ShowLevelUp && _levelUpSystem != null)
+            {
+                PlayerState player = _playerPresenter.Player;
+                if (_levelUpSystem.CanLevelUp(player.Xp, player.Level))
+                {
+                    ShowLevelUpStat(flow);
+                    return;
+                }
+            }
+
+            ContinueAfterLevelUp(flow);
+        }
+
+        private void ShowLevelUpStat(PostBattleFlow flow)
+        {
+            PlayerState player = _playerPresenter.Player;
+
+            if (_levelUpStatView != null)
+            {
+                _levelUpStatView.SetStats(player.Atk, player.Def, player.MaxHp, player.Hp);
+                _levelUpStatView.Show();
+                _pendingFlow = flow;
+            }
+            else
+            {
+                ContinueAfterLevelUp(flow);
+            }
+        }
+
+        private void HandleStatChosen(StatChoice choice)
+        {
+            PlayerState player = _playerPresenter.Player;
+            _levelUpSystem.ApplyLevelUp(player, choice);
+            _playerPresenter.SyncView();
+            RefreshTopBar();
+
+            if (_levelUpStatView != null) _levelUpStatView.Hide();
+
+            ShowLevelUpSkill(_pendingFlow);
+        }
+
+        private void ShowLevelUpSkill(PostBattleFlow flow)
+        {
+            PlayerState player = _playerPresenter.Player;
+
+            if (_levelUpSkillView != null && player.Sp > 0)
+            {
+                _levelUpSkillView.Bind(player.Sp, player.UnlockedHands);
+                _levelUpSkillView.Show();
+                _pendingFlow = flow;
+            }
+            else
+            {
+                ContinueAfterLevelUp(flow);
+            }
+        }
+
+        private void HandleUnlockChosen(HandType hand)
+        {
+            PlayerState player = _playerPresenter.Player;
+            _skillPointSystem.Unlock(player, hand);
+            if (_levelUpSkillView != null) _levelUpSkillView.Hide();
+            ContinueAfterLevelUp(_pendingFlow);
+        }
+
+        private void HandleSkillSkipClicked()
+        {
+            if (_levelUpSkillView != null) _levelUpSkillView.Hide();
+            ContinueAfterLevelUp(_pendingFlow);
+        }
+
+        private void ContinueAfterLevelUp(PostBattleFlow flow)
+        {
+            if (flow.ShowRest && _restSystem != null)
+            {
+                ShowRest(flow);
+                return;
+            }
+
+            FinishPostBattle();
+        }
+
+        private void ShowRest(PostBattleFlow flow)
+        {
+            PlayerState player = _playerPresenter.Player;
+
+            if (_restView != null && player.Hp < player.MaxHp && player.Gold >= RestSystem.GOLD_PER_UNIT)
+            {
+                _restView.Bind(player.Hp, player.MaxHp, player.Gold);
+                _restView.Show();
+                _pendingFlow = flow;
+            }
+            else
+            {
+                FinishPostBattle();
+            }
+        }
+
+        private void HandleRestConfirmed(int investGold)
+        {
+            PlayerState player = _playerPresenter.Player;
+            _restSystem.ApplyRest(player, investGold);
+            _playerPresenter.SyncView();
+            RefreshTopBar();
+
+            if (_restView != null) _restView.Hide();
+            FinishPostBattle();
+        }
+
+        private void HandleRestSkipped()
+        {
+            if (_restView != null) _restView.Hide();
+            FinishPostBattle();
+        }
+
+        private void FinishPostBattle()
+        {
             MapNode currentNode = _runManager.GetCurrentNode();
             bool isBossNode = currentNode.Type == NodeType.Boss;
 
             if (isBossNode)
             {
-                // Boss 클리어 → 런 종료 처리 위임 (RunManager가 IsRunComplete=true 전환)
                 _runManager.AdvanceNode();
                 _onContinueRequested?.Invoke();
                 return;
             }
 
-            // 일반 노드 → 노드맵 표시 + 분기 클릭 대기
             ShowNodeMap();
+        }
+
+        private PostBattleFlow _pendingFlow;
+
+        private void WireGrowthViews()
+        {
+            if (_growthViewsWired) return;
+            _growthViewsWired = true;
+
+            if (_levelUpStatView != null)
+                _levelUpStatView.OnStatChosen += HandleStatChosen;
+            if (_levelUpSkillView != null)
+            {
+                _levelUpSkillView.OnUnlockChosen += HandleUnlockChosen;
+                _levelUpSkillView.OnSkipClicked += HandleSkillSkipClicked;
+            }
+            if (_restView != null)
+            {
+                _restView.OnRestConfirmed += HandleRestConfirmed;
+                _restView.OnRestSkipped += HandleRestSkipped;
+            }
         }
 
         /// <summary>
