@@ -33,9 +33,9 @@ namespace OUD.Unity.Battle.View
 
         public void SetStats(int atk, int def, int maxHp, int currentHp)
         {
-            if (_atkText != null) _atkText.text = $"ATK {atk} → {atk + 1}";
-            if (_defText != null) _defText.text = $"DEF {def} → {def + 1}";
-            if (_hpText != null) _hpText.text = $"HP {maxHp} → {maxHp + 5} (현재 HP {currentHp}+5)";
+            if (_atkText != null) _atkText.text = $"ATK {atk} >> {atk + 1}";
+            if (_defText != null) _defText.text = $"DEF {def} >> {def + 1}";
+            if (_hpText != null) _hpText.text = $"HP {maxHp} >> {maxHp + 5} (HP {currentHp}+5)";
         }
     }
 }
