@@ -866,6 +866,52 @@ namespace OUD.Unity.Adapter
         public void OnBattleLost()
         {
             _battleLogPresenter.ShowBattleLost();
+            _loseDefeatTransitioned = false;
+            if (_battleLogView != null)
+            {
+                _battleLogView.OnLoseScreenClicked -= HandleLoseScreenClicked;
+                _battleLogView.OnLoseScreenClicked += HandleLoseScreenClicked;
+            }
+            StartCoroutine(ShowDefeatAfterLoseScreen());
+        }
+
+        private const float LOSE_SCREEN_DURATION = 3.0f;
+        private bool _loseDefeatTransitioned;
+
+        private void HandleLoseScreenClicked()
+        {
+            TransitionToDefeat();
+        }
+
+        private System.Collections.IEnumerator ShowDefeatAfterLoseScreen()
+        {
+            float elapsed = 0f;
+            // 패배 화면 진입 직후 직전 클릭이 잔류해 즉시 닫히는 것 방지용 1프레임 대기.
+            yield return null;
+            while (elapsed < LOSE_SCREEN_DURATION)
+            {
+                if (_loseDefeatTransitioned) yield break;
+                var pointer = Pointer.current;
+                if (pointer != null && pointer.press.wasPressedThisFrame)
+                {
+                    TransitionToDefeat();
+                    yield break;
+                }
+                elapsed += Time.deltaTime;
+                yield return null;
+            }
+            TransitionToDefeat();
+        }
+
+        private void TransitionToDefeat()
+        {
+            if (_loseDefeatTransitioned) return;
+            _loseDefeatTransitioned = true;
+            if (_battleLogView != null)
+            {
+                _battleLogView.OnLoseScreenClicked -= HandleLoseScreenClicked;
+                _battleLogView.HideResultScreens();
+            }
             ShowDefeatScreen();
         }
 

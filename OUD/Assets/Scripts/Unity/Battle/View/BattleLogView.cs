@@ -20,6 +20,9 @@ namespace OUD.Unity.Battle.View
         /// <summary>WinScreen 클릭 시 호출. Adapter가 구독해 보상 화면으로 즉시 전환한다.</summary>
         public event System.Action OnWinScreenClicked;
 
+        /// <summary>LoseScreen 클릭 시 호출. Adapter가 구독해 패배 결과 화면으로 즉시 전환한다.</summary>
+        public event System.Action OnLoseScreenClicked;
+
         private const int POOL_SIZE = 10;
         private DamagePopup[] _pool;
         private int           _poolIndex;
@@ -42,6 +45,14 @@ namespace OUD.Unity.Battle.View
                 var btn = _winScreen.GetComponent<Button>();
                 if (btn != null)
                     btn.onClick.AddListener(() => OnWinScreenClicked?.Invoke());
+            }
+
+            // LoseScreen도 동일하게 Button 클릭 이벤트 노출.
+            if (_loseScreen != null)
+            {
+                var btn = _loseScreen.GetComponent<Button>();
+                if (btn != null)
+                    btn.onClick.AddListener(() => OnLoseScreenClicked?.Invoke());
             }
         }
 
