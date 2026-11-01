@@ -22,6 +22,7 @@ namespace OUD.Unity.Battle.Presenter
         private int           _activeSlotIndex;
         private List<MonsterInstance> _aliveEnemies;
         private Action<int[]> _onAllTargetsConfirmed;
+        private PlayerState   _playerState;
 
         public TargetSelectionPresenter(ITargetSelectionView view) => _view = view;
 
@@ -38,11 +39,13 @@ namespace OUD.Unity.Battle.Presenter
         public void Begin(
             SkillData[]            slots,
             List<MonsterInstance>  aliveEnemies,
-            Action<int[]>          onAllTargetsConfirmed)
+            Action<int[]>          onAllTargetsConfirmed,
+            PlayerState            playerState = null)
         {
             _slots                 = slots;
             _aliveEnemies          = aliveEnemies;
             _onAllTargetsConfirmed = onAllTargetsConfirmed;
+            if (playerState != null) _playerState = playerState;
             _targetIndices         = new int[slots.Length];
             for (int i = 0; i < _targetIndices.Length; i++) _targetIndices[i] = -1;
 
@@ -53,19 +56,27 @@ namespace OUD.Unity.Battle.Presenter
             AdvanceToNextAttackSlot(0);
         }
 
-        private static SkillCardData[] ToSlotCards(SkillData[] slots)
+        private SkillCardData[] ToSlotCards(SkillData[] slots)
         {
             var cards = new SkillCardData[slots.Length];
             for (int i = 0; i < slots.Length; i++)
             {
                 if (slots[i] == null) continue;
                 SkillData s = slots[i];
+                string valueText = null;
+                if (_playerState != null)
+                {
+                    int enhLv = _playerState.GetEnhanceLevel(s.Hand);
+                    valueText = SkillValueHelper.BuildValueText(
+                        s, _playerState.Atk, _playerState.Def, enhLv);
+                }
                 cards[i] = new SkillCardData
                 {
                     SkillId      = s.Id,
                     DisplayName  = s.Name,
                     RequiredHand = s.Hand,
                     Category     = s.Category,
+                    ValueText    = valueText,
                     IsEnabled    = true
                 };
             }

@@ -24,6 +24,7 @@ namespace OUD.Unity.Battle.Presenter
         private HashSet<string>            _usableSkillIds = new HashSet<string>();
         private List<MonsterInstance>      _aliveEnemies;
         private Action<List<SlotAssignment>> _onComplete;
+        private PlayerState                _playerState;
 
         private SkillData[]   _slots      = new SkillData[SlotManager.MAX_SLOTS];
         private HashSet<HandType> _usedHands = new HashSet<HandType>();
@@ -61,12 +62,14 @@ namespace OUD.Unity.Battle.Presenter
             List<SkillData>            usableSkills,
             List<SkillData>            allLearnedSkills,
             List<MonsterInstance>      aliveEnemies,
-            Action<List<SlotAssignment>> onComplete)
+            Action<List<SlotAssignment>> onComplete,
+            PlayerState                playerState = null)
         {
             _usableSkills      = usableSkills;
             _allLearnedSkills  = allLearnedSkills ?? usableSkills;
             _aliveEnemies      = aliveEnemies;
             _onComplete        = onComplete;
+            if (playerState != null) _playerState = playerState;
 
             _usableSkillIds.Clear();
             foreach (var s in usableSkills) _usableSkillIds.Add(s.Id);
@@ -175,15 +178,25 @@ namespace OUD.Unity.Battle.Presenter
                     _view.SetSkillCardEnabled(s.Id, false);
         }
 
-        private static SkillCardData ToCardData(SkillData s, bool enabled) =>
-            new SkillCardData
+        private SkillCardData ToCardData(SkillData s, bool enabled)
+        {
+            string valueText = null;
+            if (_playerState != null)
+            {
+                int enhLv = _playerState.GetEnhanceLevel(s.Hand);
+                valueText = SkillValueHelper.BuildValueText(
+                    s, _playerState.Atk, _playerState.Def, enhLv);
+            }
+            return new SkillCardData
             {
                 SkillId         = s.Id,
                 DisplayName     = s.Name,
                 RequiredHand    = s.Hand,
                 Category        = s.Category,
                 DescriptionText = $"{s.Name} ({s.Hand})",
+                ValueText       = valueText,
                 IsEnabled       = enabled
             };
+        }
     }
 }

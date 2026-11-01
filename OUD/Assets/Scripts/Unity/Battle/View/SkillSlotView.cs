@@ -79,6 +79,7 @@ namespace OUD.Unity.Battle.View
         private Color _baseColor;
         private bool _highlighted;
         private bool _isEmpty = true;
+        private TMP_Text _valueText;
 
         public void Init()
         {
@@ -94,7 +95,12 @@ namespace OUD.Unity.Battle.View
             Init();
             _isEmpty = false;
             if (_nameText) _nameText.text = card.DisplayName;
-            if (_handText) _handText.text = card.RequiredHand.ToString();
+            if (_handText)
+            {
+                _handText.text = card.RequiredHand.ToString();
+                _handText.alignment = TextAlignmentOptions.MidlineLeft;
+            }
+            SetValueText(card.ValueText);
             _baseColor = card.Category == SkillCategory.Attack
                 ? ResolveColor(_atkColor, FallbackAttack)
                 : ResolveColor(_defColor, FallbackDefense);
@@ -107,9 +113,45 @@ namespace OUD.Unity.Battle.View
             _isEmpty = true;
             if (_nameText)   _nameText.text   = "빈 슬롯";
             if (_handText)   _handText.text   = "";
+            if (_valueText)  _valueText.text  = "";
             _baseColor = ResolveColor(_emptyColor, FallbackEmpty);
             SetHighlight(false);
             ApplyBackground();
+        }
+
+        private void SetValueText(string text)
+        {
+            if (_handText == null) return;
+            if (string.IsNullOrEmpty(text))
+            {
+                if (_valueText) _valueText.text = "";
+                return;
+            }
+            EnsureValueText();
+            if (_valueText) _valueText.text = text;
+        }
+
+        private void EnsureValueText()
+        {
+            if (_valueText) return;
+            if (_handText == null) return;
+
+            var go = new GameObject("ValueText");
+            go.transform.SetParent(_handText.transform, false);
+            _valueText = go.AddComponent<TextMeshProUGUI>();
+            _valueText.font = _handText.font;
+            _valueText.fontSharedMaterial = _handText.fontSharedMaterial;
+            _valueText.fontSize = _handText.fontSize;
+            _valueText.color = _handText.color;
+            _valueText.alignment = TextAlignmentOptions.MidlineRight;
+            _valueText.overflowMode = TextOverflowModes.Overflow;
+            _valueText.raycastTarget = false;
+
+            var rt = _valueText.rectTransform;
+            rt.anchorMin = Vector2.zero;
+            rt.anchorMax = Vector2.one;
+            rt.offsetMin = Vector2.zero;
+            rt.offsetMax = Vector2.zero;
         }
 
         public void SetHighlight(bool on)

@@ -14,6 +14,7 @@ namespace OUD.Unity.Battle
         public HandType RequiredHand;
         public SkillCategory Category;
         public string DescriptionText;
+        public string ValueText;
         public bool IsEnabled;
     }
 }
