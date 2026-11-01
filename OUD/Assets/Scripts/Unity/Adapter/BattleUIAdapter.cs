@@ -84,6 +84,7 @@ namespace OUD.Unity.Adapter
         private bool _shopViewWired;
 
         private bool _hasUsableSkills = false;
+        private UnityEngine.UI.Button _backButton;
 
         private PostBattleFlow _pendingFlow;
 
@@ -613,6 +614,8 @@ namespace OUD.Unity.Adapter
                 diceEntryInterfaces,
                 keepMask => _onRerollRequested?.Invoke(keepMask));
 
+            _dicePresenter.OnRollingFinished += () => SetBackButtonEnabled(true);
+
             _slotAssignmentPresenter = new SlotAssignmentPresenter(
                 _slotAssignmentView,
                 _dicePresenter,
@@ -675,6 +678,7 @@ namespace OUD.Unity.Adapter
                 Debug.LogWarning("[BattleUIAdapter] WireBackButton: 'BackButton'에 Button 컴포넌트가 없습니다.");
                 return;
             }
+            _backButton = btn;
             btn.onClick.AddListener(HandleBackClicked);
         }
 
@@ -692,9 +696,15 @@ namespace OUD.Unity.Adapter
             return null;
         }
 
+        private void SetBackButtonEnabled(bool enabled)
+        {
+            if (_backButton != null) _backButton.interactable = enabled;
+        }
+
         private void HandleBackClicked()
         {
-            // Screen B에서 배정한 슬롯을 Screen A의 슬롯 패널에 미러링 후 전환.
+            if (_dicePresenter != null && _dicePresenter.IsRolling) return;
+
             MirrorAssignedSlotsToScreenA();
             _uiManager.ShowScreen(UIManager.BattleScreen.A_BattleBasic);
         }
@@ -858,6 +868,8 @@ namespace OUD.Unity.Adapter
             _dicePresenter.UpdateDice(values, rerollsLeft);
             _slotAssignmentPresenter.OnRerollCountChanged(rerollsLeft);
             SoundManager.Instance?.PlayDiceRoll();
+
+            SetBackButtonEnabled(!_dicePresenter.IsRolling);
         }
 
         public void OnHandsEvaluated(List<HandType> hands, List<SkillData> usableSkills) { }

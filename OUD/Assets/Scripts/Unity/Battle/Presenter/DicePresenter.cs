@@ -23,6 +23,8 @@ namespace OUD.Unity.Battle.Presenter
         public const float BASE_ROLL_DURATION  = 0.8f;
         public const float STOP_STAGGER        = 0.2f;
 
+        public event Action OnRollingFinished;
+
         public DicePresenter(
             IDiceView diceView,
             List<IDiceEntryView> entryViews,
@@ -90,6 +92,7 @@ namespace OUD.Unity.Battle.Presenter
             _isRolling = false;
             bool canReroll = _rerollsLeft > 0;
             _diceView.UpdateRerollInfo(_rerollsLeft, canReroll);
+            OnRollingFinished?.Invoke();
         }
 
         public void OnDieToggleKeep(int index)
