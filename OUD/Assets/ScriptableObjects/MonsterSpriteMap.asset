@@ -1,0 +1,23 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 7cb866f5eef34d8428253f57b1f44857, type: 3}
+  m_Name: MonsterSpriteMap
+  m_EditorClassIdentifier: Assembly-CSharp::OUD.Unity.Battle.MonsterSpriteMap
+  entries:
+  - monsterId: Spider
+    sprite: {fileID: 21300000, guid: bbdbaa9ce072a004fa0eef7785dc84c0, type: 3}
+  - monsterId: Snake
+    sprite: {fileID: -7766637424382265647, guid: acc7e7e1e91826a4b821b6143f73c623, type: 3}
+  - monsterId: Bear
+    sprite: {fileID: 4693792977596894205, guid: 29c2ee352859ea64bbca0878f667d46d, type: 3}
+  - monsterId: StoneGolem
+    sprite: {fileID: 21300000, guid: 26a1ed7f7ae78ae439c93a9822aaf9c7, type: 3}

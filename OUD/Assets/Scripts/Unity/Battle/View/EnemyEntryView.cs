@@ -19,6 +19,12 @@ namespace OUD.Unity.Battle.View
         [SerializeField] private Image    _hpFill;
         [SerializeField] private TMP_Text _hpText;
 
+        [Header("Life Icon")]
+        [SerializeField] private Image  _lifeImage;
+        [SerializeField] private Sprite _lifeFull;     // 100~81%
+        [SerializeField] private Sprite _lifeMid;      // 80~51%
+        [SerializeField] private Sprite _lifeLow;      // 50~1%
+
         [Header("실드")]
         [SerializeField] private GameObject _shieldGroup;
         [SerializeField] private TMP_Text   _shieldText;
@@ -70,15 +76,24 @@ namespace OUD.Unity.Battle.View
         public void Setup(string name, Sprite sprite, float hpFill, string hpText)
         {
             if (_nameText) _nameText.text        = name;
-            if (_portrait && sprite != null) _portrait.sprite = sprite;
-            if (_hpFill)   _hpFill.fillAmount    = hpFill;
-            if (_hpText)   _hpText.text           = hpText;
+            // sprite=null도 그대로 할당 — MonsterSpriteMap에 매핑 없는 몬스터는 흰 박스로 표시.
+            if (_portrait) _portrait.sprite = sprite;
+            UpdateHp(hpFill, hpText);
         }
 
         public void UpdateHp(float fillAmount, string hpText)
         {
             if (_hpFill) _hpFill.fillAmount = fillAmount;
             if (_hpText) _hpText.text        = hpText;
+
+            if (_lifeImage != null)
+            {
+                Sprite next;
+                if (fillAmount > 0.80f)      next = _lifeFull;
+                else if (fillAmount > 0.50f) next = _lifeMid;
+                else                          next = _lifeLow;
+                if (next != null) _lifeImage.sprite = next;
+            }
         }
 
         public void UpdateShield(int shield, bool visible)

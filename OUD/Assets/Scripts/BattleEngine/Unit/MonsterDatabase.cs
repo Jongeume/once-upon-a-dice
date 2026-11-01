@@ -16,6 +16,9 @@ namespace OUD.BattleEngine.Unit
         public const string ID_SLIME       = "Slime";
         public const string ID_SKELETON    = "Skeleton";
         public const string ID_GOBLIN      = "Goblin";
+        public const string ID_SPIDER      = "Spider";
+        public const string ID_SNAKE       = "Snake";
+        public const string ID_BEAR        = "Bear";
         public const string ID_STONE_GOLEM = "StoneGolem";
         public const string ID_ELITE_GOLEM = "EliteGolem";
 
@@ -29,6 +32,9 @@ namespace OUD.BattleEngine.Unit
                 [ID_SLIME]       = BuildSlime(),
                 [ID_SKELETON]    = BuildSkeleton(),
                 [ID_GOBLIN]      = BuildGoblin(),
+                [ID_SPIDER]      = BuildSpider(),
+                [ID_SNAKE]       = BuildSnake(),
+                [ID_BEAR]        = BuildBear(),
                 [ID_STONE_GOLEM] = BuildStoneGolem(),
                 [ID_ELITE_GOLEM] = BuildEliteGolem(),
             };
@@ -124,6 +130,48 @@ namespace OUD.BattleEngine.Unit
                 IntentType.Attack,
             });
 
+        /// <summary>Spider (1스테이지). 임시: Slime과 동일 수치.</summary>
+        private static MonsterData BuildSpider() => new MonsterData(
+            id:          ID_SPIDER,
+            name:        "Spider",
+            maxHp:       20,
+            baseAtk:     8,
+            shieldValue: 0,
+            pattern:     new[]
+            {
+                IntentType.Attack,
+                IntentType.Attack,
+                IntentType.Attack,
+            });
+
+        /// <summary>Snake (2스테이지). 임시: Skeleton과 비슷한 수치.</summary>
+        private static MonsterData BuildSnake() => new MonsterData(
+            id:          ID_SNAKE,
+            name:        "Snake",
+            maxHp:       25,
+            baseAtk:     9,
+            shieldValue: 3,
+            pattern:     new[]
+            {
+                IntentType.Attack,
+                IntentType.Shield,
+                IntentType.Attack,
+            });
+
+        /// <summary>Bear (3스테이지). 임시: Goblin보다 강함.</summary>
+        private static MonsterData BuildBear() => new MonsterData(
+            id:          ID_BEAR,
+            name:        "Bear",
+            maxHp:       30,
+            baseAtk:     11,
+            shieldValue: 0,
+            pattern:     new[]
+            {
+                IntentType.Attack,
+                IntentType.Attack,
+                IntentType.StrongAttack,
+            });
+
         /// <summary>
         /// Stone Golem (보스): HP=80, ATK=14, 실드=10, 강공격배율=1.5x.
         /// 기본 패턴: 공격(14) → 실드(10) → 공격(14) → 강공격(21) → 반복.
@@ -174,6 +222,7 @@ namespace OUD.BattleEngine.Unit
                 IntentType.Attack,
                 IntentType.StrongAttack,
                 IntentType.Attack,
-            });
+            },
+            tier: MonsterTier.Elite);
     }
 }
