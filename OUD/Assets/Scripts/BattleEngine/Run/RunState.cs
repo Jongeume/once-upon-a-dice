@@ -20,8 +20,8 @@ namespace OUD.BattleEngine.Run
     /// </summary>
     public class RunState
     {
-        public const int TOTAL_NODES = 8;
-        public const int LAST_NODE   = 7;
+        public const int TOTAL_NODES = 13;
+        public const int LAST_NODE   = 12;
 
         public PlayerState Player           { get; private set; }
         public int         CurrentNodeIndex { get; private set; }   // layer index
@@ -29,7 +29,7 @@ namespace OUD.BattleEngine.Run
         public bool        IsRunComplete    { get; private set; }
 
         /// <summary>현재 노드가 마지막 layer(Boss layer)인지.</summary>
-        public bool IsLastNode => CurrentNodeIndex == LAST_NODE;
+        public bool IsLastNode => CurrentNodeId == LAST_NODE;
 
         public RunState(PlayerState player)
         {
