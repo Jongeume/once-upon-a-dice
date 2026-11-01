@@ -41,6 +41,8 @@ namespace OUD.Unity.Battle.Presenter
                 Sprite sprite = _spriteMap?.GetSprite(m.Data.Id);
                 float fill = m.Data.MaxHp > 0 ? (float)m.Hp / m.Data.MaxHp : 0f;
                 view.Setup(m.Data.Name, sprite, fill, $"{m.Hp} / {m.Data.MaxHp}");
+                view.UpdateAtk(m.Atk);
+                view.UpdateDef(m.Data.ShieldValue);
                 view.UpdateIntent(m.GetCurrentIntent(), m.GetIntentValue());
                 view.SetRageActive(m.IsEnraged);
                 _entryViews.Add(view);
@@ -72,6 +74,8 @@ namespace OUD.Unity.Battle.Presenter
             float fill = m.Data.MaxHp > 0 ? (float)m.Hp / m.Data.MaxHp : 0f;
             _entryViews[index].UpdateHp(fill, $"{m.Hp} / {m.Data.MaxHp}");
             _entryViews[index].UpdateShield(m.Shield, m.Shield > 0);
+            _entryViews[index].UpdateAtk(m.Atk);
+            _entryViews[index].UpdateDef(m.Data.ShieldValue);
             _entryViews[index].SetRageActive(m.IsEnraged);
 
             // 사망 시 GameObject 비활성화로 화면에서 제거. 이미 비활성이면 스킵(idempotent).
@@ -129,6 +133,8 @@ namespace OUD.Unity.Battle.Presenter
             Sprite sprite = _spriteMap?.GetSprite(monster.Data.Id);
             float fill = monster.Data.MaxHp > 0 ? (float)monster.Hp / monster.Data.MaxHp : 0f;
             view.Setup(monster.Data.Name, sprite, fill, $"{monster.Hp} / {monster.Data.MaxHp}");
+            view.UpdateAtk(monster.Atk);
+            view.UpdateDef(monster.Data.ShieldValue);
             view.UpdateIntent(monster.GetCurrentIntent(), monster.GetIntentValue());
             _entryViews.Add(view);
 
