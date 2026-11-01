@@ -75,17 +75,17 @@ namespace OUD.BattleEngine.Combat
         // ── 플레이어 턴 ───────────────────────────────────────────────────────
 
         /// <summary>
-        /// 플레이어 턴을 시작한다. 턴 상태 초기화 후 주사위를 굴리고
-        /// 족보를 즉시 평가해 기술 목록을 UI에 전달.
-        /// Unity는 이후 RequestReroll() 또는 기술 사용 버튼을 눌러 ConfirmDice()를 호출한다.
+        /// 플레이어 턴을 시작한다. 턴 상태 초기화 후 미굴림 주사위(값=0) 상태를 UI에 전달.
+        /// 주사위 굴림은 자동으로 실행되지 않으며, 플레이어가 리롤 버튼으로 직접 3회 굴린다.
+        /// Unity는 이후 RequestReroll()을 최대 3회 호출한 뒤 ConfirmDice()를 호출한다.
         /// </summary>
         public void StartPlayerTurn()
         {
             _state.ResetForNewTurn();
             _state.Phase = BattlePhase.DiceRoll;
             _ui.OnPlayerTurnStarted();
-            _state.DiceHand.RollAll();
-            EvaluateAndBroadcast();
+            // 자동 RollAll() 제거 — 플레이어가 리롤 버튼으로 직접 굴림
+            _ui.OnDiceRolled(_state.DiceHand.GetValues(), _state.DiceHand.RerollsLeft);
         }
 
         /// <summary>

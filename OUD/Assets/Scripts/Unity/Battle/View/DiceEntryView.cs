@@ -50,7 +50,7 @@ namespace OUD.Unity.Battle.View
 
         public void UpdateValue(int value)
         {
-            if (_valueText) _valueText.text = value.ToString();
+            if (_valueText) _valueText.text = value > 0 ? value.ToString() : "-";
         }
 
         public void SetKept(bool kept)

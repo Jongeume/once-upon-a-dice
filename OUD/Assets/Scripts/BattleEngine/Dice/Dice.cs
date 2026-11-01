@@ -44,5 +44,8 @@ namespace OUD.BattleEngine.Dice
 
         /// <summary>잠금을 해제한다. RollAll() 또는 ResetForNewTurn() 시 호출.</summary>
         public void ResetKeep() => IsKept = false;
+
+        /// <summary>값을 0으로 초기화한다. 미굴림 상태 표현 (ResetForNewTurn 시 호출).</summary>
+        public void ResetValue() => Value = 0;
     }
 }

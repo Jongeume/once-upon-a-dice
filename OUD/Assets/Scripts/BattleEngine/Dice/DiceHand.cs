@@ -13,7 +13,7 @@ namespace OUD.BattleEngine.Dice
     public class DiceHand
     {
         // ── 상수 ──────────────────────────────────────────────────
-        private const int MAX_REROLLS = 2;
+        private const int MAX_REROLLS = 3;
         private const int DICE_COUNT  = 5;
 
         // ── 공개 상태 ──────────────────────────────────────────────
@@ -80,7 +80,10 @@ namespace OUD.BattleEngine.Dice
         {
             RerollsLeft = MAX_REROLLS;
             for (int i = 0; i < DICE_COUNT; i++)
+            {
                 Dices[i].ResetKeep();
+                Dices[i].ResetValue();
+            }
         }
 
         /// <summary>
