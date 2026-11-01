@@ -53,6 +53,16 @@ namespace OUD.BattleEngine.Core
     }
 
     /// <summary>
+    /// 레벨업 시 플레이어가 선택하는 스탯 보상.
+    /// </summary>
+    public enum StatChoice
+    {
+        AtkUp,
+        DefUp,
+        HpUp
+    }
+
+    /// <summary>
     /// 전투 진행 단계. TurnManager가 상태 머신처럼 관리.
     /// </summary>
     public enum BattlePhase
