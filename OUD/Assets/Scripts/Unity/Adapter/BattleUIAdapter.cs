@@ -102,6 +102,13 @@ namespace OUD.Unity.Adapter
             _mapButtonWired = true;
         }
 
+        /// <summary>지도(peek) 버튼 활성/비활성 토글. 노드 선택 모드 동안에는 비활성화하여
+        /// 선택용 노드맵을 peek 토글로 닫아버리는 충돌을 막는다.</summary>
+        private void SetMapButtonEnabled(bool enabled)
+        {
+            if (_mapButton != null) _mapButton.interactable = enabled;
+        }
+
         /// <summary>지도 버튼 클릭 — 노드맵 peek 모드 토글. 노드 진행 없이 보기만.
         /// peek 동안 노드 Button 컴포넌트는 비활성화 → 클릭 모션(하이라이트/눌림)까지 차단.
         /// 닫을 땐 다시 지도 버튼 클릭.</summary>
@@ -464,6 +471,7 @@ namespace OUD.Unity.Adapter
             int startId = _runManager.State.CurrentNodeId;
             _nodeMapView.Bind(_runManager.Map, -1, new int[] { startId });
             _nodeMapView.Show();
+            SetMapButtonEnabled(false);  // 노드 선택 모드 — peek 버튼 비활성
         }
 
         private void ShowNodeMap()
@@ -484,6 +492,7 @@ namespace OUD.Unity.Adapter
 
             _nodeMapView.Bind(_runManager.Map, currentNodeId, nextIds);
             _nodeMapView.Show();
+            SetMapButtonEnabled(false);  // 노드 선택 모드 — peek 버튼 비활성
         }
 
         private void HandleNodeMapClicked(int nodeId)
@@ -504,6 +513,7 @@ namespace OUD.Unity.Adapter
             if (nodeId == currentNodeId)
             {
                 if (_nodeMapView != null) _nodeMapView.Hide();
+                SetMapButtonEnabled(true);  // 선택 종료 — peek 버튼 복원
                 _onContinueRequested?.Invoke();
                 return;
             }
@@ -519,6 +529,7 @@ namespace OUD.Unity.Adapter
             }
 
             if (_nodeMapView != null) _nodeMapView.Hide();
+            SetMapButtonEnabled(true);  // 선택 종료 — peek 버튼 복원
             _onContinueRequested?.Invoke();
         }
 
