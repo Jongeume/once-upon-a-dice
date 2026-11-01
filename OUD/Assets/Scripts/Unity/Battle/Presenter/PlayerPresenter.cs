@@ -9,6 +9,9 @@ namespace OUD.Unity.Battle.Presenter
         private readonly IPlayerView _view;
         private PlayerState _state;
 
+        /// <summary>Init 호출 후에만 유효. OnBattleWon 등 후속 이벤트에서 PlayerState 접근용.</summary>
+        public PlayerState Player => _state;
+
         public PlayerPresenter(IPlayerView view) => _view = view;
 
         public void Init(PlayerState state)
