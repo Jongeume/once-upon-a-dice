@@ -25,6 +25,9 @@ namespace OUD.Unity.Battle.View
         private const float HOLD_DURATION     = 0.70f;
         private const float FADE_OUT_DURATION = 0.35f;
 
+        /// <summary>배너 1회 재생 총 길이(초). 튜토리얼이 배너 종료 후 안내를 띄울 때 참조.</summary>
+        public const float TOTAL_DURATION = FADE_IN_DURATION + HOLD_DURATION + FADE_OUT_DURATION;
+
         // ── 강조 색 ──
         private static readonly Color ALLY_COLOR  = new Color(0.32f, 0.85f, 0.70f, 1f); // 청록
         private static readonly Color ENEMY_COLOR = new Color(0.90f, 0.28f, 0.28f, 1f); // 빨강
