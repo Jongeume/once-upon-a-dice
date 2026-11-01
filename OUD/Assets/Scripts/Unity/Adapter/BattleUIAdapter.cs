@@ -37,6 +37,9 @@ namespace OUD.Unity.Adapter
         [SerializeField] private ClearView  _clearView;
         [SerializeField] private DefeatView _defeatView;
 
+        [Header("턴 전환 배너")]
+        [SerializeField] private TurnBannerView _turnBannerView;
+
         [Header("화면 관리")]
         [SerializeField] private UIManager            _uiManager;
 
@@ -128,6 +131,11 @@ namespace OUD.Unity.Adapter
 
         private const float ACTION_DELAY = 0.6f;
         private const float INTENT_DELAY = 0.15f;
+
+        // "Enemy Turn" 배너가 페이드인할 짧은 리드 타임 — 첫 적 행동 직전 1회.
+        private const float ENEMY_BANNER_LEAD = 0.35f;
+        // 큐 재생당 "Enemy Turn" 배너 1회 제한 플래그.
+        private bool _enemyTurnBannerShown;
 
         private enum BattleActionType
         {
@@ -947,7 +955,18 @@ namespace OUD.Unity.Adapter
             _hasUsableSkills = false;
 
             RefreshTopBar();
+            ShowPlayerTurnReady(); // 전투 시작 직후 첫 턴 — 플레이어가 Roll Dice 입력을 기다리는 시점.
             OnTutorialEvent?.Invoke("BattleStart");
+        }
+
+        /// <summary>플레이어가 조작권을 얻어 Roll Dice 입력을 기다리는 시점에 "Your Turn" 배너를 띄우고
+        /// Roll Dice 버튼에 글로우를 건다. 실제 StartPlayerTurn()은 Roll Dice 클릭이 호출하므로,
+        /// 체감상 "내 턴 시작"은 전투 시작 직후 / 적 턴 큐 재생 종료 후 이 시점이다.
+        /// 글로우는 튜토리얼 전투에선 생략한다(TutorialOverlayView가 같은 버튼을 직접 제어 → 충돌 방지).</summary>
+        private void ShowPlayerTurnReady()
+        {
+            _turnBannerView?.ShowYourTurn();
+            if (!_isTutorialBattle) _turnBannerView?.SetRollDiceGlow(true);
         }
 
         public void OnPlayerTurnStarted()
@@ -966,6 +985,7 @@ namespace OUD.Unity.Adapter
         public void OnDiceRolled(int[] values, int rerollsLeft)
         {
             _hasUsableSkills = false;
+            _turnBannerView?.SetRollDiceGlow(false); // 주사위를 굴리면 "지금 네 턴" 글로우 해제.
             _uiManager.ShowScreen(UIManager.BattleScreen.B_DiceTable);
             _dicePresenter.UpdateDice(values, rerollsLeft);
             _slotAssignmentPresenter.OnRerollCountChanged(rerollsLeft);
@@ -1334,21 +1354,35 @@ namespace OUD.Unity.Adapter
             if (_actionQueue.Count == 0)
             {
                 IsPlayingQueue = false;
+                ShowPlayerTurnReady(); // 큐가 비어 바로 플레이어 입력 대기로 돌아가는 경우(드묾).
                 return;
             }
+            _enemyTurnBannerShown = false; // 이번 큐 재생에서 "Enemy Turn" 배너 1회 허용.
             IsPlayingQueue = true;
             _playbackCoroutine = StartCoroutine(PlayActionQueue());
         }
 
         private System.Collections.IEnumerator PlayActionQueue()
         {
+            bool battleEnded = false;
             while (_actionQueue.Count > 0)
             {
                 var action = _actionQueue.Dequeue();
+
+                // 플레이어 스킬 해소가 모두 끝나고 첫 적 행동이 나오기 직전에 "Enemy Turn" 배너 1회.
+                // (적 행동이 없는 큐 — 적 전멸 등 — 에선 자동으로 표시되지 않는다.)
+                if (action.Type == BattleActionType.EnemyAction && !_enemyTurnBannerShown)
+                {
+                    _enemyTurnBannerShown = true;
+                    _turnBannerView?.ShowEnemyTurn();
+                    yield return new WaitForSeconds(ENEMY_BANNER_LEAD);
+                }
+
                 ExecuteQueuedAction(action);
 
                 if (action.Type == BattleActionType.BattleWon || action.Type == BattleActionType.BattleLost)
                 {
+                    battleEnded = true;
                     _actionQueue.Clear();
                     break;
                 }
@@ -1371,6 +1405,10 @@ namespace OUD.Unity.Adapter
 
             IsPlayingQueue = false;
             _playbackCoroutine = null;
+
+            // 적 턴 큐 재생이 끝나고 전투가 계속되면 → 플레이어가 다시 Roll Dice를 기다리는 시점.
+            // 승리/패배로 끝난 경우엔 결과 화면과 겹치지 않도록 "Your Turn"을 띄우지 않는다.
+            if (!battleEnded) ShowPlayerTurnReady();
         }
 
         private void ExecuteQueuedAction(QueuedBattleAction action)
