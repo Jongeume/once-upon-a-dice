@@ -20,9 +20,8 @@ namespace OUD.BattleEngine.Run
     /// </summary>
     public class RunState
     {
-        // ── layer 단위 상수 (RunMap.TOTAL_LAYERS / LAST_LAYER와 동기) ─────────
-        public const int TOTAL_NODES = 3;       // = layer 수 (1-2-1 구조)
-        public const int LAST_NODE   = 2;       // = LAST_LAYER (Boss layer)
+        public const int TOTAL_NODES = 8;
+        public const int LAST_NODE   = 7;
 
         public PlayerState Player           { get; private set; }
         public int         CurrentNodeIndex { get; private set; }   // layer index

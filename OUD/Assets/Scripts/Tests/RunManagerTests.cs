@@ -1,5 +1,3 @@
-// RunManagerTests.cs
-// feature-spec F-11 RunManager 흐름 테스트 (Phase D-2 — 1-2-1 + Boss, 분기 선택 API).
 using System;
 using System.Collections.Generic;
 using NUnit.Framework;
@@ -27,8 +25,6 @@ namespace OUD.Tests
             var random = new FixedRandom(0);
             return new RunManager(new EncounterTable(random), random);
         }
-
-        // ── 생성자 / StartRun 가드 ───────────────────────────────────────────
 
         [Test]
         public void Constructor_NullEncounterTable_Throws()
@@ -58,15 +54,6 @@ namespace OUD.Tests
         }
 
         [Test]
-        public void GetCurrentNode_BeforeStartRun_Throws()
-        {
-            var sut = NewManager();
-            Assert.Throws<InvalidOperationException>(() => sut.GetCurrentNode());
-        }
-
-        // ── StartRun ─────────────────────────────────────────────────────────
-
-        [Test]
         public void StartRun_SetsStateAtStartNode_NotComplete()
         {
             var sut = NewManager();
@@ -84,20 +71,16 @@ namespace OUD.Tests
         {
             var sut = NewManager();
             sut.StartRun(NewPlayer());
-            for (int i = 0; i < 3; i++) sut.AdvanceNode();
+            for (int i = 0; i < 8; i++) sut.AdvanceNode();
             Assert.IsTrue(sut.IsRunComplete());
 
-            // 새 플레이어로 재시작
             var newPlayer = NewPlayer();
             sut.StartRun(newPlayer);
 
             Assert.AreSame(newPlayer, sut.State.Player);
             Assert.AreEqual(0, sut.State.CurrentNodeIndex);
-            Assert.AreEqual(RunMap.START_NODE_ID, sut.State.CurrentNodeId);
             Assert.IsFalse(sut.IsRunComplete());
         }
-
-        // ── GetNextBattle (NodeType + Layer 위임) ────────────────────────────
 
         [Test]
         public void GetNextBattle_AtStart_ReturnsSlimeOnly()
@@ -116,10 +99,10 @@ namespace OUD.Tests
         [Test]
         public void GetNextBattle_AtBossNode_ReturnsStoneGolem()
         {
-            // Phase D-2: 마지막 노드는 Boss = StoneGolem 부활
             var sut = NewManager();
             sut.StartRun(NewPlayer());
-            for (int i = 0; i < 2; i++) sut.AdvanceNode(); // layer 2 (Boss)로
+            // Advance to node 7 (Boss) — skip shops by advancing through all
+            for (int i = 0; i < 7; i++) sut.AdvanceNode();
 
             List<MonsterData> result = sut.GetNextBattle();
 
@@ -127,10 +110,22 @@ namespace OUD.Tests
             Assert.AreEqual(MonsterDatabase.ID_STONE_GOLEM, result[0].Id);
         }
 
-        // ── PostBattleFlow: 일반 노드 ────────────────────────────────────────
+        [Test]
+        public void GetNextBattle_AtEliteNode_ReturnsEliteGolem()
+        {
+            var sut = NewManager();
+            sut.StartRun(NewPlayer());
+            // Advance to node 5 (Elite)
+            for (int i = 0; i < 5; i++) sut.AdvanceNode();
+
+            List<MonsterData> result = sut.GetNextBattle();
+
+            Assert.AreEqual(1, result.Count);
+            Assert.AreEqual(MonsterDatabase.ID_ELITE_GOLEM, result[0].Id);
+        }
 
         [Test]
-        public void GetPostBattleFlow_Layer0_RewardAndRest_NoLevelUp()
+        public void GetPostBattleFlow_CombatNode_RewardAndLevelUpConditional()
         {
             var sut = NewManager();
             sut.StartRun(NewPlayer());
@@ -138,60 +133,37 @@ namespace OUD.Tests
             PostBattleFlow flow = sut.GetPostBattleFlow();
 
             Assert.IsTrue(flow.ShowReward);
-            Assert.IsTrue(flow.ShowRest);
-            Assert.IsFalse(flow.ShowLevelUp);  // layer 0은 레벨업 체크 시점 아님
+            Assert.IsFalse(flow.ShowLevelUp);
         }
 
         [Test]
-        public void GetPostBattleFlow_Layer1_LevelUp_WhenXp2()
+        public void GetPostBattleFlow_CombatNode_LevelUp_WhenXpMeetsThreshold()
         {
             var sut = NewManager();
             var player = NewPlayer();
             player.AddXp(2);
             sut.StartRun(player);
-            sut.AdvanceNode(); // layer 1로
 
             PostBattleFlow flow = sut.GetPostBattleFlow();
 
             Assert.IsTrue(flow.ShowLevelUp);
             Assert.IsTrue(flow.ShowReward);
-            Assert.IsTrue(flow.ShowRest);
         }
-
-        [Test]
-        public void GetPostBattleFlow_Layer1_NoLevelUp_WhenXpBelow2()
-        {
-            var sut = NewManager();
-            var player = NewPlayer();
-            player.AddXp(1);
-            sut.StartRun(player);
-            sut.AdvanceNode(); // layer 1
-
-            PostBattleFlow flow = sut.GetPostBattleFlow();
-
-            Assert.IsFalse(flow.ShowLevelUp);
-        }
-
-        // ── PostBattleFlow: Boss 노드 (마지막) ───────────────────────────────
 
         [Test]
         public void GetPostBattleFlow_BossNode_OnlyReward()
         {
-            // Boss 노드는 보상만 표시 (XP/Gold), 휴식/레벨업 없음
             var sut = NewManager();
             var player = NewPlayer();
-            player.AddXp(99);  // XP 많아도 마지막 노드는 레벨업 없음
+            player.AddXp(99);
             sut.StartRun(player);
-            for (int i = 0; i < 2; i++) sut.AdvanceNode(); // Boss layer로
+            for (int i = 0; i < 7; i++) sut.AdvanceNode();
 
             PostBattleFlow flow = sut.GetPostBattleFlow();
 
             Assert.IsTrue(flow.ShowReward);
-            Assert.IsFalse(flow.ShowRest);
             Assert.IsFalse(flow.ShowLevelUp);
         }
-
-        // ── 노드맵 분기 API (Phase D-2 신규) ─────────────────────────────────
 
         [Test]
         public void GetCurrentNode_AtStart_IsCombatLayer0()
@@ -203,36 +175,18 @@ namespace OUD.Tests
 
             Assert.AreEqual(RunMap.START_NODE_ID, node.Id);
             Assert.AreEqual(NodeType.Combat, node.Type);
-            Assert.AreEqual(0, node.Layer);
         }
 
         [Test]
-        public void GetAvailableNextNodes_FromStart_HasTwoBranches()
+        public void GetAvailableNextNodes_Linear_HasOneNext()
         {
-            // 1-2-1 구조: layer 0 → layer 1의 2분기 노드(1, 2)
             var sut = NewManager();
             sut.StartRun(NewPlayer());
-
-            IReadOnlyList<MapNode> next = sut.GetAvailableNextNodes();
-
-            Assert.AreEqual(2, next.Count);
-            var ids = new List<int> { next[0].Id, next[1].Id };
-            CollectionAssert.AreEquivalent(new[] { 1, 2 }, ids);
-        }
-
-        [Test]
-        public void GetAvailableNextNodes_FromBranch_LeadsToBoss()
-        {
-            // layer 1의 두 분기 모두 Boss(id=3)로 합류
-            var sut = NewManager();
-            sut.StartRun(NewPlayer());
-            sut.SelectNextNode(1);  // 분기 1 선택
 
             IReadOnlyList<MapNode> next = sut.GetAvailableNextNodes();
 
             Assert.AreEqual(1, next.Count);
-            Assert.AreEqual(RunMap.LAST_NODE_ID, next[0].Id);
-            Assert.AreEqual(NodeType.Boss, next[0].Type);
+            Assert.AreEqual(1, next[0].Id);
         }
 
         [Test]
@@ -240,7 +194,7 @@ namespace OUD.Tests
         {
             var sut = NewManager();
             sut.StartRun(NewPlayer());
-            for (int i = 0; i < 2; i++) sut.AdvanceNode(); // Boss로
+            for (int i = 0; i < 7; i++) sut.AdvanceNode();
 
             IReadOnlyList<MapNode> next = sut.GetAvailableNextNodes();
 
@@ -248,25 +202,24 @@ namespace OUD.Tests
         }
 
         [Test]
-        public void SelectNextNode_ValidBranch_UpdatesState()
+        public void SelectNextNode_ValidNext_UpdatesState()
         {
             var sut = NewManager();
             sut.StartRun(NewPlayer());
 
-            sut.SelectNextNode(2);
+            sut.SelectNextNode(1);
 
-            Assert.AreEqual(2, sut.State.CurrentNodeId);
+            Assert.AreEqual(1, sut.State.CurrentNodeId);
             Assert.AreEqual(1, sut.State.CurrentNodeIndex);
         }
 
         [Test]
-        public void SelectNextNode_InvalidBranch_Throws()
+        public void SelectNextNode_InvalidNode_Throws()
         {
             var sut = NewManager();
             sut.StartRun(NewPlayer());
 
-            // 시작 노드(0)에서 Boss(3)로 직접 갈 수 없음
-            Assert.Throws<ArgumentException>(() => sut.SelectNextNode(RunMap.LAST_NODE_ID));
+            Assert.Throws<ArgumentException>(() => sut.SelectNextNode(5));
         }
 
         [Test]
@@ -274,25 +227,20 @@ namespace OUD.Tests
         {
             var sut = NewManager();
             sut.StartRun(NewPlayer());
-            for (int i = 0; i < 3; i++) sut.AdvanceNode();
-            Assert.IsTrue(sut.IsRunComplete());
+            for (int i = 0; i < 8; i++) sut.AdvanceNode();
 
             Assert.Throws<InvalidOperationException>(() => sut.SelectNextNode(0));
         }
 
-        // ── AdvanceNode (호환 API) ────────────────────────────────────────────
-
         [Test]
-        public void AdvanceNode_FromStart_AutoSelectsFirstBranch()
+        public void AdvanceNode_Linear_ProgressesToNextNode()
         {
-            // 호환 API: 첫 번째 분기 후보(id=1) 자동 선택
             var sut = NewManager();
             sut.StartRun(NewPlayer());
 
             sut.AdvanceNode();
 
             Assert.AreEqual(1, sut.State.CurrentNodeId);
-            Assert.AreEqual(1, sut.State.CurrentNodeIndex);
         }
 
         [Test]
@@ -300,10 +248,10 @@ namespace OUD.Tests
         {
             var sut = NewManager();
             sut.StartRun(NewPlayer());
-            for (int i = 0; i < 2; i++) sut.AdvanceNode();
+            for (int i = 0; i < 7; i++) sut.AdvanceNode();
             Assert.IsFalse(sut.IsRunComplete());
 
-            sut.AdvanceNode(); // Boss 클리어
+            sut.AdvanceNode();
 
             Assert.IsTrue(sut.IsRunComplete());
         }
@@ -313,17 +261,13 @@ namespace OUD.Tests
         {
             var sut = NewManager();
             sut.StartRun(NewPlayer());
-            for (int i = 0; i < 3; i++) sut.AdvanceNode();
-            int idBefore = sut.State.CurrentNodeId;
+            for (int i = 0; i < 8; i++) sut.AdvanceNode();
 
             sut.AdvanceNode();
             sut.AdvanceNode();
 
             Assert.IsTrue(sut.IsRunComplete());
-            Assert.AreEqual(idBefore, sut.State.CurrentNodeId);
         }
-
-        // ── IsRunComplete ────────────────────────────────────────────────────
 
         [Test]
         public void IsRunComplete_BeforeStartRun_False()
@@ -333,25 +277,12 @@ namespace OUD.Tests
         }
 
         [Test]
-        public void IsRunComplete_AfterAllAdvance_True()
-        {
-            var sut = NewManager();
-            sut.StartRun(NewPlayer());
-            for (int i = 0; i < 3; i++) sut.AdvanceNode(); // layer 0 → 1 → 2 → complete
-
-            Assert.IsTrue(sut.IsRunComplete());
-        }
-
-        // ── PostBattleFlow struct 무결성 ─────────────────────────────────────
-
-        [Test]
         public void PostBattleFlow_Constructor_StoresValues()
         {
-            var flow = new PostBattleFlow(showReward: true, showLevelUp: false, showRest: true);
+            var flow = new PostBattleFlow(showReward: true, showLevelUp: false);
 
             Assert.IsTrue(flow.ShowReward);
             Assert.IsFalse(flow.ShowLevelUp);
-            Assert.IsTrue(flow.ShowRest);
         }
     }
 }

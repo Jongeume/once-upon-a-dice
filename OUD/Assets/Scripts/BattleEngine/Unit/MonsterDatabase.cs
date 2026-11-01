@@ -17,6 +17,7 @@ namespace OUD.BattleEngine.Unit
         public const string ID_SKELETON    = "Skeleton";
         public const string ID_GOBLIN      = "Goblin";
         public const string ID_STONE_GOLEM = "StoneGolem";
+        public const string ID_ELITE_GOLEM = "EliteGolem";
 
         // ── 내부 테이블 ───────────────────────────────────────────────────────
         private static readonly Dictionary<string, MonsterData> _table;
@@ -29,6 +30,7 @@ namespace OUD.BattleEngine.Unit
                 [ID_SKELETON]    = BuildSkeleton(),
                 [ID_GOBLIN]      = BuildGoblin(),
                 [ID_STONE_GOLEM] = BuildStoneGolem(),
+                [ID_ELITE_GOLEM] = BuildEliteGolem(),
             };
         }
 
@@ -145,6 +147,28 @@ namespace OUD.BattleEngine.Unit
             },
             rageHpThreshold: 40,   // HP ≤ 40 (MaxHp 80의 50%) 시 분노 전환
             rageAtkBonus:    4,    // ATK 14 → 18
+            ragePattern: new[]
+            {
+                IntentType.Attack,
+                IntentType.StrongAttack,
+                IntentType.Attack,
+            });
+
+        private static MonsterData BuildEliteGolem() => new MonsterData(
+            id:                     ID_ELITE_GOLEM,
+            name:                   "Elite Golem",
+            maxHp:                  50,
+            baseAtk:                11,
+            shieldValue:            7,
+            strongAttackMultiplier: 1.5,
+            pattern: new[]
+            {
+                IntentType.Attack,
+                IntentType.Shield,
+                IntentType.StrongAttack,
+            },
+            rageHpThreshold: 25,
+            rageAtkBonus:    3,
             ragePattern: new[]
             {
                 IntentType.Attack,
