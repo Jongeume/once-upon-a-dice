@@ -22,17 +22,28 @@ namespace OUD.BattleEngine.Unit
         public bool IsEnraged { get; private set; }
         public bool IsDead    => Hp <= 0;
 
+        /// <summary>소환된 분신인지 여부. 보스 사망 시 함께 제거.</summary>
+        public bool IsClone   { get; }
+
         private int _patternIndex;
 
+        // ── 소환자 상태 머신 (Data.IsSummoner == true 일 때만 사용) ─────────
+        // 0=Summon, 1=Defend, 2=StrongAttack
+        private int _summonerPhase;
+        private int _summonCount;
+
         // ── 생성자 ────────────────────────────────────────────────────────────
-        public MonsterInstance(MonsterData data)
+        public MonsterInstance(MonsterData data, bool isClone = false)
         {
-            Data          = data;
-            Hp            = data.MaxHp;
-            Shield        = 0;
-            Atk           = data.BaseAtk;
-            IsEnraged     = false;
-            _patternIndex = 0;
+            Data            = data;
+            Hp              = data.MaxHp;
+            Shield          = 0;
+            Atk             = data.BaseAtk;
+            IsEnraged       = false;
+            IsClone         = isClone;
+            _patternIndex   = 0;
+            _summonerPhase  = 0;
+            _summonCount    = 0;
         }
 
         // ── Intent / 패턴 ─────────────────────────────────────────────────────
@@ -43,6 +54,15 @@ namespace OUD.BattleEngine.Unit
         /// </summary>
         public IntentType GetCurrentIntent()
         {
+            if (Data.IsSummoner)
+                return _summonerPhase switch
+                {
+                    0 => IntentType.Summon,
+                    1 => IntentType.Shield,
+                    2 => IntentType.StrongAttack,
+                    _ => IntentType.Attack
+                };
+
             IntentType[] pattern = IsEnraged ? Data.RagePattern : Data.Pattern;
             return pattern[_patternIndex % pattern.Length];
         }
@@ -60,7 +80,8 @@ namespace OUD.BattleEngine.Unit
                 IntentType.Attack       => Atk,
                 IntentType.StrongAttack => (int)Math.Floor(Atk * Data.StrongAttackMultiplier),
                 IntentType.Shield       => Data.ShieldValue,
-                IntentType.RageWarning  => Atk, // 경고용, 실제 행동은 Attack
+                IntentType.RageWarning  => Atk,
+                IntentType.Summon       => 0,
                 _ => 0
             };
         }
@@ -68,8 +89,46 @@ namespace OUD.BattleEngine.Unit
         /// <summary>행동 실행 후 패턴 인덱스를 한 칸 전진.</summary>
         public void AdvancePattern()
         {
+            if (Data.IsSummoner)
+            {
+                AdvanceSummonerState();
+                return;
+            }
             IntentType[] pattern = IsEnraged ? Data.RagePattern : Data.Pattern;
             _patternIndex = (_patternIndex + 1) % pattern.Length;
+        }
+
+        // ── 소환자 상태 머신 ──────────────────────────────────────────────────
+
+        /// <summary>적 턴 시작 시 분신 전멸 여부에 따라 페이즈 전환.</summary>
+        public void UpdateSummonerPhase(bool allClonesDead)
+        {
+            if (!Data.IsSummoner) return;
+            if (_summonerPhase == 1 && allClonesDead)
+                _summonerPhase = 2;
+        }
+
+        private void AdvanceSummonerState()
+        {
+            switch (_summonerPhase)
+            {
+                case 0:
+                    _summonCount++;
+                    if (_summonCount >= Data.MaxSummonClones)
+                        _summonerPhase = 1;
+                    break;
+                case 2:
+                    _summonerPhase = 0;
+                    _summonCount   = 0;
+                    break;
+            }
+        }
+
+        /// <summary>보스 사망 시 분신 일괄 처리용.</summary>
+        public void KillClone()
+        {
+            if (!IsClone) return;
+            Hp = 0;
         }
 
         /// <summary>

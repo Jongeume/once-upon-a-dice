@@ -544,6 +544,7 @@ namespace OUD.Unity.Adapter
                 HandleUseSkillClicked);
 
             _targetSelectionPresenter = new TargetSelectionPresenter(_targetSelectionView);
+            _targetSelectionPresenter.SetEnemyPresenter(_enemyPresenter);
 
             _battleLogPresenter = new BattleLogPresenter(
                 _battleLogView,
@@ -736,6 +737,9 @@ namespace OUD.Unity.Adapter
             _targetSelectionPresenter?.ResetForNewTurn();
             if (_targetSelectionView != null) _targetSelectionView.ResetForNewTurn();
             _hasUsableSkills = false;
+
+            var allLearned = SkillDatabase.GetSkillsByUnlockedHands(_playerPresenter.Player.UnlockedHands);
+            _slotAssignmentPresenter.ShowAllSkillsDisabled(allLearned, _playerPresenter.Player);
         }
 
         public void OnDiceRolled(int[] values, int rerollsLeft)
@@ -778,6 +782,11 @@ namespace OUD.Unity.Adapter
         public void OnIntentUpdated(int enemyIndex, IntentType intent, int value)
         {
             _enemyPresenter.ShowAction(enemyIndex, intent, value);
+        }
+
+        public void OnEnemySummoned(int enemyIndex, MonsterInstance clone)
+        {
+            _enemyPresenter.AddEntry(clone, enemyIndex);
         }
 
         public void OnShieldsReset()

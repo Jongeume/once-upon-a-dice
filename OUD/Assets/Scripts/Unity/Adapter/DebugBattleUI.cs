@@ -97,6 +97,11 @@ namespace OUD.Unity.Adapter
 
         public void OnIntentUpdated(int enemyIndex, IntentType intent, int value) { }
 
+        public void OnEnemySummoned(int enemyIndex, MonsterInstance clone)
+        {
+            Debug.Log($"[소환] 적[{enemyIndex}] {clone.Data.Name} (HP:{clone.Hp} ATK:{clone.Atk})");
+        }
+
         public void OnShieldsReset()
         {
             Debug.Log("[실드 초기화]");

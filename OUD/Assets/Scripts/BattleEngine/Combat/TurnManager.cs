@@ -84,7 +84,6 @@ namespace OUD.BattleEngine.Combat
             _state.ResetForNewTurn();
             _state.Phase = BattlePhase.DiceRoll;
             _ui.OnPlayerTurnStarted();
-            // 자동 RollAll() 제거 — 플레이어가 리롤 버튼으로 직접 굴림
             _ui.OnDiceRolled(_state.DiceHand.GetValues(), _state.DiceHand.RerollsLeft);
         }
 
@@ -222,6 +221,9 @@ namespace OUD.BattleEngine.Combat
             // 5a: 플레이어 턴 종료 → 적 실드 초기화
             ResetEnemyShieldsAndNotify();
 
+            // 5b: 소환 보스 사망 → 분신 일괄 처리
+            KillClonesOfDeadSummoners();
+
             // 6: 적 전원 사망 체크 → 승리
             if (_state.AreAllEnemiesDead)
             {
@@ -249,19 +251,21 @@ namespace OUD.BattleEngine.Combat
                 MonsterInstance enemy = _state.Enemies[i];
                 if (enemy.IsDead) continue;
 
-                // 7a: 분노 체크 (보스 전용, 일반 몬스터는 HasRage=false이므로 무시)
                 enemy.CheckRage();
 
-                // Intent 캡처 (행동 전에 저장해야 표시와 실행이 일치)
+                if (enemy.Data.IsSummoner)
+                    enemy.UpdateSummonerPhase(!HasLivingClones());
+
                 IntentType intent = enemy.GetCurrentIntent();
                 int        value  = enemy.GetIntentValue();
 
-                // 행동 실행
-                ExecuteEnemyAction(enemy, intent, value);
+                if (intent == IntentType.Summon)
+                    SpawnClone(enemy);
+                else
+                    ExecuteEnemyAction(enemy, intent, value);
 
                 _ui.OnEnemyAction(i, intent, value);
 
-                // 패턴 전진 (다음 Intent 결정)
                 enemy.AdvancePattern();
             }
 
@@ -333,6 +337,36 @@ namespace OUD.BattleEngine.Combat
                 case IntentType.Shield:
                     enemy.GainShield(value);
                     break;
+            }
+        }
+
+        private void SpawnClone(MonsterInstance summoner)
+        {
+            MonsterData cloneData = MonsterDatabase.Get(summoner.Data.SummonCloneId);
+            if (cloneData == null) return;
+            var clone = new MonsterInstance(cloneData, isClone: true);
+            _state.Enemies.Add(clone);
+            int cloneIndex = _state.Enemies.Count - 1;
+            _ui.OnEnemySummoned(cloneIndex, clone);
+        }
+
+        private bool HasLivingClones()
+        {
+            foreach (var e in _state.Enemies)
+                if (e.IsClone && !e.IsDead) return true;
+            return false;
+        }
+
+        /// <summary>소환 보스 사망 시 분신 일괄 처리.</summary>
+        private void KillClonesOfDeadSummoners()
+        {
+            foreach (var enemy in _state.Enemies)
+            {
+                if (enemy.Data.IsSummoner && enemy.IsDead)
+                {
+                    foreach (var other in _state.Enemies)
+                        other.KillClone();
+                }
             }
         }
 

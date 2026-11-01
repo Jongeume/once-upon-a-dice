@@ -16,6 +16,7 @@ namespace OUD.Unity.Battle.Presenter
     public class TargetSelectionPresenter
     {
         private readonly ITargetSelectionView _view;
+        private EnemyPresenter _enemyPresenter;
 
         private SkillData[]   _slots;
         private int[]         _targetIndices;
@@ -26,6 +27,8 @@ namespace OUD.Unity.Battle.Presenter
 
         public TargetSelectionPresenter(ITargetSelectionView view) => _view = view;
 
+        public void SetEnemyPresenter(EnemyPresenter enemyPresenter) => _enemyPresenter = enemyPresenter;
+
         /// <summary>새 턴/새 전투 시작 시 내부 상태 초기화. 이전 턴 슬롯이 클릭 처리에 영향 주지 않도록.</summary>
         public void ResetForNewTurn()
         {
@@ -34,6 +37,7 @@ namespace OUD.Unity.Battle.Presenter
             _activeSlotIndex       = -1;
             _aliveEnemies          = null;
             _onAllTargetsConfirmed = null;
+            _enemyPresenter?.ClearAllTargetBadges();
         }
 
         public void Begin(
@@ -92,6 +96,7 @@ namespace OUD.Unity.Battle.Presenter
 
             _targetIndices[_activeSlotIndex] = enemyIndex;
             _view.ShowTargetLink(_activeSlotIndex, enemyIndex);
+            RefreshAllTargetBadges();
 
             // 다음 미확정 공격 슬롯으로 이동
             int next = FindNextUnconfirmedAttackSlot(_activeSlotIndex + 1);
@@ -141,6 +146,29 @@ namespace OUD.Unity.Battle.Presenter
 
         /// <summary>현재까지 확정된 타겟 인덱스 배열 반환. Execute 버튼 클릭 시 Confirm()에 전달.</summary>
         public int[] GetTargetIndices() => _targetIndices;
+
+        private void RefreshAllTargetBadges()
+        {
+            if (_enemyPresenter == null) return;
+            _enemyPresenter.ClearAllTargetBadges();
+            if (_slots == null || _targetIndices == null) return;
+
+            for (int i = 0; i < _slots.Length; i++)
+            {
+                if (_slots[i] == null) continue;
+                if (_slots[i].Category != SkillCategory.Attack) continue;
+                if (_targetIndices[i] < 0) continue;
+
+                string damageText = "";
+                if (_playerState != null)
+                {
+                    int enhLv = _playerState.GetEnhanceLevel(_slots[i].Hand);
+                    damageText = SkillValueHelper.BuildValueText(
+                        _slots[i], _playerState.Atk, _playerState.Def, enhLv);
+                }
+                _enemyPresenter.ShowTargetBadge(_targetIndices[i], i, _slots[i].Name, damageText);
+            }
+        }
 
         private int FindNextUnconfirmedAttackSlot(int startFrom)
         {

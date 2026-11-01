@@ -46,6 +46,11 @@ namespace OUD.BattleEngine.Unit
         /// <summary>분노 전환 후 사용할 패턴.</summary>
         public IntentType[] RagePattern     { get; }
 
+        // ── 소환 보스용 ──────────────────────────────────────────────────────
+        public bool   IsSummoner       { get; }
+        public string SummonCloneId    { get; }
+        public int    MaxSummonClones  { get; }
+
         // ── 생성자 (일반 몬스터) ─────────────────────────────────────────────
         public MonsterData(
             string id,
@@ -68,6 +73,9 @@ namespace OUD.BattleEngine.Unit
             RageHpThreshold        = 0;
             RageAtkBonus           = 0;
             RagePattern            = System.Array.Empty<IntentType>();
+            IsSummoner             = false;
+            SummonCloneId          = null;
+            MaxSummonClones        = 0;
         }
 
         // ── 생성자 (분노/강공격 보스) ────────────────────────────────────────
@@ -96,6 +104,38 @@ namespace OUD.BattleEngine.Unit
             RageHpThreshold        = rageHpThreshold;
             RageAtkBonus           = rageAtkBonus;
             RagePattern            = ragePattern;
+            IsSummoner             = false;
+            SummonCloneId          = null;
+            MaxSummonClones        = 0;
+        }
+
+        // ── 생성자 (소환 보스) ───────────────────────────────────────────────
+        public MonsterData(
+            string id,
+            string name,
+            int maxHp,
+            int baseAtk,
+            int shieldValue,
+            double strongAttackMultiplier,
+            string summonCloneId,
+            int maxSummonClones,
+            MonsterTier tier = MonsterTier.Boss)
+        {
+            Id                     = id;
+            Name                   = name;
+            Tier                   = tier;
+            MaxHp                  = maxHp;
+            BaseAtk                = baseAtk;
+            ShieldValue            = shieldValue;
+            StrongAttackMultiplier = strongAttackMultiplier;
+            Pattern                = System.Array.Empty<IntentType>();
+            HasRage                = false;
+            RageHpThreshold        = 0;
+            RageAtkBonus           = 0;
+            RagePattern            = System.Array.Empty<IntentType>();
+            IsSummoner             = true;
+            SummonCloneId          = summonCloneId;
+            MaxSummonClones        = maxSummonClones;
         }
     }
 }

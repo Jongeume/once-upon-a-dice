@@ -105,6 +105,37 @@ namespace OUD.Unity.Battle.Presenter
             }
         }
 
+        public void ShowTargetBadge(int enemyIndex, int slotNumber, string skillName, string damageText)
+        {
+            if (enemyIndex < 0 || enemyIndex >= _entryViews.Count) return;
+            _entryViews[enemyIndex].ShowTargetBadge(slotNumber, skillName, damageText);
+        }
+
+        public void ClearTargetBadge(int enemyIndex)
+        {
+            if (enemyIndex < 0 || enemyIndex >= _entryViews.Count) return;
+            _entryViews[enemyIndex].ClearTargetBadge();
+        }
+
+        public void ClearAllTargetBadges()
+        {
+            for (int i = 0; i < _entryViews.Count; i++)
+                _entryViews[i].ClearTargetBadge();
+        }
+
+        public void AddEntry(MonsterInstance monster, int index)
+        {
+            var view = _entryFactory(monster.Data.Tier);
+            Sprite sprite = _spriteMap?.GetSprite(monster.Data.Id);
+            float fill = monster.Data.MaxHp > 0 ? (float)monster.Hp / monster.Data.MaxHp : 0f;
+            view.Setup(monster.Data.Name, sprite, fill, $"{monster.Hp} / {monster.Data.MaxHp}");
+            view.UpdateIntent(monster.GetCurrentIntent(), monster.GetIntentValue());
+            _entryViews.Add(view);
+
+            int idx = index;
+            view.OnClicked += () => NotifyEnemyClicked(idx);
+        }
+
         public void NotifyEnemyClicked(int index) => OnEnemyClicked?.Invoke(index);
 
         /// <summary>

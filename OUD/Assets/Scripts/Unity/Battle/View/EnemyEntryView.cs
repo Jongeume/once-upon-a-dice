@@ -43,6 +43,9 @@ namespace OUD.Unity.Battle.View
         [SerializeField] private Color _selectableOutlineColor = new Color(0.95f, 0.78f, 0.18f, 1f);
         [SerializeField] private Color _hoverOutlineColor      = new Color(1f,    0.45f, 0.20f, 1f);
 
+        [Header("타겟 뱃지")]
+        [SerializeField] private GameObject _targetBadgeContainer;
+
         [Header("분노 (보스)")]
         [SerializeField] private GameObject _rageGroup;
         [SerializeField] private Image      _rageIcon;
@@ -111,6 +114,7 @@ namespace OUD.Unity.Battle.View
                 IntentType.StrongAttack => $"ATK!! {value}",
                 IntentType.Shield       => $"DEF {value}",
                 IntentType.RageWarning  => $"RAGE {value}",
+                IntentType.Summon       => "SUMMON",
                 _                       => "?"
             };
         }
@@ -152,6 +156,94 @@ namespace OUD.Unity.Battle.View
         public void SetRageActive(bool active)
         {
             if (_rageGroup) _rageGroup.SetActive(active);
+        }
+
+        private readonly System.Collections.Generic.List<GameObject> _badgeBoxes = new();
+
+        public void ShowTargetBadge(int slotNumber, string skillName, string damageText)
+        {
+            if (_targetBadgeContainer == null) EnsureTargetBadgeContainer();
+            if (_targetBadgeContainer) _targetBadgeContainer.SetActive(true);
+
+            var box = CreateBadgeBox(slotNumber + 1);
+            _badgeBoxes.Add(box);
+        }
+
+        public void ClearTargetBadge()
+        {
+            foreach (var box in _badgeBoxes)
+                if (box != null) Destroy(box);
+            _badgeBoxes.Clear();
+            if (_targetBadgeContainer) _targetBadgeContainer.SetActive(false);
+        }
+
+        private GameObject CreateBadgeBox(int displayNumber)
+        {
+            var box = new GameObject($"Badge_{displayNumber}");
+            box.transform.SetParent(_targetBadgeContainer.transform, false);
+
+            var rt = box.AddComponent<RectTransform>();
+            rt.sizeDelta = new Vector2(32f, 28f);
+
+            var bg = box.AddComponent<Image>();
+            bg.color = new Color(0.12f, 0.12f, 0.12f, 0.9f);
+            bg.raycastTarget = false;
+
+            var outline = box.AddComponent<Outline>();
+            outline.effectColor = new Color(0.95f, 0.78f, 0.18f, 1f);
+            outline.effectDistance = new Vector2(1.5f, -1.5f);
+
+            var textGo = new GameObject("Text");
+            textGo.transform.SetParent(box.transform, false);
+            var textRt = textGo.AddComponent<RectTransform>();
+            textRt.anchorMin = Vector2.zero;
+            textRt.anchorMax = Vector2.one;
+            textRt.offsetMin = Vector2.zero;
+            textRt.offsetMax = Vector2.zero;
+
+            var tmp = textGo.AddComponent<TextMeshProUGUI>();
+            if (_nameText != null)
+            {
+                tmp.font = _nameText.font;
+                tmp.fontSharedMaterial = _nameText.fontSharedMaterial;
+            }
+            tmp.fontSize = 14f;
+            tmp.color = new Color(1f, 0.9f, 0.3f, 1f);
+            tmp.alignment = TextAlignmentOptions.Center;
+            tmp.text = $"[{displayNumber}]";
+            tmp.raycastTarget = false;
+
+            return box;
+        }
+
+        private void EnsureTargetBadgeContainer()
+        {
+            if (_targetBadgeContainer != null) return;
+
+            var containerGo = new GameObject("TargetBadgeContainer");
+            containerGo.transform.SetParent(transform, false);
+
+            var rt = containerGo.AddComponent<RectTransform>();
+            rt.anchorMin = new Vector2(0f, 1f);
+            rt.anchorMax = new Vector2(0f, 1f);
+            rt.pivot     = new Vector2(0f, 0f);
+            rt.anchoredPosition = new Vector2(0f, 4f);
+            rt.sizeDelta = new Vector2(200f, 28f);
+
+            var hlg = containerGo.AddComponent<HorizontalLayoutGroup>();
+            hlg.spacing = 4f;
+            hlg.childAlignment = TextAnchor.MiddleLeft;
+            hlg.childForceExpandWidth = false;
+            hlg.childForceExpandHeight = false;
+            hlg.childControlWidth = false;
+            hlg.childControlHeight = false;
+
+            var csf = containerGo.AddComponent<ContentSizeFitter>();
+            csf.horizontalFit = ContentSizeFitter.FitMode.PreferredSize;
+            csf.verticalFit   = ContentSizeFitter.FitMode.PreferredSize;
+
+            _targetBadgeContainer = containerGo;
+            containerGo.SetActive(false);
         }
 
         public void PlayDeathEffect()

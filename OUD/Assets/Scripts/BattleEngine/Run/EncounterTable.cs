@@ -27,7 +27,7 @@ namespace OUD.BattleEngine.Run
             switch (node.Type)
             {
                 case NodeType.Boss:
-                    return new List<MonsterData> { MonsterDatabase.Get(MonsterDatabase.ID_STONE_GOLEM) };
+                    return new List<MonsterData> { MonsterDatabase.Get(MonsterDatabase.ID_EVIL_QUEEN) };
 
                 case NodeType.Elite:
                     return new List<MonsterData> { MonsterDatabase.Get(MonsterDatabase.ID_ELITE_GOLEM) };

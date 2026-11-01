@@ -21,6 +21,8 @@ namespace OUD.BattleEngine.Unit
         public const string ID_BEAR        = "Bear";
         public const string ID_STONE_GOLEM = "StoneGolem";
         public const string ID_ELITE_GOLEM = "EliteGolem";
+        public const string ID_EVIL_QUEEN  = "EvilQueen";
+        public const string ID_EVIL_QUEEN_CLONE = "EvilQueenClone";
 
         // ── 내부 테이블 ───────────────────────────────────────────────────────
         private static readonly Dictionary<string, MonsterData> _table;
@@ -35,8 +37,10 @@ namespace OUD.BattleEngine.Unit
                 [ID_SPIDER]      = BuildSpider(),
                 [ID_SNAKE]       = BuildSnake(),
                 [ID_BEAR]        = BuildBear(),
-                [ID_STONE_GOLEM] = BuildStoneGolem(),
-                [ID_ELITE_GOLEM] = BuildEliteGolem(),
+                [ID_STONE_GOLEM]      = BuildStoneGolem(),
+                [ID_ELITE_GOLEM]      = BuildEliteGolem(),
+                [ID_EVIL_QUEEN]       = BuildEvilQueen(),
+                [ID_EVIL_QUEEN_CLONE] = BuildEvilQueenClone(),
             };
         }
 
@@ -224,5 +228,31 @@ namespace OUD.BattleEngine.Unit
                 IntentType.Attack,
             },
             tier: MonsterTier.Elite);
+
+        /// <summary>
+        /// Evil Queen (보스): HP=80, ATK=14, 실드=10, 강공격배율=2.0.
+        /// 소환 보스 — 분신 2체를 소환하고 방어, 분신 전멸 시 강공격(ATK×2=28).
+        /// </summary>
+        private static MonsterData BuildEvilQueen() => new MonsterData(
+            id:                     ID_EVIL_QUEEN,
+            name:                   "Evil Queen",
+            maxHp:                  100,
+            baseAtk:                20,
+            shieldValue:            10,
+            strongAttackMultiplier: 2.0,
+            summonCloneId:          ID_EVIL_QUEEN_CLONE,
+            maxSummonClones:        2);
+
+        /// <summary>
+        /// Evil Queen Clone: HP=8 (보스의 10%), ATK=7 (보스의 50%).
+        /// 공격만 수행.
+        /// </summary>
+        private static MonsterData BuildEvilQueenClone() => new MonsterData(
+            id:          ID_EVIL_QUEEN_CLONE,
+            name:        "Queen's Shadow",
+            maxHp:       10,
+            baseAtk:     10,
+            shieldValue: 0,
+            pattern:     new[] { IntentType.Attack, IntentType.Attack, IntentType.Attack });
     }
 }
