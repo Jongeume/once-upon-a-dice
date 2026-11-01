@@ -8,7 +8,7 @@ namespace OUD.Unity.Common
     /// </summary>
     public class UIManager : MonoBehaviour
     {
-        public enum BattleScreen { A_BattleBasic, B_DiceTable, C_Targeting }
+        public enum BattleScreen { A_BattleBasic, B_DiceTable, C_Targeting, D_Shop }
 
         [SerializeField] private GameObject _battlePanel;
         [SerializeField] private GameObject _diceTablePanel;
@@ -21,8 +21,8 @@ namespace OUD.Unity.Common
         public void ShowScreen(BattleScreen screen)
         {
             _current = screen;
-            // BattlePanel: 화면 A, C에서 표시
-            _battlePanel.SetActive(screen != BattleScreen.B_DiceTable);
+            // BattlePanel: 화면 A, C에서 표시 (B/D는 비활성)
+            _battlePanel.SetActive(screen == BattleScreen.A_BattleBasic || screen == BattleScreen.C_Targeting);
             // DiceTablePanel: 화면 B에서만 표시
             _diceTablePanel.SetActive(screen == BattleScreen.B_DiceTable);
             // TargetingOverlay: 화면 C에서만 활성

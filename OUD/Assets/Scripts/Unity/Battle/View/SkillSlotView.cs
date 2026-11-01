@@ -78,6 +78,7 @@ namespace OUD.Unity.Battle.View
         private bool _initialized;
         private Color _baseColor;
         private bool _highlighted;
+        private bool _isEmpty = true;
 
         public void Init()
         {
@@ -91,6 +92,7 @@ namespace OUD.Unity.Battle.View
         public void SetCard(SkillCardData card)
         {
             Init();
+            _isEmpty = false;
             if (_nameText) _nameText.text = card.DisplayName;
             if (_handText) _handText.text = card.RequiredHand.ToString();
             _baseColor = card.Category == SkillCategory.Attack
@@ -102,6 +104,7 @@ namespace OUD.Unity.Battle.View
         public void Clear()
         {
             Init();
+            _isEmpty = true;
             if (_nameText)   _nameText.text   = "빈 슬롯";
             if (_handText)   _handText.text   = "";
             _baseColor = ResolveColor(_emptyColor, FallbackEmpty);
@@ -111,8 +114,9 @@ namespace OUD.Unity.Battle.View
 
         public void SetHighlight(bool on)
         {
-            _highlighted = on;
-            if (_highlight) _highlight.enabled = on;
+            // 빈 슬롯이면 하이라이트 무시 — 버튼 클릭은 받지만 시각 변화 없음.
+            _highlighted = on && !_isEmpty;
+            if (_highlight) _highlight.enabled = _highlighted;
             ApplyBackground();
         }
 

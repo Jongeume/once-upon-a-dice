@@ -20,6 +20,8 @@ namespace OUD.Unity.Battle.Presenter
         private readonly Action              _onUseSkillClicked;
 
         private List<SkillData>            _usableSkills;
+        private List<SkillData>            _allLearnedSkills;
+        private HashSet<string>            _usableSkillIds = new HashSet<string>();
         private List<MonsterInstance>      _aliveEnemies;
         private Action<List<SlotAssignment>> _onComplete;
 
@@ -43,7 +45,12 @@ namespace OUD.Unity.Battle.Presenter
             _slots       = new SkillData[SlotManager.MAX_SLOTS];
             _usedHands   = new HashSet<HandType>();
             _filledCount = 0;
+            _usableSkills = null;
             _view.ClearSlots();
+            // 잡패가 다음 턴에 나와 RebuildSkillList가 호출되지 않을 경우 대비해 기술 목록도 즉시 비운다.
+            _view.ShowSkillList(new List<SkillCardData>(), new List<SkillCardData>());
+            // 이전 턴 끝물에 활성화된 "기술 사용" 버튼이 새 턴까지 남아있지 않도록 비활성으로 강제.
+            _view.SetUseSkillButtonActive(false);
         }
 
         /// <summary>
@@ -52,12 +59,17 @@ namespace OUD.Unity.Battle.Presenter
         /// </summary>
         public void Begin(
             List<SkillData>            usableSkills,
+            List<SkillData>            allLearnedSkills,
             List<MonsterInstance>      aliveEnemies,
             Action<List<SlotAssignment>> onComplete)
         {
-            _usableSkills = usableSkills;
-            _aliveEnemies = aliveEnemies;
-            _onComplete   = onComplete;
+            _usableSkills      = usableSkills;
+            _allLearnedSkills  = allLearnedSkills ?? usableSkills;
+            _aliveEnemies      = aliveEnemies;
+            _onComplete        = onComplete;
+
+            _usableSkillIds.Clear();
+            foreach (var s in usableSkills) _usableSkillIds.Add(s.Id);
 
             RebuildSkillList();
             int rerollsLeft = _dicePresenter?.RerollsLeft ?? 0;
@@ -139,9 +151,13 @@ namespace OUD.Unity.Battle.Presenter
             var attack  = new List<SkillCardData>();
             var defense = new List<SkillCardData>();
 
-            foreach (var s in _usableSkills)
+            // 배운 모든 스킬을 카드로 표시. 활성 조건: 이번 턴 사용 가능(usable) AND 이번 턴 미사용.
+            var source = _allLearnedSkills ?? _usableSkills;
+            foreach (var s in source)
             {
-                bool enabled = !_usedHands.Contains(s.Hand);
+                bool isUsable = _usableSkillIds.Contains(s.Id);
+                bool notUsed  = !_usedHands.Contains(s.Hand);
+                bool enabled  = isUsable && notUsed;
                 var card = ToCardData(s, enabled);
                 if (s.Category == SkillCategory.Attack) attack.Add(card);
                 else                                      defense.Add(card);
@@ -152,7 +168,9 @@ namespace OUD.Unity.Battle.Presenter
 
         private void DisableSameHand(HandType hand)
         {
-            foreach (var s in _usableSkills)
+            // 전체 학습 스킬 중 같은 hand에 속하는 카드 비활성 (사용 가능했더라도 슬롯에 들어간 이후엔 잠금).
+            var source = _allLearnedSkills ?? _usableSkills;
+            foreach (var s in source)
                 if (s.Hand == hand)
                     _view.SetSkillCardEnabled(s.Id, false);
         }

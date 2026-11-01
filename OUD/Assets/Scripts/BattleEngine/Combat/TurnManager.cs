@@ -40,6 +40,25 @@ namespace OUD.BattleEngine.Combat
             _slotManager = new SlotManager();
         }
 
+        /// <summary>현재 전투 페이즈. 뒤로가기/Roll Dice 토글 분기 등 외부에서 상태 판단용.</summary>
+        public BattlePhase CurrentPhase => _state.Phase;
+
+        /// <summary>
+        /// [DEBUG] 디버그 단축키용 — 모든 적을 즉시 사망 처리 후 OnBattleWon 트리거.
+        /// 정상 전투 종료 흐름(EnemyTurn/EndTurn)을 건너뛴다. Boss 노드면 클리어, 일반 노드면 보상 흐름 진입.
+        /// </summary>
+        public void ForceWin()
+        {
+            if (_state.Phase == BattlePhase.BattleWon || _state.Phase == BattlePhase.BattleLost) return;
+
+            foreach (var enemy in _state.Enemies)
+            {
+                if (!enemy.IsDead) enemy.TakeDamage(int.MaxValue);
+            }
+            _state.Phase = BattlePhase.BattleWon;
+            _ui.OnBattleWon();
+        }
+
         // ── 전투 시작 ─────────────────────────────────────────────────────────
 
         /// <summary>
@@ -111,9 +130,11 @@ namespace OUD.BattleEngine.Combat
             if (usableSkills.Count > 0)
             {
                 // phase는 DiceRoll 유지 → 리롤 여전히 가능
-                // RequestSlotAssignment로 기술 목록 즉시 표시 + ExecuteSlots 콜백 등록
+                // 배운 모든 스킬은 항상 카드로 표시(비활성 포함), usable은 현재 활성화 대상.
+                var allLearned = SkillDatabase.GetSkillsByUnlockedHands(_state.Player.UnlockedHands);
                 _ui.RequestSlotAssignment(
                     usableSkills,
+                    allLearned,
                     _state.AliveEnemies,
                     ExecuteSlots);
             }

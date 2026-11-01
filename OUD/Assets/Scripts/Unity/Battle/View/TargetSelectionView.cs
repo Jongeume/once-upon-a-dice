@@ -57,5 +57,13 @@ namespace OUD.Unity.Battle.View
         {
             if (_executeButton) _executeButton.interactable = active;
         }
+
+        /// <summary>새 플레이어 턴 시작 시 호출. Screen A 슬롯 패널과 타겟 선을 비운다.</summary>
+        public void ResetForNewTurn()
+        {
+            _slotView?.ClearAll();
+            ClearTargetLinks();
+            SetExecuteButtonActive(false);
+        }
     }
 }

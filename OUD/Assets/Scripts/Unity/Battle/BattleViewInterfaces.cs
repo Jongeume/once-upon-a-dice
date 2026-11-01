@@ -22,6 +22,8 @@ namespace OUD.Unity.Battle
         void UpdateIntent(IntentType intent, int value);
         void SetTargetSelectable(bool selectable);
         void SetTargetHighlight(bool highlighted);
+        /// <summary>분노 상태 표시 토글 (보스 전용 — HP 임계치 도달 시 영구 활성).</summary>
+        void SetRageActive(bool active);
         void PlayDeathEffect();
     }
 

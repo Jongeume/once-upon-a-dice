@@ -42,6 +42,7 @@ namespace OUD.Unity.Battle.Presenter
                 float fill = m.Data.MaxHp > 0 ? (float)m.Hp / m.Data.MaxHp : 0f;
                 view.Setup(m.Data.Name, sprite, fill, $"{m.Hp} / {m.Data.MaxHp}");
                 view.UpdateIntent(m.GetCurrentIntent(), m.GetIntentValue());
+                view.SetRageActive(m.IsEnraged);
                 _entryViews.Add(view);
 
                 int idx = i;
@@ -71,6 +72,7 @@ namespace OUD.Unity.Battle.Presenter
             float fill = m.Data.MaxHp > 0 ? (float)m.Hp / m.Data.MaxHp : 0f;
             _entryViews[index].UpdateHp(fill, $"{m.Hp} / {m.Data.MaxHp}");
             _entryViews[index].UpdateShield(m.Shield, m.Shield > 0);
+            _entryViews[index].SetRageActive(m.IsEnraged);
         }
 
         public void ShowAction(int enemyIndex, IntentType intent, int value)

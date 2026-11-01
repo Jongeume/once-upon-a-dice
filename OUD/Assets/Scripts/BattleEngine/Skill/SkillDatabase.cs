@@ -39,6 +39,21 @@ namespace OUD.BattleEngine.Skill
         public static IReadOnlyList<SkillData> GetAll() => _all;
 
         /// <summary>
+        /// 플레이어가 해금한 족보에 해당하는 모든 스킬 반환 (사용 가능 여부 무관).
+        /// UI에서 "배운 스킬 전체 목록"으로 표시하는 용도.
+        /// </summary>
+        public static List<SkillData> GetSkillsByUnlockedHands(HashSet<HandType> unlockedHands)
+        {
+            var result = new List<SkillData>();
+            foreach (var skill in _all)
+            {
+                if (unlockedHands.Contains(skill.Hand))
+                    result.Add(skill);
+            }
+            return result;
+        }
+
+        /// <summary>
         /// 현재 턴에 사용 가능한 스킬 목록 반환.
         /// 조건: 달성 족보에 포함 AND 해금 AND 이번 턴 미사용.
         /// feature-spec F-03: 동일 족보 공격+수비 합산 1회 제한.

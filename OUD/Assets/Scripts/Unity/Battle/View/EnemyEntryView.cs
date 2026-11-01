@@ -37,6 +37,11 @@ namespace OUD.Unity.Battle.View
         [SerializeField] private Color _selectableOutlineColor = new Color(0.95f, 0.78f, 0.18f, 1f);
         [SerializeField] private Color _hoverOutlineColor      = new Color(1f,    0.45f, 0.20f, 1f);
 
+        [Header("분노 (보스)")]
+        [SerializeField] private GameObject _rageGroup;
+        [SerializeField] private Image      _rageIcon;
+        [SerializeField] private TMP_Text   _rageLabel;
+
         [Header("이펙트")]
         [SerializeField] private Animator   _animator;
 
@@ -127,6 +132,11 @@ namespace OUD.Unity.Battle.View
             {
                 _targetOutline.enabled = false;
             }
+        }
+
+        public void SetRageActive(bool active)
+        {
+            if (_rageGroup) _rageGroup.SetActive(active);
         }
 
         public void PlayDeathEffect()

@@ -2,6 +2,7 @@ using OUD.Unity.Battle;
 using OUD.Unity.Common;
 using TMPro;
 using UnityEngine;
+using UnityEngine.UI;
 
 namespace OUD.Unity.Battle.View
 {
@@ -15,6 +16,9 @@ namespace OUD.Unity.Battle.View
         [Header("승패 화면")]
         [SerializeField] private GameObject _winScreen;
         [SerializeField] private GameObject _loseScreen;
+
+        /// <summary>WinScreen 클릭 시 호출. Adapter가 구독해 보상 화면으로 즉시 전환한다.</summary>
+        public event System.Action OnWinScreenClicked;
 
         private const int POOL_SIZE = 10;
         private DamagePopup[] _pool;
@@ -30,6 +34,14 @@ namespace OUD.Unity.Battle.View
                     _pool[i] = Instantiate(_popupPrefab, _popupParent);
                     _pool[i].gameObject.SetActive(false);
                 }
+            }
+
+            // WinScreen 자체에 Button이 붙어 있으면 클릭 이벤트로 노출.
+            if (_winScreen != null)
+            {
+                var btn = _winScreen.GetComponent<Button>();
+                if (btn != null)
+                    btn.onClick.AddListener(() => OnWinScreenClicked?.Invoke());
             }
         }
 

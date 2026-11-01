@@ -18,7 +18,11 @@ namespace OUD.Unity.Battle.View
         [SerializeField] private Color _normalColor  = new Color(0.09f, 0.06f, 0.04f);
         [SerializeField] private Color _keptColor    = new Color(0.83f, 0.63f, 0.09f);
 
+        [Header("선택 보더")]
+        [SerializeField] private Vector2 _borderThickness = new Vector2(4f, 4f);
+
         private bool _kept;
+        private Outline _outline;
 
         public event Action OnToggled;
 
@@ -28,6 +32,20 @@ namespace OUD.Unity.Battle.View
             {
                 OnToggled?.Invoke();
             });
+
+            if (_background)
+            {
+                _background.color = _normalColor;
+
+                _outline = _background.GetComponent<Outline>();
+                if (_outline == null) _outline = _background.gameObject.AddComponent<Outline>();
+                _outline.effectDistance = _borderThickness;
+                _outline.useGraphicAlpha = false;
+
+                var hidden = _keptColor;
+                hidden.a = 0f;
+                _outline.effectColor = hidden;
+            }
         }
 
         public void UpdateValue(int value)
@@ -38,7 +56,12 @@ namespace OUD.Unity.Battle.View
         public void SetKept(bool kept)
         {
             _kept = kept;
-            if (_background) _background.color = kept ? _keptColor : _normalColor;
+            if (_outline)
+            {
+                var c = _keptColor;
+                c.a = kept ? 1f : 0f;
+                _outline.effectColor = c;
+            }
         }
     }
 }
