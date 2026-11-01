@@ -29,10 +29,21 @@ namespace OUD.Unity.Battle.View
         public void ShowSlots(SkillCardData[] slotCards)
         {
             _slotView?.ClearAll();
-            if (slotCards == null) return;
+            if (slotCards == null)
+            {
+                UnityEngine.Debug.LogWarning("[TargetSelectionView.ShowSlots] slotCards가 null입니다!");
+                return;
+            }
+            int setCount = 0;
             for (int i = 0; i < slotCards.Length; i++)
+            {
                 if (slotCards[i] != null)
+                {
                     _slotView?.SetSlot(i, slotCards[i]);
+                    setCount++;
+                }
+            }
+            UnityEngine.Debug.Log($"[TargetSelectionView.ShowSlots] total={slotCards.Length}, set={setCount}, slotView={(_slotView != null ? "OK" : "NULL")}");
         }
 
         public void HighlightSlot(int slotIndex) => _slotView?.HighlightSlot(slotIndex);

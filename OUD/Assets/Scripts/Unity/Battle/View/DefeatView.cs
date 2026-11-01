@@ -23,7 +23,7 @@ namespace OUD.Unity.Battle.View
         public void SetDefeatInfo(int reachedNode, int totalNodes)
         {
             if (_reachedNodeText != null)
-                _reachedNodeText.text = $"Node: {reachedNode}/{totalNodes}";
+                _reachedNodeText.text = $"도달 노드: {reachedNode}/{totalNodes}";
         }
     }
 }

@@ -42,8 +42,8 @@ namespace OUD.Unity.Battle.View
         {
             if (_gainedXpText)   _gainedXpText.text   = $"<sprite name=\"xp\"> +{gainedXp} XP";
             if (_gainedGoldText) _gainedGoldText.text = $"<sprite name=\"gold\"> +{gainedGold} Gold";
-            if (_totalXpText)    _totalXpText.text    = $"<sprite name=\"xp\"> {totalXp}";
-            if (_totalGoldText)  _totalGoldText.text  = $"<sprite name=\"gold\"> {totalGold}";
+            if (_totalXpText)    _totalXpText.text    = $"<sprite name=\"xp\"> XP {totalXp}";
+            if (_totalGoldText)  _totalGoldText.text  = $"<sprite name=\"gold\"> Gold {totalGold} ";
         }
     }
 }
