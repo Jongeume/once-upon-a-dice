@@ -44,6 +44,17 @@ namespace OUD.Unity.Battle.View
             OnNodeClicked?.Invoke(nodeId);
         }
 
+        /// <summary>모든 노드의 Button 컴포넌트 enable/disable.
+        /// peek 모드 진입 시 false 로 호출하여 클릭 모션까지 완전 차단.</summary>
+        public void SetAllButtonsEnabled(bool enabled)
+        {
+            if (_nodes == null) return;
+            foreach (NodeView node in _nodes)
+            {
+                if (node != null) node.SetButtonEnabled(enabled);
+            }
+        }
+
         /// <summary>
         /// 노드맵 상태를 바인딩한다.
         /// currentNodeId = -1이면 아직 아무 노드도 진행하지 않은 상태(게임 시작 직후).
