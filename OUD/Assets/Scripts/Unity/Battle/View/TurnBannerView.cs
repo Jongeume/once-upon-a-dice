@@ -22,7 +22,7 @@ namespace OUD.Unity.Battle.View
 
         // ── 연출 타이밍 ──
         private const float FADE_IN_DURATION  = 0.25f;
-        private const float HOLD_DURATION     = 0.70f;
+        private const float HOLD_DURATION     = 0.90f;
         private const float FADE_OUT_DURATION = 0.35f;
 
         /// <summary>배너 1회 재생 총 길이(초). 튜토리얼이 배너 종료 후 안내를 띄울 때 참조.</summary>
