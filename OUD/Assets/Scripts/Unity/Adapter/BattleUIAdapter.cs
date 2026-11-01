@@ -819,17 +819,17 @@ namespace OUD.Unity.Adapter
 
         private System.Collections.IEnumerator ShowRewardAfterWinScreen()
         {
-            // WinScreen 표시 중에는 화면 어디든 마우스 클릭하면 즉시 보상 화면으로 넘어간다.
+            // WinScreen 표시 중에는 화면 어디든 클릭/탭하면 즉시 보상 화면으로 넘어간다.
             // UI Button 한 개에만 의존하면 다른 패널이 raycast를 가로챌 때 동작하지 않으므로
-            // 글로벌 Mouse 입력을 폴링하여 처리한다.
+            // 글로벌 Pointer 입력(마우스 + 터치 통합)을 폴링하여 처리한다.
             float elapsed = 0f;
             // VICTORY 화면 진입 직후 직전 클릭이 잔류해 즉시 닫히는 것 방지용 1프레임 대기.
             yield return null;
             while (elapsed < WIN_SCREEN_DURATION)
             {
                 if (_winRewardTransitioned) yield break;
-                var mouse = Mouse.current;
-                if (mouse != null && mouse.leftButton.wasPressedThisFrame)
+                var pointer = Pointer.current;  // Mouse / TouchScreen / Pen 통합 추상화
+                if (pointer != null && pointer.press.wasPressedThisFrame)
                 {
                     TransitionToReward();
                     yield break;
