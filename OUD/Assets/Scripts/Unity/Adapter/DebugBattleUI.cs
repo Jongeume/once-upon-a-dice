@@ -95,6 +95,8 @@ namespace OUD.Unity.Adapter
             Debug.Log($"[적 행동] 적[{enemyIndex}] {intent}  수치:{value}");
         }
 
+        public void OnIntentUpdated(int enemyIndex, IntentType intent, int value) { }
+
         public void OnShieldsReset()
         {
             Debug.Log("[실드 초기화]");
