@@ -102,6 +102,19 @@
 - 머지 후 로컬 feature branch 삭제
 - 토큰 80% 자동 정리 시점에도 PR 생성 → 사용자 승인 대기 (직접 머지 금지)
 
+### PR 템플릿 (`.github/pull_request_template.md`)
+GitHub은 PR 생성 시 자동으로 이 템플릿을 PR 본문에 채워준다. **PR 본문 작성 시 모든 섹션을 빠짐없이 채울 것**:
+
+1. **요약** — 1~2줄로 PR 핵심 변경 요약
+2. **변경 내역** — bullet 항목별 구체적 변경 (코드/씬/에셋 명시)
+3. **영향 범위** — 변경 파일 목록 + 영향받는 시스템 + 부작용 가능성
+4. **테스트 계획** — 체크박스로 검증 절차 (Play 모드 / 기능 동작 / 회귀)
+5. **스크린샷/GIF** (선택) — UI 변경 시 Before/After
+6. **참고** — 결정사항/함정/의존성/후속 작업
+7. **체크리스트** — prefix 규칙 / `.meta` 동반 / tasks.md 갱신 / 빌드 통과
+
+`gh pr create --body`로 PR 만들 때도 위 7개 섹션 형식을 그대로 따른다. 빈 섹션도 `_없음_` 등으로 명시.
+
 ## Session Protocol
 1. 이 파일 읽기 → `oud-docs/tasks.md` 변경분만 확인 (`git diff HEAD~1 -- tasks.md`), 변경 섹션만 Read → 필요 시 `oud-docs/sprint.yaml`, `oud-docs/workflow.yaml` 읽기
 2. 코드 작성 전: feature-spec 해당 Feature 확인
