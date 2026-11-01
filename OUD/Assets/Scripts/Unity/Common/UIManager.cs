@@ -1,4 +1,5 @@
 using UnityEngine;
+using UnityEngine.UI;
 
 namespace OUD.Unity.Common
 {
@@ -14,6 +15,11 @@ namespace OUD.Unity.Common
         [SerializeField] private GameObject _diceTablePanel;
         [SerializeField] private GameObject _targetingOverlay;
 
+        [Header("배경 (D_Shop 진입 시 교체)")]
+        [SerializeField] private Image  _canvasBackground;
+        [SerializeField] private Sprite _battleBackground;
+        [SerializeField] private Sprite _shopBackground;
+
         private BattleScreen _current = BattleScreen.A_BattleBasic;
 
         public BattleScreen Current => _current;
@@ -28,6 +34,9 @@ namespace OUD.Unity.Common
             // TargetingOverlay: 화면 C에서만 활성
             if (_targetingOverlay != null)
                 _targetingOverlay.SetActive(screen == BattleScreen.C_Targeting);
+            // 배경: 상점 화면이면 상점 배경, 그 외엔 전투 배경으로 교체
+            if (_canvasBackground != null)
+                _canvasBackground.sprite = (screen == BattleScreen.D_Shop) ? _shopBackground : _battleBackground;
         }
     }
 }
