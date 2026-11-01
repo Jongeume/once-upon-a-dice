@@ -24,8 +24,8 @@ MonoBehaviour:
   - monsterId: CrowKnight
     sprite: {fileID: 8299622140500035369, guid: ebe3b177594f1fb45826dc40754e43ed, type: 3}
   - monsterId: ScarecrowA
-    sprite: {fileID: 234189154208601328, guid: 58211aa7af87708409517ce930e94ab7, type: 3}
+    sprite: {fileID: -2839945980582109125, guid: 7d57e3bfcd36aa44187a47b92318f844, type: 3}
   - monsterId: ScarecrowB
-    sprite: {fileID: 234189154208601328, guid: 58211aa7af87708409517ce930e94ab7, type: 3}
+    sprite: {fileID: -2839945980582109125, guid: 7d57e3bfcd36aa44187a47b92318f844, type: 3}
   - monsterId: EvilQueenClone
-    sprite: {fileID: 1993517463968225395, guid: aa4987d9c322bfa4c93f723ef205dade, type: 3}
+    sprite: {fileID: 7919699635213817154, guid: fb0e512a3bbf71444b0eae7d20c533f3, type: 3}
