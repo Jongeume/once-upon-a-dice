@@ -135,7 +135,29 @@ namespace OUD.Unity.Battle.Presenter
         public void ClearAllTargetBadges()
         {
             for (int i = 0; i < _entryViews.Count; i++)
+            {
                 _entryViews[i].ClearTargetBadge();
+                _entryViews[i].ClearDamagePreview();
+            }
+        }
+
+        /// <summary>타겟팅 시 예상 HP 비율을 전달해 HP바에 반투명 프리뷰 표시.</summary>
+        public void ShowDamagePreview(int enemyIndex, float predictedRatio)
+        {
+            if (enemyIndex < 0 || enemyIndex >= _entryViews.Count) return;
+            _entryViews[enemyIndex].ShowDamagePreview(predictedRatio);
+        }
+
+        public void ClearDamagePreview(int enemyIndex)
+        {
+            if (enemyIndex < 0 || enemyIndex >= _entryViews.Count) return;
+            _entryViews[enemyIndex].ClearDamagePreview();
+        }
+
+        public void ClearAllDamagePreviews()
+        {
+            for (int i = 0; i < _entryViews.Count; i++)
+                _entryViews[i].ClearDamagePreview();
         }
 
         public void AddEntry(MonsterInstance monster, int index)

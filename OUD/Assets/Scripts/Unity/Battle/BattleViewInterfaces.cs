@@ -33,6 +33,10 @@ namespace OUD.Unity.Battle
         void PlayDeathEffect();
         void ShowTargetBadge(string skillName, SkillCategory category, bool isAoe);
         void ClearTargetBadge();
+        /// <summary>타겟팅 시 예상 피해를 HP 바에 반투명 표시. predictedRatio = 피해 후 남을 HP 비율.</summary>
+        void ShowDamagePreview(float predictedRatio);
+        /// <summary>데미지 프리뷰 해제.</summary>
+        void ClearDamagePreview();
     }
 
     public interface IDiceEntryView

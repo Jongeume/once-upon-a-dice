@@ -90,6 +90,18 @@ namespace OUD.Unity.Battle.View
 
         private Coroutine _summonToastCoroutine;
 
+        // HP 바 서서히 감소 애니메이션
+        private const float HP_DRAIN_SPEED = 1.2f;    // 초당 anchorMax.x 감소량
+        private Coroutine _hpDrainCoroutine;
+        private RectTransform _hpFillRect;
+        private float _currentHpRatio = 1f;           // 실제 HP 비율 (애니메이션 목표)
+
+        // 데미지 프리뷰 — 타겟팅 시 깎일 부분을 반투명 초록으로 표시
+        private const float PREVIEW_ALPHA = 0.35f;
+        private Image _hpPreviewFill;
+        private RectTransform _hpPreviewRect;
+        private bool _isPreviewActive;
+
         // 현재 ATK 캐시 — StrongAttack 의도가 들어올 때 임시로 강공격 데미지를 표시한 뒤
         // 다른 의도(Attack/Shield/Summon 등)로 바뀌면 원본 Atk로 복귀시키기 위해 보관.
         private int _cachedAtk;
@@ -103,6 +115,7 @@ namespace OUD.Unity.Battle.View
         {
             if (_targetButton) _targetButton.onClick.AddListener(() => OnClicked?.Invoke());
             EnsureOutline();
+            EnsureHpTrail();
             ApplyTargetVisual();
         }
 
@@ -120,6 +133,105 @@ namespace OUD.Unity.Battle.View
             _targetOutline.effectDistance = new Vector2(3f, -3f);
         }
 
+        /// <summary>
+        /// HP 바 초기화. RectTransform 캐시 + 프리뷰 바 자동 생성.
+        /// HP 바는 Sliced Image이므로 anchorMax.x 방식으로 너비 조절.
+        /// </summary>
+        private void EnsureHpTrail()
+        {
+            if (_hpFill != null)
+                _hpFillRect = _hpFill.GetComponent<RectTransform>();
+
+            if (_hpFill == null) return;
+
+            CreatePreviewBar();
+        }
+
+        private void CreatePreviewBar()
+        {
+            if (_hpPreviewFill != null || _hpFill == null) return;
+
+            GameObject previewGo = Instantiate(_hpFill.gameObject, _hpFill.transform.parent);
+            previewGo.name = "HPPreviewFill";
+            // 초록 바 바로 뒤(같은 위치)에 배치 → 초록 바가 위, 프리뷰가 아래
+            previewGo.transform.SetSiblingIndex(_hpFill.transform.GetSiblingIndex());
+
+            _hpPreviewFill = previewGo.GetComponent<Image>();
+            Color previewColor = _hpFill.color;
+            previewColor.a = PREVIEW_ALPHA;
+            _hpPreviewFill.color = previewColor;
+
+            _hpPreviewRect = previewGo.GetComponent<RectTransform>();
+            previewGo.SetActive(false);
+        }
+
+        /// <summary>anchorMax.x를 이용한 HP바 너비 설정 (Sliced Image 호환).</summary>
+        private void SetHpBarRatio(RectTransform rt, float ratio)
+        {
+            if (rt == null) return;
+            Vector2 aMax = rt.anchorMax;
+            aMax.x = Mathf.Clamp01(ratio);
+            rt.anchorMax = aMax;
+        }
+
+        /// <summary>초록 HP 바가 부드럽게 목표 비율까지 줄어드는 애니메이션.</summary>
+        private IEnumerator AnimateHpDrain(float targetRatio)
+        {
+            while (_hpFillRect != null && _hpFillRect.anchorMax.x > targetRatio)
+            {
+                float current = _hpFillRect.anchorMax.x;
+                float next = Mathf.MoveTowards(current, targetRatio, HP_DRAIN_SPEED * Time.deltaTime);
+                SetHpBarRatio(_hpFillRect, next);
+                yield return null;
+            }
+
+            SetHpBarRatio(_hpFillRect, targetRatio);
+            _hpDrainCoroutine = null;
+        }
+
+        /// <summary>
+        /// 타겟팅 시 예상 데미지만큼 HP바를 반투명 표시.
+        /// 초록 바를 predictedRatio까지 축소하고, 사이 구간을 반투명 초록으로 보여준다.
+        /// </summary>
+        public void ShowDamagePreview(float predictedRatio)
+        {
+            predictedRatio = Mathf.Clamp01(predictedRatio);
+            if (predictedRatio >= _currentHpRatio)
+            {
+                ClearDamagePreview();
+                return;
+            }
+
+            _isPreviewActive = true;
+
+            // 초록 바 → 피해 후 남을 비율까지 축소
+            SetHpBarRatio(_hpFillRect, predictedRatio);
+
+            // 프리뷰 바 → 현재 HP 비율에서 예상 비율 사이를 반투명 초록으로 표시
+            if (_hpPreviewRect != null)
+            {
+                _hpPreviewFill.gameObject.SetActive(true);
+                Vector2 aMin = _hpPreviewRect.anchorMin;
+                aMin.x = predictedRatio;
+                _hpPreviewRect.anchorMin = aMin;
+                SetHpBarRatio(_hpPreviewRect, _currentHpRatio);
+            }
+        }
+
+        /// <summary>데미지 프리뷰 해제 → 초록 바 원래 비율로 복구.</summary>
+        public void ClearDamagePreview()
+        {
+            if (!_isPreviewActive) return;
+            _isPreviewActive = false;
+
+            // 초록 바 원래 HP 비율 복구
+            SetHpBarRatio(_hpFillRect, _currentHpRatio);
+
+            // 프리뷰 바 숨김
+            if (_hpPreviewFill != null)
+                _hpPreviewFill.gameObject.SetActive(false);
+        }
+
         public void Setup(string name, Sprite sprite, float hpFill, string hpText)
         {
             if (_nameText) _nameText.text        = name;
@@ -130,8 +242,27 @@ namespace OUD.Unity.Battle.View
 
         public void UpdateHp(float fillAmount, string hpText)
         {
-            if (_hpFill) _hpFill.fillAmount = fillAmount;
-            if (_hpText) _hpText.text        = hpText;
+            // 실제 HP 변경 시 프리뷰 해제
+            if (_isPreviewActive) ClearDamagePreview();
+
+            float previousRatio = _currentHpRatio;
+            _currentHpRatio = Mathf.Clamp01(fillAmount);
+            if (_hpText) _hpText.text = hpText;
+
+            // 초록 바 애니메이션: 데미지 시 서서히 감소, 힐/초기화 시 즉시 반영
+            if (_currentHpRatio < previousRatio)
+            {
+                // 데미지 — 초록 바가 서서히 줄어듦
+                if (_hpDrainCoroutine != null) StopCoroutine(_hpDrainCoroutine);
+                if (isActiveAndEnabled)
+                    _hpDrainCoroutine = StartCoroutine(AnimateHpDrain(_currentHpRatio));
+            }
+            else
+            {
+                // 힐 또는 초기 설정 — 즉시 반영
+                if (_hpDrainCoroutine != null) { StopCoroutine(_hpDrainCoroutine); _hpDrainCoroutine = null; }
+                SetHpBarRatio(_hpFillRect, _currentHpRatio);
+            }
 
             if (_lifeImage != null)
             {
@@ -331,6 +462,7 @@ namespace OUD.Unity.Battle.View
             if (_atkPulseCoroutine    != null) { StopCoroutine(_atkPulseCoroutine);    _atkPulseCoroutine    = null; }
             if (_defPulseCoroutine    != null) { StopCoroutine(_defPulseCoroutine);    _defPulseCoroutine    = null; }
             if (_summonToastCoroutine != null) { StopCoroutine(_summonToastCoroutine); _summonToastCoroutine = null; }
+            if (_hpDrainCoroutine     != null) { StopCoroutine(_hpDrainCoroutine);     _hpDrainCoroutine     = null; }
             RestoreImageAlpha(_atkSwordImage);
             RestoreImageAlpha(_defShieldImage);
             SetSummonHighlight(false);

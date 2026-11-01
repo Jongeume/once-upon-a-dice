@@ -45,7 +45,7 @@ namespace OUD.BattleEngine.Run
                     return new List<MonsterData> { MonsterDatabase.Get(MonsterDatabase.ID_EVIL_QUEEN) };
 
                 case NodeType.Elite:
-                    return new List<MonsterData> { MonsterDatabase.Get(MonsterDatabase.ID_ELITE_GOLEM) };
+                    return new List<MonsterData> { MonsterDatabase.Get(MonsterDatabase.ID_CROW_KNIGHT) };
 
                 case NodeType.Shop:
                     throw new InvalidOperationException(

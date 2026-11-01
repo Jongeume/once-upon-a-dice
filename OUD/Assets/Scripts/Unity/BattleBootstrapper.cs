@@ -98,7 +98,7 @@ namespace OUD.Unity
             MapNode node = _runManager.GetCurrentNode();
 
             // 노드 타입에 맞춰 전투 배경 전환 (Elite 제외 → 숲 배경, Elite → 별도/단색)
-            _adapter.SetBattleBackground(node.Type);
+            _adapter.SetBattleBackground(node.Type, node.Layer);
 
             if (node.Type == NodeType.Shop)
             {

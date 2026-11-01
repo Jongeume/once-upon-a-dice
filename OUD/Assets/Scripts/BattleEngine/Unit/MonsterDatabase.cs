@@ -20,7 +20,7 @@ namespace OUD.BattleEngine.Unit
         public const string ID_SNAKE       = "Snake";
         public const string ID_BEAR        = "Bear";
         public const string ID_STONE_GOLEM = "StoneGolem";
-        public const string ID_ELITE_GOLEM = "EliteGolem";
+        public const string ID_CROW_KNIGHT = "CrowKnight";
         public const string ID_EVIL_QUEEN  = "EvilQueen";
         public const string ID_EVIL_QUEEN_CLONE = "EvilQueenClone";
 
@@ -38,7 +38,7 @@ namespace OUD.BattleEngine.Unit
                 [ID_SNAKE]       = BuildSnake(),
                 [ID_BEAR]        = BuildBear(),
                 [ID_STONE_GOLEM]      = BuildStoneGolem(),
-                [ID_ELITE_GOLEM]      = BuildEliteGolem(),
+                [ID_CROW_KNIGHT]      = BuildCrowKnight(),
                 [ID_EVIL_QUEEN]       = BuildEvilQueen(),
                 [ID_EVIL_QUEEN_CLONE] = BuildEvilQueenClone(),
             };
@@ -206,9 +206,9 @@ namespace OUD.BattleEngine.Unit
                 IntentType.Attack,
             });
 
-        private static MonsterData BuildEliteGolem() => new MonsterData(
-            id:                     ID_ELITE_GOLEM,
-            name:                   "Elite Golem",
+        private static MonsterData BuildCrowKnight() => new MonsterData(
+            id:                     ID_CROW_KNIGHT,
+            name:                   "Crow Knight",
             maxHp:                  50,
             baseAtk:                11,
             shieldValue:            7,
