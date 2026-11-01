@@ -556,6 +556,7 @@ namespace OUD.Unity.Adapter
 
             _targetSelectionPresenter = new TargetSelectionPresenter(_targetSelectionView);
             _targetSelectionPresenter.SetEnemyPresenter(_enemyPresenter);
+            _targetSelectionPresenter.SetPlayerView(_playerView);
 
             _battleLogPresenter = new BattleLogPresenter(
                 _battleLogView,
@@ -705,6 +706,7 @@ namespace OUD.Unity.Adapter
         private void HandleExecuteClicked()
         {
             _enemyPresenter.SetTargetSelectable(false);
+            _playerView.ClearDefenseBadges();
             var targetIndices = _targetSelectionPresenter.GetTargetIndices();
             if (targetIndices != null)
                 _slotAssignmentPresenter.Confirm(targetIndices);

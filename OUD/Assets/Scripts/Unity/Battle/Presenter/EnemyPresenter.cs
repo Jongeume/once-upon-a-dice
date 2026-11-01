@@ -110,10 +110,10 @@ namespace OUD.Unity.Battle.Presenter
             }
         }
 
-        public void ShowTargetBadge(int enemyIndex, int slotNumber, string skillName, string damageText)
+        public void ShowTargetBadge(int enemyIndex, string skillName, SkillCategory category, bool isAoe)
         {
             if (enemyIndex < 0 || enemyIndex >= _entryViews.Count) return;
-            _entryViews[enemyIndex].ShowTargetBadge(slotNumber, skillName, damageText);
+            _entryViews[enemyIndex].ShowTargetBadge(skillName, category, isAoe);
         }
 
         public void ClearTargetBadge(int enemyIndex)
