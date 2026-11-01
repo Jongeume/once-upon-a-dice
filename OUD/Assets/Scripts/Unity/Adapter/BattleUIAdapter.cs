@@ -30,6 +30,7 @@ namespace OUD.Unity.Adapter
         [SerializeField] private TargetSelectionView  _targetSelectionView;
         [SerializeField] private BattleLogView        _battleLogView;
         [SerializeField] private RewardView           _rewardView;
+        [SerializeField] private NodeMapView          _nodeMapView;
 
         [Header("화면 관리")]
         [SerializeField] private UIManager            _uiManager;
@@ -73,6 +74,9 @@ namespace OUD.Unity.Adapter
         // ── RewardView 이벤트 등록 1회 가드 (Initialize 매번 호출 대비) ───────
         private bool _rewardContinueWired;
 
+        // ── NodeMapView 이벤트 등록 1회 가드 ───────────────────────────────────
+        private bool _nodeMapClickWired;
+
         // ── 사용 가능한 기술 존재 여부 ────────────────────────────────────────
         // true = RequestSlotAssignment 호출됨(기술 있음) / false = 잡패(기술 없음)
         private bool _hasUsableSkills = false;
@@ -108,11 +112,93 @@ namespace OUD.Unity.Adapter
                 _rewardView.OnContinueClicked += HandleRewardContinueClicked;
                 _rewardContinueWired = true;
             }
+
+            if (_nodeMapView != null && !_nodeMapClickWired)
+            {
+                _nodeMapView.OnNodeClicked += HandleNodeMapClicked;
+                _nodeMapClickWired = true;
+            }
         }
 
+        /// <summary>
+        /// 보상 [계속] 클릭 흐름.
+        /// <para>
+        /// Boss 노드(마지막) 클리어 → AdvanceNode(=MarkComplete) → Bootstrapper에 통보 → 런 클리어 처리.
+        /// 일반 노드 클리어 → 노드맵 표시 → 노드 클릭 시 SelectNextNode → Bootstrapper에 통보 → 다음 전투.
+        /// </para>
+        /// AdvanceNode 호출 시점이 Phase D-1과 다르다 — OnBattleWon에서 즉시 호출하지 않고 본 메서드에서 분기.
+        /// 이유: 노드맵 표시 시 "현재 노드"는 *방금 클리어한 노드*여야 함.
+        /// </summary>
         private void HandleRewardContinueClicked()
         {
             if (_rewardView != null) _rewardView.Hide();
+
+            // RunManager 미바인딩 시 ─ 단순 다음 전투 통보 (Phase D-1 호환 동작)
+            if (_runManager == null)
+            {
+                _onContinueRequested?.Invoke();
+                return;
+            }
+
+            MapNode currentNode = _runManager.GetCurrentNode();
+            bool isBossNode = currentNode.Type == NodeType.Boss;
+
+            if (isBossNode)
+            {
+                // Boss 클리어 → 런 종료 처리 위임 (RunManager가 IsRunComplete=true 전환)
+                _runManager.AdvanceNode();
+                _onContinueRequested?.Invoke();
+                return;
+            }
+
+            // 일반 노드 → 노드맵 표시 + 분기 클릭 대기
+            ShowNodeMap();
+        }
+
+        /// <summary>
+        /// 노드맵 표시. 현재 노드(=방금 클리어) + 진행 가능 후보를 RunMap 데이터와 함께 NodeMapView에 주입.
+        /// _nodeMapView 미바인딩 시 ─ 폴백으로 AdvanceNode + Continue 즉시 호출 (UI 없는 환경 호환).
+        /// </summary>
+        private void ShowNodeMap()
+        {
+            if (_runManager == null) return;
+
+            if (_nodeMapView == null)
+            {
+                // 폴백: 노드맵 UI 미바인딩 → 첫 후보 자동 선택 + 다음 전투
+                _runManager.AdvanceNode();
+                _onContinueRequested?.Invoke();
+                return;
+            }
+
+            int currentNodeId = _runManager.State.CurrentNodeId;
+            IReadOnlyList<MapNode> nextCandidates = _runManager.GetAvailableNextNodes();
+            int[] nextIds = new int[nextCandidates.Count];
+            for (int i = 0; i < nextCandidates.Count; i++) nextIds[i] = nextCandidates[i].Id;
+
+            _nodeMapView.Bind(_runManager.Map, currentNodeId, nextIds);
+            _nodeMapView.Show();
+        }
+
+        /// <summary>
+        /// 노드맵에서 분기 노드 클릭 시 호출.
+        /// SelectNextNode로 RunState 갱신 → 노드맵 닫고 → Bootstrapper에 다음 전투 통보.
+        /// </summary>
+        private void HandleNodeMapClicked(int nodeId)
+        {
+            if (_runManager == null) return;
+
+            try
+            {
+                _runManager.SelectNextNode(nodeId);
+            }
+            catch (System.ArgumentException e)
+            {
+                Debug.LogWarning($"[BattleUIAdapter] 노드맵 클릭 무시: {e.Message}");
+                return;
+            }
+
+            if (_nodeMapView != null) _nodeMapView.Hide();
             _onContinueRequested?.Invoke();
         }
 
@@ -307,8 +393,9 @@ namespace OUD.Unity.Adapter
         {
             _battleLogPresenter.ShowBattleWon();
             GrantReward();
-            // 노드 진행 — 마지막 노드면 RunState.IsRunComplete=true 전환 (Bootstrapper가 [계속] 후 분기)
-            _runManager?.AdvanceNode();
+            // Phase D-2 변경: 노드 진행을 OnBattleWon에서 호출하지 않는다.
+            // 이유 — 노드맵 표시 시 "현재 노드"가 *방금 클리어한 노드*여야 시각적으로 자연스럽다.
+            // AdvanceNode / SelectNextNode는 보상 [계속] → HandleRewardContinueClicked에서 분기 처리.
         }
 
         public void OnBattleLost() => _battleLogPresenter.ShowBattleLost();
