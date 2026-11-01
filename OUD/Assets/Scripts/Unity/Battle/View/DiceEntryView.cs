@@ -1,4 +1,4 @@
-using System;
+﻿using System;
 using System.Collections;
 using System.Collections.Generic;
 using OUD.Unity.Battle;
@@ -56,8 +56,7 @@ namespace OUD.Unity.Battle.View
         // ── 주사위 간 충돌 공유 상태 ──
         private static readonly Vector2[] s_positions = new Vector2[5];
         private static readonly bool[] s_active = new bool[5];
-        private const float DICE_COLLISION_RADIUS = 30f;
-        private const float COLLISION_REPULSION   = 1200f;
+        private const float DICE_COLLISION_RADIUS = 55f;
         private const float KEEP_SCALE            = 0.85f;
 
         // KeepSlot 동적 할당 (첫 번째 빈 슬롯부터 채움)
@@ -260,12 +259,12 @@ namespace OUD.Unity.Battle.View
             float zVelocity = -UnityEngine.Random.Range(50f, 150f);
             bool hasLanded = false;
 
-            // === 시작 위치: RollingArea 중앙에서 충분히 퍼져서 시작 ===
+            // === 시작 위치: 중�� 모여서 낙하 (이전과 동일) ===
             float centerX = (minX + maxX) * 0.5f;
             float centerY = (minY + maxY) * 0.5f;
             float spreadAngle = _diceIdx * (360f / 5f) * Mathf.Deg2Rad
                                 + UnityEngine.Random.Range(-0.3f, 0.3f);
-            float spreadRadius = DICE_COLLISION_RADIUS * 3f; // 겹치지 않게 충분한 거리 (반경30*3=90)
+            float spreadRadius = DICE_COLLISION_RADIUS * 2.5f;
             Vector2 tablePos = new Vector2(
                 centerX + Mathf.Cos(spreadAngle) * spreadRadius,
                 centerY + Mathf.Sin(spreadAngle) * spreadRadius);
@@ -299,18 +298,15 @@ namespace OUD.Unity.Battle.View
                     if (!hasLanded)
                     {
                         hasLanded = true;
-                        // 착지 속도: 다른 주사위들과 반대 방향으로 굴러감
+                        // 착지 속도: 완전 랜덤 방향 + 속도로 굴러감 (매번 다른 착지점)
                         float speed = UnityEngine.Random.Range(_slideSpeedMin, _slideSpeedMax);
-                        Vector2 awayDir = GetAwayDirection(tablePos);
-                        tableVel = awayDir * speed;
+                        float randomAngle = UnityEngine.Random.Range(0f, 360f) * Mathf.Deg2Rad;
+                        tableVel = new Vector2(Mathf.Cos(randomAngle), Mathf.Sin(randomAngle)) * speed;
                         StartCoroutine(SquashEffect());
                     }
                     zVelocity = Mathf.Abs(zVelocity) * _zBounceCoeff;
                     if (zVelocity < 30f) zVelocity = 0f;
                 }
-
-                // 주사위 간 충돌 — 착지 전에도 적용 (겹침 방지)
-                ApplyDiceCollision(ref tablePos, ref tableVel, dt);
 
                 if (hasLanded)
                 {
@@ -330,6 +326,10 @@ namespace OUD.Unity.Battle.View
                     ClampToBounds(ref tablePos, ref tableVel, minX, maxX, minY, maxY, 0.3f);
                     tableVel *= Mathf.Exp(-1f * dt); // 가벼운 공기 저항
                 }
+
+                // 충돌: 이동 후 마지막에 적용 → 렌더링 시점에 겹침 불가
+                ApplyDiceCollision(ref tablePos, ref tableVel, dt);
+                ClampToBounds(ref tablePos, ref tableVel, minX, maxX, minY, maxY, _wallBounceCoeff);
 
                 // 공유 위치 갱신
                 s_positions[_diceIdx] = tablePos;
@@ -366,12 +366,14 @@ namespace OUD.Unity.Battle.View
                     float dt = Time.deltaTime;
                     stepElapsed += dt;
 
-                    ApplyDiceCollision(ref tablePos, ref tableVel, dt);
-
                     tablePos += tableVel * dt;
                     ClampToBounds(ref tablePos, ref tableVel, minX, maxX, minY, maxY, 0.3f);
                     tableVel *= Mathf.Exp(-_slideFriction * dampMult * dt);
                     rotation += tableVel.magnitude * _rotationMultiplier * 0.5f * dt * Mathf.Sign(tableVel.x);
+
+                    // 충돌: 이동 후 마지막에 적용
+                    ApplyDiceCollision(ref tablePos, ref tableVel, dt);
+                    ClampToBounds(ref tablePos, ref tableVel, minX, maxX, minY, maxY, 0.3f);
 
                     s_positions[_diceIdx] = tablePos;
                     ApplyVisuals(tablePos, 0f, rotation);
@@ -438,7 +440,7 @@ namespace OUD.Unity.Battle.View
             return new Vector2(Mathf.Cos(a), Mathf.Sin(a));
         }
 
-        /// <summary>실시간 충돌: 다른 주사위와 반발력 적용</summary>
+        /// <summary>실시간 충돌: 겹치면 즉시 완전 분리 + 속도 반사.</summary>
         private void ApplyDiceCollision(ref Vector2 pos, ref Vector2 vel, float dt)
         {
             float minDist = DICE_COLLISION_RADIUS * 2f;
@@ -449,12 +451,25 @@ namespace OUD.Unity.Battle.View
 
                 Vector2 delta = pos - s_positions[other];
                 float dist = delta.magnitude;
-                if (dist < minDist && dist > 0.01f)
+                if (dist < minDist)
                 {
-                    Vector2 dir = delta / dist;
-                    float overlap = minDist - dist;
-                    vel += dir * COLLISION_REPULSION * dt;
-                    pos += dir * overlap * 0.5f; // 즉시 절반만큼 밀어내기
+                    Vector2 dir;
+                    if (dist > 0.01f)
+                        dir = delta / dist;
+                    else
+                    {
+                        // 완전 겹침 — 랜덤 방향
+                        float a = UnityEngine.Random.Range(0f, 360f) * Mathf.Deg2Rad;
+                        dir = new Vector2(Mathf.Cos(a), Mathf.Sin(a));
+                    }
+
+                    // 하드 분리: 여유 마진 포함하여 밀어냄
+                    pos = s_positions[other] + dir * (minDist + 5f);
+
+                    // 상대 방향으로 향하는 속도 성분을 강하게 반사
+                    float inward = Vector2.Dot(vel, -dir);
+                    if (inward > 0f)
+                        vel += dir * inward * 2.5f;
                 }
             }
         }
@@ -463,7 +478,7 @@ namespace OUD.Unity.Battle.View
         private void ResolveOverlap(ref Vector2 pos, float minX, float maxX, float minY, float maxY)
         {
             float minDist = DICE_COLLISION_RADIUS * 2f;
-            for (int iter = 0; iter < 15; iter++)
+            for (int iter = 0; iter < 30; iter++)
             {
                 bool moved = false;
                 for (int other = 0; other < 5; other++)
@@ -474,7 +489,7 @@ namespace OUD.Unity.Battle.View
                     if (dist < minDist && dist > 0.01f)
                     {
                         Vector2 dir = delta / dist;
-                        pos += dir * (minDist - dist) * 0.6f;
+                        pos += dir * (minDist - dist) * 1f;
                         moved = true;
                     }
                     else if (dist <= 0.01f)
