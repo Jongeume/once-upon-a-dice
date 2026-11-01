@@ -21,6 +21,11 @@ namespace OUD.BattleEngine.Combat
         /// <summary>전투 진입 시 초기 상태 전달. 씬 셋업에 사용.</summary>
         void OnBattleStart(PlayerState player, List<MonsterInstance> enemies);
 
+        // ── 플레이어 턴 시작 ──────────────────────────────────────────────────
+
+        /// <summary>새 플레이어 턴 시작 시 1회 호출. UI 슬롯 초기화 트리거.</summary>
+        void OnPlayerTurnStarted();
+
         // ── 주사위 페이즈 ─────────────────────────────────────────────────────
 
         /// <summary>주사위 굴림/리롤 결과 전달. 리롤 잔여 횟수 포함.</summary>

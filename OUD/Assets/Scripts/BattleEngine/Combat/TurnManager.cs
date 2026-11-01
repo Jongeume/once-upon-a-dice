@@ -42,33 +42,36 @@ namespace OUD.BattleEngine.Combat
         // ── 전투 시작 ─────────────────────────────────────────────────────────
 
         /// <summary>
-        /// 전투를 시작한다. 초기 상태를 UI에 전달 후 첫 플레이어 턴 시작.
+        /// 전투를 시작한다. 초기 상태를 UI에 전달하고 Screen A를 표시한다.
+        /// StartPlayerTurn()은 Unity Layer(Roll Dice 버튼)가 명시적으로 호출한다.
         /// </summary>
         public void StartBattle()
         {
             _state.Phase = BattlePhase.BattleStart;
             _ui.OnBattleStart(_state.Player, _state.Enemies);
-            StartPlayerTurn();
+            // StartPlayerTurn() 제거 — Roll Dice 버튼 클릭 시 BattleBootstrapper가 호출
         }
 
         // ── 플레이어 턴 ───────────────────────────────────────────────────────
 
         /// <summary>
-        /// 플레이어 턴을 시작한다. 턴 상태 초기화 후 주사위를 굴리고 결과를 UI에 전달.
-        /// Unity는 이후 RequestReroll() 또는 ConfirmDice()를 호출한다.
+        /// 플레이어 턴을 시작한다. 턴 상태 초기화 후 주사위를 굴리고
+        /// 족보를 즉시 평가해 기술 목록을 UI에 전달.
+        /// Unity는 이후 RequestReroll() 또는 기술 사용 버튼을 눌러 ConfirmDice()를 호출한다.
         /// </summary>
         public void StartPlayerTurn()
         {
             _state.ResetForNewTurn();
             _state.Phase = BattlePhase.DiceRoll;
+            _ui.OnPlayerTurnStarted();
             _state.DiceHand.RollAll();
-            _ui.OnDiceRolled(_state.DiceHand.GetValues(), _state.DiceHand.RerollsLeft);
+            EvaluateAndBroadcast();
         }
 
         /// <summary>
         /// 리롤 요청. keepMask[i]=true이면 i번 주사위를 잠금 유지.
-        /// 리롤 가능하면 true 반환 후 OnDiceRolled 호출.
-        /// 리롤 횟수 소진이면 false 반환 (Unity가 Confirm을 강제).
+        /// 리롤 가능하면 true 반환 후 OnDiceRolled + 재평가 호출.
+        /// 리롤 횟수 소진이면 false 반환.
         /// </summary>
         public bool RequestReroll(bool[] keepMask)
         {
@@ -81,23 +84,18 @@ namespace OUD.BattleEngine.Combat
 
             bool success = _state.DiceHand.Reroll();
             if (success)
-                _ui.OnDiceRolled(_state.DiceHand.GetValues(), _state.DiceHand.RerollsLeft);
+                EvaluateAndBroadcast(); // 리롤 후 재평가 + 기술 목록 갱신
             return success;
         }
 
         /// <summary>
-        /// 주사위 확정. Unity가 플레이어의 "확정" 버튼 입력을 받아 호출.
-        /// 족보를 판정하고:
-        ///   잡패 → 슬롯 배분 건너뜀 → 적 턴
-        ///   정상 → RequestSlotAssignment 호출 (콜백으로 ExecuteSlots)
-        /// feature-spec F-05 §3, §4
+        /// 주사위 평가 + UI 통보 공통 메서드.
+        /// StartPlayerTurn / RequestReroll 모두 사용.
+        /// 기술이 있으면 RequestSlotAssignment 즉시 호출(phase 유지로 리롤 가능).
+        /// 잡패이면 phase=DiceRoll 유지 → UI가 UseSkill 버튼 즉시 표시.
         /// </summary>
-        public void ConfirmDice()
+        private void EvaluateAndBroadcast()
         {
-            if (_state.Phase != BattlePhase.DiceRoll) return;
-
-            // 족보 판정
-            _state.Phase = BattlePhase.HandEvaluation;
             int[] values = _state.DiceHand.GetValues();
             _state.AchievedHands = HandEvaluator.Evaluate(values);
 
@@ -106,22 +104,52 @@ namespace OUD.BattleEngine.Combat
                 _state.Player.UnlockedHands,
                 _state.UsedHandsThisTurn);
 
+            _ui.OnDiceRolled(values, _state.DiceHand.RerollsLeft);
             _ui.OnHandsEvaluated(_state.AchievedHands, usableSkills);
 
-            // 잡패: 슬롯 배분 건너뜀 → 적 실드 초기화 → 적 턴
+            if (usableSkills.Count > 0)
+            {
+                // phase는 DiceRoll 유지 → 리롤 여전히 가능
+                // RequestSlotAssignment로 기술 목록 즉시 표시 + ExecuteSlots 콜백 등록
+                _ui.RequestSlotAssignment(
+                    usableSkills,
+                    _state.AliveEnemies,
+                    ExecuteSlots);
+            }
+            // 잡패: RequestSlotAssignment 호출하지 않음
+            // → BattleUIAdapter가 _hasUsableSkills=false 감지, UseSkill 버튼 즉시 표시
+        }
+
+        /// <summary>
+        /// 기술 사용 버튼 클릭 시 Unity에서 호출.
+        /// 잡패(usableSkills=0): 적 실드 초기화 → 적 턴으로 진행.
+        /// 정상: phase를 SlotAssignment로 전환해 추가 리롤을 차단.
+        ///        SlotAssignment는 이미 EvaluateAndBroadcast에서 표시됨.
+        /// feature-spec F-05 §3, §4
+        /// </summary>
+        public void ConfirmDice()
+        {
+            if (_state.Phase != BattlePhase.DiceRoll) return;
+
+            // 잡패 판정
+            var usableSkills = SkillDatabase.GetUsableSkills(
+                _state.AchievedHands,
+                _state.Player.UnlockedHands,
+                _state.UsedHandsThisTurn);
+
             if (usableSkills.Count == 0)
             {
+                // 잡패: 슬롯 배분 건너뜀 → 적 실드 초기화 → 적 턴
+                _state.Phase = BattlePhase.HandEvaluation;
                 ResetEnemyShieldsAndNotify();
                 ExecuteEnemyTurn();
                 return;
             }
 
-            // 정상: 슬롯 배분 UI 요청
+            // 정상: 리롤 차단을 위해 페이즈 전환
+            // RequestSlotAssignment + Begin()은 EvaluateAndBroadcast에서 이미 호출됨
+            // ExecuteSlots 콜백도 이미 등록됨 → 여기선 재호출 불필요
             _state.Phase = BattlePhase.SlotAssignment;
-            _ui.RequestSlotAssignment(
-                usableSkills,
-                _state.AliveEnemies,
-                ExecuteSlots);  // 플레이어가 [실행]을 누르면 이 콜백 호출
         }
 
         // ── 슬롯 실행 ─────────────────────────────────────────────────────────

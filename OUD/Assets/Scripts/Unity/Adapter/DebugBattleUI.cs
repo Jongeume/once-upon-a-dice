@@ -34,6 +34,8 @@ namespace OUD.Unity.Adapter
 
         // ── IBattleUI 구현 ────────────────────────────────────────────────────
 
+        public void OnPlayerTurnStarted() { }
+
         public void OnBattleStart(PlayerState player, List<MonsterInstance> enemies)
         {
             var names = string.Join(", ", enemies.ConvertAll(e => $"{e.Data.Name}(HP:{e.Hp})"));

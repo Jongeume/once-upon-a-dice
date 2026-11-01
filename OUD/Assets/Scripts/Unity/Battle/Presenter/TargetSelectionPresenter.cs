@@ -36,9 +36,29 @@ namespace OUD.Unity.Battle.Presenter
             _targetIndices         = new int[slots.Length];
             for (int i = 0; i < _targetIndices.Length; i++) _targetIndices[i] = -1;
 
+            _view.ShowSlots(ToSlotCards(slots));
             _view.ClearTargetLinks();
             _view.SetExecuteButtonActive(false);
             AdvanceToNextAttackSlot(0);
+        }
+
+        private static SkillCardData[] ToSlotCards(SkillData[] slots)
+        {
+            var cards = new SkillCardData[slots.Length];
+            for (int i = 0; i < slots.Length; i++)
+            {
+                if (slots[i] == null) continue;
+                SkillData s = slots[i];
+                cards[i] = new SkillCardData
+                {
+                    SkillId      = s.Id,
+                    DisplayName  = s.Name,
+                    RequiredHand = s.Hand,
+                    Category     = s.Category,
+                    IsEnabled    = true
+                };
+            }
+            return cards;
         }
 
         /// <summary>적 클릭 시 View에서 호출.</summary>
@@ -93,6 +113,9 @@ namespace OUD.Unity.Battle.Presenter
             _view.SetExecuteButtonActive(true);
             _onAllTargetsConfirmed?.Invoke(_targetIndices);
         }
+
+        /// <summary>현재까지 확정된 타겟 인덱스 배열 반환. Execute 버튼 클릭 시 Confirm()에 전달.</summary>
+        public int[] GetTargetIndices() => _targetIndices;
 
         private int FindNextUnconfirmedAttackSlot(int startFrom)
         {
