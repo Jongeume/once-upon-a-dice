@@ -1,10 +1,10 @@
 fileFormatVersion: 2
-guid: e2a7c43feb69f534db78176eb4086e84
+guid: 3e3d495d35ce4f84a89adfbeafa05d83
 TextureImporter:
   internalIDToNameTable:
   - first:
-      213: 6019621319932330884
-    second: Nomal_Button_0
+      213: -2388798164957006699
+    second: Middle_0
   externalObjects: {}
   serializedVersion: 13
   mipmaps:
@@ -126,13 +126,13 @@ TextureImporter:
     serializedVersion: 2
     sprites:
     - serializedVersion: 2
-      name: Nomal_Button_0
+      name: Middle_0
       rect:
         serializedVersion: 2
-        x: 460
-        y: 126
-        width: 846
-        height: 635
+        x: 4
+        y: 4
+        width: 1054
+        height: 438
       alignment: 0
       pivot: {x: 0, y: 0}
       border: {x: 0, y: 0, z: 0, w: 0}
@@ -141,8 +141,8 @@ TextureImporter:
       physicsShape: []
       tessellationDetail: -1
       bones: []
-      spriteID: 4834fe872bdf98350800000000000000
-      internalID: 6019621319932330884
+      spriteID: 594f1a1b9b849ded0800000000000000
+      internalID: -2388798164957006699
       vertices: []
       indices: 
       edges: []
@@ -161,7 +161,7 @@ TextureImporter:
     spriteCustomMetadata:
       entries: []
     nameFileIdTable:
-      Nomal_Button_0: 6019621319932330884
+      Middle_0: -2388798164957006699
   mipmapLimitGroupName: 
   pSDRemoveMatte: 0
   userData: 

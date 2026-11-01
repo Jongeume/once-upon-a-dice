@@ -47,13 +47,13 @@ namespace OUD.Unity.Battle.View
             if (_spText != null) _spText.text = $"SP: {currentSp}";
 
             SetupButton(_smallStraightBtn, _smallStraightText, HandType.SmallStraight,
-                "스몰 스트레이트", 1, currentSp, unlockedHands);
+                "Small Straight", 1, currentSp, unlockedHands);
             SetupButton(_fourOfAKindBtn, _fourOfAKindText, HandType.FourOfAKind,
-                "포오브어카인드", 2, currentSp, unlockedHands);
+                "Four of a Kind", 2, currentSp, unlockedHands);
             SetupButton(_largeStraightBtn, _largeStraightText, HandType.LargeStraight,
-                "라지 스트레이트", 2, currentSp, unlockedHands);
+                "Large Straight", 2, currentSp, unlockedHands);
             SetupButton(_yahtzeeBtn, _yahtzeeText, HandType.Yahtzee,
-                "야추", 3, currentSp, unlockedHands);
+                "Yahtzee", 3, currentSp, unlockedHands);
         }
 
         private void SetupButton(Button btn, TMP_Text text, HandType hand,
@@ -67,7 +67,7 @@ namespace OUD.Unity.Battle.View
             if (text != null)
             {
                 if (isUnlocked)
-                    text.text = $"{displayName} — 해금됨";
+                    text.text = $"{displayName} — Unlocked";
                 else
                     text.text = $"{displayName} (SP {cost})";
             }
