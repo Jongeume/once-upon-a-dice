@@ -89,6 +89,38 @@ namespace OUD.Unity.Adapter
 
         private PostBattleFlow _pendingFlow;
 
+        // ── Tutorial 이벤트 — TutorialManager가 구독 ────────────────────────
+
+        /// <summary>튜토리얼 트리거 이벤트. 키: "BattleStart", "DiceRolled", "DiceKept",
+        /// "SkillSelected", "UseSkillClicked", "TargetSelected", "ExecuteClicked",
+        /// "EnemyShielded", "BattleWon", "BattleLost", "PlayerTurnStarted"</summary>
+        public event System.Action<string> OnTutorialEvent;
+
+        // ── Tutorial View 접근자 ────────────────────────────────────────────
+
+        public DiceView            DiceViewRef            => _diceView;
+        public SlotAssignmentView  SlotAssignmentViewRef  => _slotAssignmentView;
+        public TargetSelectionView TargetSelectionViewRef => _targetSelectionView;
+        public List<DiceEntryView> DiceEntries            => _diceEntries;
+        public EnemyPresenter      EnemyPresenterRef      => _enemyPresenter;
+
+        /// <summary>현재 전투의 적 EnemyEntryView 목록. EnemyPresenter의 내부 뷰를 반환.</summary>
+        public List<EnemyEntryView> GetEnemyEntryViews()
+        {
+            var result = new List<EnemyEntryView>();
+            if (_enemyPresenter == null) return result;
+            var transforms = _enemyPresenter.GetEntryTransforms();
+            foreach (var t in transforms)
+            {
+                if (t != null)
+                {
+                    var view = t.GetComponent<EnemyEntryView>();
+                    if (view != null) result.Add(view);
+                }
+            }
+            return result;
+        }
+
         // ── Action Queue — 전투 행동 순차 연출 ───────────────────────────────
 
         private const float ACTION_DELAY = 0.6f;
@@ -658,15 +690,32 @@ namespace OUD.Unity.Adapter
             for (int i = 0; i < _diceEntries.Count; i++)
             {
                 int idx = i;
-                _diceEntries[i].OnToggled += () => _dicePresenter.OnDieToggleKeep(idx);
+                _diceEntries[i].OnToggled += () =>
+                {
+                    _dicePresenter.OnDieToggleKeep(idx);
+                    OnTutorialEvent?.Invoke("DiceKept");
+                };
             }
 
-            _slotAssignmentView.OnSkillCardClicked += _slotAssignmentPresenter.OnSkillClicked;
+            _slotAssignmentView.OnSkillCardClicked += id =>
+            {
+                _slotAssignmentPresenter.OnSkillClicked(id);
+                OnTutorialEvent?.Invoke("SkillSelected");
+                var slots = _slotAssignmentPresenter.GetSlots();
+                int filled = 0;
+                foreach (var s in slots) if (s != null) filled++;
+                if (filled >= SlotManager.MAX_SLOTS)
+                    OnTutorialEvent?.Invoke("AllSlotsFilled");
+            };
             _slotAssignmentView.OnRerollClicked    += _dicePresenter.RequestReroll;
 
             _diceView.OnUseSkillClicked += OnUseSkillButtonClicked;
 
-            _enemyPresenter.OnEnemyClicked += _targetSelectionPresenter.OnEnemyClicked;
+            _enemyPresenter.OnEnemyClicked += idx =>
+            {
+                _targetSelectionPresenter.OnEnemyClicked(idx);
+                OnTutorialEvent?.Invoke("TargetSelected");
+            };
             _targetSelectionView.OnSlotClicked += _targetSelectionPresenter.OnSlotClicked;
             _targetSelectionView.OnExecuteClicked += HandleExecuteClicked;
 
@@ -797,6 +846,8 @@ namespace OUD.Unity.Adapter
                 return;
             }
 
+            OnTutorialEvent?.Invoke("UseSkillClicked");
+
             _isQueueMode = true;
             _turnManager.ConfirmDice();
 
@@ -829,6 +880,7 @@ namespace OUD.Unity.Adapter
 
         private void HandleExecuteClicked()
         {
+            OnTutorialEvent?.Invoke("ExecuteClicked");
             _enemyPresenter.SetTargetSelectable(false);
             _playerView.ClearDefenseBadges();
             var targetIndices = _targetSelectionPresenter.GetTargetIndices();
@@ -870,6 +922,7 @@ namespace OUD.Unity.Adapter
             _hasUsableSkills = false;
 
             RefreshTopBar();
+            OnTutorialEvent?.Invoke("BattleStart");
         }
 
         public void OnPlayerTurnStarted()
@@ -882,6 +935,7 @@ namespace OUD.Unity.Adapter
 
             var allLearned = SkillDatabase.GetSkillsByUnlockedHands(_playerPresenter.Player.UnlockedHands);
             _slotAssignmentPresenter.ShowAllSkillsDisabled(allLearned, _playerPresenter.Player);
+            OnTutorialEvent?.Invoke("PlayerTurnStarted");
         }
 
         public void OnDiceRolled(int[] values, int rerollsLeft)
@@ -893,6 +947,9 @@ namespace OUD.Unity.Adapter
             SoundManager.Instance?.PlayDiceRoll();
 
             SetBackButtonEnabled(!_dicePresenter.IsRolling);
+            OnTutorialEvent?.Invoke("DiceRolled");
+            if (rerollsLeft == 0)
+                OnTutorialEvent?.Invoke("RerollsExhausted");
         }
 
         public void OnHandsEvaluated(List<HandType> hands, List<SkillData> usableSkills) { }
@@ -906,6 +963,7 @@ namespace OUD.Unity.Adapter
             _hasUsableSkills     = true;
             _pendingSlotCallback = onComplete;
             _slotAssignmentPresenter.Begin(usableSkills, allLearnedSkills, aliveEnemies, onComplete, _playerPresenter.Player);
+            OnTutorialEvent?.Invoke("SkillsReady");
         }
 
         public void OnSlotExecuted(int slotIndex, SkillResult result)
@@ -934,6 +992,9 @@ namespace OUD.Unity.Adapter
 
         public void OnEnemyAction(int enemyIndex, IntentType intent, int value)
         {
+            if (intent == IntentType.Shield)
+                OnTutorialEvent?.Invoke("EnemyShielded");
+
             if (_isQueueMode)
             {
                 _actionQueue.Enqueue(new QueuedBattleAction
@@ -1027,6 +1088,7 @@ namespace OUD.Unity.Adapter
 
         private void ExecuteBattleWon()
         {
+            OnTutorialEvent?.Invoke("BattleWon");
             SoundManager.Instance?.PlayVictory();
             _battleLogPresenter.ShowBattleWon();
             _winRewardTransitioned = false;

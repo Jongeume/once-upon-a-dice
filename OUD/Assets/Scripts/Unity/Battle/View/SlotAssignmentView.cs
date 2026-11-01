@@ -37,6 +37,9 @@ namespace OUD.Unity.Battle.View
         public event System.Action         OnRerollClicked;
         public event System.Action         OnUseSkillClicked;
 
+        public Transform SkillListAttackColumn  => _attackColumn;
+        public Transform SkillListDefenseColumn => _defenseColumn;
+
         private const float DISABLED_ALPHA = 0.4f;
 
         private void Awake()

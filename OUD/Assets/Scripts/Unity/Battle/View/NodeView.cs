@@ -78,7 +78,7 @@ namespace OUD.Unity.Battle.View
         private const string LABEL_SHOP   = "상점";
         private const string LABEL_ELITE  = "엘리트";
         private const string LABEL_LOCKED = "?";
-        private const string OVERLAY_CHECK = "●";
+        private const string OVERLAY_CHECK = "V";
 
         // ── 상태 ─────────────────────────────────────────────────────────────
 

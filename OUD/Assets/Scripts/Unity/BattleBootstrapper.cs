@@ -8,6 +8,7 @@ using OUD.BattleEngine.Dice;
 using OUD.BattleEngine.Run;
 using OUD.BattleEngine.Unit;
 using OUD.Unity.Adapter;
+using OUD.Unity.Tutorial;
 
 namespace OUD.Unity
 {
@@ -18,6 +19,9 @@ namespace OUD.Unity
 
         [Header("Roll Dice 버튼 (BattlePanel/ActionButtonA)")]
         [SerializeField] private Button _rollDiceButton;
+
+        [Header("Tutorial")]
+        [SerializeField] private TutorialOverlayView _tutorialOverlayView;
 
         private IRandom          _random;
         private RewardSystem     _rewardSystem;
@@ -30,6 +34,8 @@ namespace OUD.Unity
         private TurnManager _turnManager;
         private BattleState _state;
         private bool _rollDiceWired;
+        private bool _isTutorialBattle;
+        private TutorialManager _tutorialManager;
 
         private void Start()
         {
@@ -111,10 +117,26 @@ namespace OUD.Unity
                 return;
             }
 
-            List<MonsterData>     enemyData     = _runManager.GetNextBattle();
-            List<MonsterInstance> enemyInstances = new List<MonsterInstance>(enemyData.Count);
-            foreach (MonsterData d in enemyData)
-                enemyInstances.Add(new MonsterInstance(d));
+            // ── 튜토리얼 분기: Node 0(layer 0) + 미완료 → 허수아비 전투 ────
+            _isTutorialBattle = node.Layer == 0 && !TutorialState.IsCompleted;
+
+            List<MonsterInstance> enemyInstances;
+            if (_isTutorialBattle)
+            {
+                enemyInstances = new List<MonsterInstance>
+                {
+                    MonsterDatabase.Create(MonsterDatabase.ID_SCARECROW_A),
+                    MonsterDatabase.Create(MonsterDatabase.ID_SCARECROW_B),
+                };
+                Debug.Log("[BattleBootstrapper] 튜토리얼 모드 — 허수아비 2마리 생성");
+            }
+            else
+            {
+                List<MonsterData> enemyData = _runManager.GetNextBattle();
+                enemyInstances = new List<MonsterInstance>(enemyData.Count);
+                foreach (MonsterData d in enemyData)
+                    enemyInstances.Add(new MonsterInstance(d));
+            }
 
             DiceHand diceHand = new DiceHand(_random);
             _state       = new BattleState(_runManager.State.Player, enemyInstances, diceHand);
@@ -130,6 +152,14 @@ namespace OUD.Unity
             Debug.Log($"[BattleBootstrapper] 노드 {nodeIndex + 1}/{RunState.TOTAL_NODES} 시작 — 적: {enemyNames}");
 
             _turnManager.StartBattle();
+
+            // ── 튜토리얼 매니저 초기화 ──────────────────────────────────────
+            if (_isTutorialBattle && _tutorialOverlayView != null)
+            {
+                _tutorialManager = gameObject.AddComponent<TutorialManager>();
+                _tutorialManager.Begin(_adapter, _tutorialOverlayView,
+                    _rollDiceButton != null ? _rollDiceButton.gameObject : null);
+            }
         }
 
         private void OnContinueAfterNode()
