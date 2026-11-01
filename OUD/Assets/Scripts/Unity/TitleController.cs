@@ -26,12 +26,16 @@ namespace OUD.Unity
 
         private void OnNewGameClicked()
         {
+            // 완료 상태를 존중: 완료면 일반 게임, 미완료면 튜토리얼로 진입.
+            TutorialEntry.ForceTutorial = false;
             SceneManager.LoadScene("BattleScene");
         }
 
         private void OnTutorialClicked()
         {
-            TutorialState.Reset();
+            // 완료 여부와 무관하게 항상 튜토리얼. 영구 완료 상태는 건드리지 않는다
+            // (재생 중 종료해도 완료 기록 보존).
+            TutorialEntry.ForceTutorial = true;
             SceneManager.LoadScene("BattleScene");
         }
     }

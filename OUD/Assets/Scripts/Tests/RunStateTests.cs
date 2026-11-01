@@ -42,7 +42,7 @@ namespace OUD.Tests
             Assert.AreEqual(1, sut.CurrentNodeIndex);
             Assert.AreEqual(1, sut.CurrentNodeId);
             Assert.IsFalse(sut.IsLastNode);
-            Assert.IsTrue(sut.VisitedNodeIds.Contains(0));
+            Assert.IsTrue(sut.VisitedNodeIds.Contains(RunMap.START_NODE_ID));
             Assert.IsTrue(sut.VisitedNodeIds.Contains(1));
             Assert.AreEqual(2, sut.VisitedNodeIds.Count);
         }
@@ -114,7 +114,7 @@ namespace OUD.Tests
             sut.MoveTo(5, 3);
 
             Assert.AreEqual(4, sut.VisitedNodeIds.Count);
-            Assert.IsTrue(sut.VisitedNodeIds.Contains(0));
+            Assert.IsTrue(sut.VisitedNodeIds.Contains(RunMap.START_NODE_ID));
             Assert.IsTrue(sut.VisitedNodeIds.Contains(2));
             Assert.IsTrue(sut.VisitedNodeIds.Contains(4));
             Assert.IsTrue(sut.VisitedNodeIds.Contains(5));

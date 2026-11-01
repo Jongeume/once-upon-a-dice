@@ -18,33 +18,46 @@ namespace OUD.Tests
         private static RunMap NewMap() => new RunMap(new FixedRandom(0));
 
         [Test]
-        public void Constants_Define_13Node_Branching_Structure()
+        public void Constants_Define_Branching_Structure()
         {
             Assert.AreEqual(9,  RunMap.TOTAL_LAYERS);
             Assert.AreEqual(8,  RunMap.LAST_LAYER);
-            Assert.AreEqual(0,  RunMap.START_NODE_ID);
+            Assert.AreEqual(13, RunMap.START_NODE_ID);
+            Assert.AreEqual(0,  RunMap.FIRST_COMBAT_NODE_ID);
             Assert.AreEqual(12, RunMap.LAST_NODE_ID);
         }
 
         [Test]
-        public void NodeCount_Is13()
+        public void NodeCount_Is14()
         {
             var map = NewMap();
-            Assert.AreEqual(13, map.NodeCount);
+            Assert.AreEqual(14, map.NodeCount);
         }
 
         [Test]
-        public void StartNode_IsCombatLayer0_WithTwoBranches()
+        public void StartNode_IsStartType_LeadsToFirstCombat()
         {
             var map = NewMap();
-            MapNode start = map.GetNode(0);
+            MapNode start = map.GetNode(RunMap.START_NODE_ID);
 
-            Assert.AreEqual(0,              start.Id);
-            Assert.AreEqual(NodeType.Combat, start.Type);
-            Assert.AreEqual(0,              start.Layer);
-            Assert.AreEqual(2,              start.NextNodeIds.Count);
-            Assert.AreEqual(1,              start.NextNodeIds[0]);
-            Assert.AreEqual(2,              start.NextNodeIds[1]);
+            Assert.AreEqual(RunMap.START_NODE_ID, start.Id);
+            Assert.AreEqual(NodeType.Start,       start.Type);
+            Assert.AreEqual(1,                    start.NextNodeIds.Count);
+            Assert.AreEqual(RunMap.FIRST_COMBAT_NODE_ID, start.NextNodeIds[0]);
+        }
+
+        [Test]
+        public void FirstCombatNode_IsCombatLayer0_WithTwoBranches()
+        {
+            var map = NewMap();
+            MapNode n0 = map.GetNode(0);
+
+            Assert.AreEqual(0,              n0.Id);
+            Assert.AreEqual(NodeType.Combat, n0.Type);
+            Assert.AreEqual(0,              n0.Layer);
+            Assert.AreEqual(2,              n0.NextNodeIds.Count);
+            Assert.AreEqual(1,              n0.NextNodeIds[0]);
+            Assert.AreEqual(2,              n0.NextNodeIds[1]);
         }
 
         [Test]
@@ -172,6 +185,7 @@ namespace OUD.Tests
             var map = NewMap();
             for (int i = 0; i <= RunMap.LAST_NODE_ID; i++)
                 Assert.IsTrue(map.ContainsNode(i), $"missing nodeId {i}");
+            Assert.IsTrue(map.ContainsNode(RunMap.START_NODE_ID), "missing start node");
         }
 
         [Test]
