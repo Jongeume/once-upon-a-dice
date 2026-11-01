@@ -20,7 +20,19 @@ namespace OUD.Unity.Battle.View
                 MonsterTier.Elite => _elitePrefab != null ? _elitePrefab : _entryPrefab,
                 _                 => _entryPrefab,
             };
-            return Instantiate(prefab, _container);
+            EnemyEntryView entry = Instantiate(prefab, _container);
+            // 보스는 일반 몬스터 대비 카드 크기가 커서 pivot.y=1(상단 기준)로 맞춰야 베이스라인이 정렬됨
+            if (tier == MonsterTier.Boss)
+            {
+                RectTransform rt = entry.transform as RectTransform;
+                if (rt != null)
+                {
+                    Vector2 pivot = rt.pivot;
+                    pivot.y = 1f;
+                    rt.pivot = pivot;
+                }
+            }
+            return entry;
         }
 
         public Transform Container => _container;
