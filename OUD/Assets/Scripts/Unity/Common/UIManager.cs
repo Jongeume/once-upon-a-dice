@@ -15,6 +15,9 @@ namespace OUD.Unity.Common
         [SerializeField] private GameObject _diceTablePanel;
         [SerializeField] private GameObject _targetingOverlay;
 
+        [Header("Roll Dice 버튼 (Screen A에서만 표시 — 타겟팅 중에는 End Turn과 겹치지 않도록 숨김)")]
+        [SerializeField] private GameObject _rollDiceButton;
+
         [Header("배경 (D_Shop 진입 시 교체)")]
         [SerializeField] private Image  _canvasBackground;
         [SerializeField] private Sprite _battleBackground;
@@ -34,6 +37,11 @@ namespace OUD.Unity.Common
             // TargetingOverlay: 화면 C에서만 활성
             if (_targetingOverlay != null)
                 _targetingOverlay.SetActive(screen == BattleScreen.C_Targeting);
+            // Roll Dice 버튼: Screen A에서만 노출.
+            // Screen C에서는 같은 위치의 End Turn(Execute) 버튼이 보이도록 Roll Dice를 숨긴다.
+            // (End Turn은 TargetSelectionPresenter가 interactable로 활성/비활성 토글)
+            if (_rollDiceButton != null)
+                _rollDiceButton.SetActive(screen == BattleScreen.A_BattleBasic);
             // 배경: 상점 화면이면 상점 배경, 그 외엔 전투 배경으로 교체
             if (_canvasBackground != null)
                 _canvasBackground.sprite = (screen == BattleScreen.D_Shop) ? _shopBackground : _battleBackground;
