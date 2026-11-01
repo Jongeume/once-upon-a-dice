@@ -17,9 +17,13 @@ namespace OUD.Unity.Tutorial
 
         public const float FADE_DURATION = 0.3f;
 
-        private static readonly Color GLOW_COLOR = new Color(0.95f, 0.78f, 0.18f, 1f);
+        // 금색 버튼 프레임과 대비되도록 하늘색 계열 사용 (금색-on-금색 문제 해결)
+        private static readonly Color   GLOW_COLOR            = new Color(0.40f, 0.85f, 1.0f, 1f);
+        private static readonly Vector2 GLOW_OUTLINE_DISTANCE = new Vector2(6f, -6f);
         private const float GLOW_PULSE_PERIOD    = 1.0f;
         private const float GLOW_PULSE_MIN_ALPHA = 0.3f;
+        // 스케일 펄스 — Outline보다 훨씬 잘 보이는 주 효과 (1.0 ↔ 1.08 호흡)
+        private const float GLOW_SCALE_MAX       = 1.08f;
 
         private DiceView            _diceView;
         private SlotAssignmentView  _slotAssignmentView;
@@ -30,6 +34,8 @@ namespace OUD.Unity.Tutorial
 
         private readonly List<Coroutine> _activeGlowCoroutines = new();
         private readonly List<Outline>   _activeGlowOutlines   = new();
+        // 스케일 펄스 복원용 — (대상 RectTransform, 원래 스케일)
+        private readonly List<(RectTransform rt, Vector3 originalScale)> _activeGlowScales = new();
 
         private Coroutine _fadeCoroutine;
 
@@ -88,21 +94,21 @@ namespace OUD.Unity.Tutorial
             switch (target)
             {
                 case GlowTarget.RollDiceButton:
-                    AddOutlineGlow(GetRollDiceButton());
+                    AddGlow(GetRollDiceButton());
                     break;
                 case GlowTarget.RerollButton:
-                    AddOutlineGlow(GetRerollButton());
+                    AddGlow(GetRerollButton());
                     break;
                 case GlowTarget.UseSkillButton:
-                    AddOutlineGlow(GetUseSkillButton());
+                    AddGlow(GetUseSkillButton());
                     break;
                 case GlowTarget.ExecuteButton:
-                    AddOutlineGlow(GetExecuteButton());
+                    AddGlow(GetExecuteButton());
                     break;
                 case GlowTarget.DiceEntries:
                     if (_diceEntries != null)
                         foreach (var entry in _diceEntries)
-                            if (entry != null) AddOutlineGlow(entry.gameObject);
+                            if (entry != null) AddGlow(entry.gameObject);
                     break;
                 case GlowTarget.SkillList:
                     AddGlowToSkillList();
@@ -111,7 +117,7 @@ namespace OUD.Unity.Tutorial
                     if (_enemyEntryViews != null)
                         foreach (var entry in _enemyEntryViews)
                             if (entry != null && entry.gameObject.activeSelf)
-                                AddOutlineGlow(entry.gameObject);
+                                AddGlow(entry.gameObject);
                     break;
             }
         }
@@ -128,24 +134,43 @@ namespace OUD.Unity.Tutorial
                     outline.enabled = false;
             }
             _activeGlowOutlines.Clear();
+
+            // 스케일 펄스 원복 (코루틴은 위에서 이미 정지됨)
+            foreach (var (rt, originalScale) in _activeGlowScales)
+            {
+                if (rt != null)
+                    rt.localScale = originalScale;
+            }
+            _activeGlowScales.Clear();
         }
 
         // ── 글로우 헬퍼 ──────────────────────────────────────────────────
 
-        private void AddOutlineGlow(GameObject go)
+        private void AddGlow(GameObject go)
         {
             if (go == null) return;
 
+            // 1) 색 대비 아웃라인 — 대상에 Graphic이 있을 때만 그려짐 (없으면 무해한 no-op)
             var outline = go.GetComponent<Outline>();
             if (outline == null) outline = go.AddComponent<Outline>();
-            outline.effectDistance = new Vector2(2f, -2f);
+            outline.effectColor    = GLOW_COLOR;
+            outline.effectDistance = GLOW_OUTLINE_DISTANCE;
             outline.enabled = true;
             _activeGlowOutlines.Add(outline);
 
             if (isActiveAndEnabled)
             {
-                var co = StartCoroutine(PulseOutline(outline));
-                _activeGlowCoroutines.Add(co);
+                _activeGlowCoroutines.Add(StartCoroutine(PulseOutline(outline)));
+
+                // 2) 스케일 펄스 — Graphic 유무와 무관하게 항상 보이는 주 효과.
+                //    localScale은 레이아웃 계산 이후 적용되므로 LayoutGroup 형제 재배치 없음.
+                var rt = go.GetComponent<RectTransform>();
+                if (rt != null)
+                {
+                    Vector3 baseScale = rt.localScale;
+                    _activeGlowScales.Add((rt, baseScale));
+                    _activeGlowCoroutines.Add(StartCoroutine(PulseScale(rt, baseScale)));
+                }
             }
         }
 
@@ -154,8 +179,8 @@ namespace OUD.Unity.Tutorial
             if (_slotAssignmentView == null) return;
             var attackCol  = _slotAssignmentView.SkillListAttackColumn;
             var defenseCol = _slotAssignmentView.SkillListDefenseColumn;
-            if (attackCol != null)  AddOutlineGlow(attackCol.gameObject);
-            if (defenseCol != null) AddOutlineGlow(defenseCol.gameObject);
+            if (attackCol != null)  AddGlow(attackCol.gameObject);
+            if (defenseCol != null) AddGlow(defenseCol.gameObject);
         }
 
         private IEnumerator PulseOutline(Outline outline)
@@ -168,6 +193,21 @@ namespace OUD.Unity.Tutorial
                 float wave  = 0.5f - 0.5f * Mathf.Cos(t * Mathf.PI * 2f);
                 float alpha = Mathf.Lerp(GLOW_PULSE_MIN_ALPHA, 1f, wave);
                 outline.effectColor = new Color(GLOW_COLOR.r, GLOW_COLOR.g, GLOW_COLOR.b, alpha);
+                yield return null;
+            }
+        }
+
+        private IEnumerator PulseScale(RectTransform rt, Vector3 baseScale)
+        {
+            if (rt == null) yield break;
+            float t = 0f;
+            // ClearAllGlows / OnDisable에서 StopCoroutine으로 종료됨
+            while (rt != null)
+            {
+                t += Time.deltaTime / GLOW_PULSE_PERIOD;
+                float wave  = 0.5f - 0.5f * Mathf.Cos(t * Mathf.PI * 2f);
+                float scale = Mathf.Lerp(1f, GLOW_SCALE_MAX, wave);
+                rt.localScale = baseScale * scale;
                 yield return null;
             }
         }
