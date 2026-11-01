@@ -40,6 +40,7 @@ namespace OUD.Unity
         // ── 매 전투마다 재생성 ────────────────────────────────────────────────
         private TurnManager _turnManager;
         private BattleState _state;
+        private bool _rollDiceWired;
 
         private void Start()
         {
@@ -69,11 +70,16 @@ namespace OUD.Unity
             PlayerState player = new PlayerState(new PlayerStats(maxHp: 60, atk: 6, def: 5));
             _runManager.StartRun(player);
 
-            // Roll Dice 버튼 onClick 등록 (1회)
-            if (_rollDiceButton != null)
+            // Roll Dice 버튼 onClick 등록 (1회 가드 — 씬 재로드 없이 재시작 시 중복 방지)
+            if (_rollDiceButton != null && !_rollDiceWired)
+            {
                 _rollDiceButton.onClick.AddListener(OnRollDiceClicked);
-            else
+                _rollDiceWired = true;
+            }
+            else if (_rollDiceButton == null)
+            {
                 Debug.LogWarning("[BattleBootstrapper] Roll Dice 버튼이 바인딩되지 않았습니다.");
+            }
 
             Debug.Log("[BattleBootstrapper] 런 초기화 완료 — 3전투 진행 (sprint MVP 데모)");
             Debug.Log($"  플레이어: HP:{player.MaxHp} ATK:{player.Atk} DEF:{player.Def}");

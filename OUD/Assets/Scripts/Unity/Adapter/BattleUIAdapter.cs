@@ -2,6 +2,7 @@ using System;
 using System.Collections.Generic;
 using TMPro;
 using UnityEngine;
+using UnityEngine.SceneManagement;
 using OUD.BattleEngine.Combat;
 using OUD.BattleEngine.Core;
 using OUD.BattleEngine.Run;
@@ -36,6 +37,10 @@ namespace OUD.Unity.Adapter
         [SerializeField] private LevelUpStatView      _levelUpStatView;
         [SerializeField] private LevelUpSkillView     _levelUpSkillView;
         [SerializeField] private RestView             _restView;
+
+        [Header("End-of-Run Views (F-14)")]
+        [SerializeField] private ClearView  _clearView;
+        [SerializeField] private DefeatView _defeatView;
 
         [Header("화면 관리")]
         [SerializeField] private UIManager            _uiManager;
@@ -90,6 +95,8 @@ namespace OUD.Unity.Adapter
         // ── Growth View 이벤트 등록 1회 가드 ─────────────────────────────────
         private bool _growthViewsWired;
 
+        private bool _endRunViewsWired;
+
         // ── 사용 가능한 기술 존재 여부 ────────────────────────────────────────
         // true = RequestSlotAssignment 호출됨(기술 있음) / false = 잡패(기술 없음)
         private bool _hasUsableSkills = false;
@@ -139,6 +146,15 @@ namespace OUD.Unity.Adapter
             }
 
             WireGrowthViews();
+
+            if (!_endRunViewsWired)
+            {
+                if (_clearView != null)
+                    _clearView.OnRestartClicked += HandleRestartClicked;
+                if (_defeatView != null)
+                    _defeatView.OnRestartClicked += HandleRestartClicked;
+                _endRunViewsWired = true;
+            }
         }
 
         /// <summary>
@@ -276,6 +292,28 @@ namespace OUD.Unity.Adapter
             FinishPostBattle();
         }
 
+        private void HandleRestartClicked()
+        {
+            SceneManager.LoadScene("TitleScene");
+        }
+
+        private void ShowClearScreen()
+        {
+            if (_clearView == null) return;
+            PlayerState player = _playerPresenter.Player;
+            _clearView.SetSummary(player.Level + 1, player.Gold);
+            _clearView.Show();
+        }
+
+        private void ShowDefeatScreen()
+        {
+            if (_defeatView == null) return;
+            int reached = _runManager?.State?.CurrentNodeIndex ?? 0;
+            int total = RunState.TOTAL_NODES;
+            _defeatView.SetDefeatInfo(reached + 1, total);
+            _defeatView.Show();
+        }
+
         private void FinishPostBattle()
         {
             MapNode currentNode = _runManager.GetCurrentNode();
@@ -284,7 +322,7 @@ namespace OUD.Unity.Adapter
             if (isBossNode)
             {
                 _runManager.AdvanceNode();
-                _onContinueRequested?.Invoke();
+                ShowClearScreen();
                 return;
             }
 
@@ -555,7 +593,11 @@ namespace OUD.Unity.Adapter
             // AdvanceNode / SelectNextNode는 보상 [계속] → HandleRewardContinueClicked에서 분기 처리.
         }
 
-        public void OnBattleLost() => _battleLogPresenter.ShowBattleLost();
+        public void OnBattleLost()
+        {
+            _battleLogPresenter.ShowBattleLost();
+            ShowDefeatScreen();
+        }
 
         // ── 보상 처리 (F-13 Phase B) ──────────────────────────────────────────
         // IBattleUI에 보상 콜백을 추가하지 않고 BattleUIAdapter 내부에서 처리.
