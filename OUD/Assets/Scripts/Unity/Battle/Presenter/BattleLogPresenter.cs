@@ -28,16 +28,32 @@ namespace OUD.Unity.Battle.Presenter
             foreach (var d in result.Damages)
             {
                 if (d.TargetIndex >= 0 && d.TargetIndex < _enemyTransforms.Length)
-                    _view.ShowDamagePopup(_enemyTransforms[d.TargetIndex].position, d.HpDamage);
+                    _view.ShowDamagePopup(GetAbovePosition(_enemyTransforms[d.TargetIndex]), d.HpDamage);
             }
             if (result.HpRecovered > 0 && _playerTransform != null)
-                _view.ShowHealPopup(_playerTransform.position, result.HpRecovered);
+                _view.ShowHealPopup(GetAbovePosition(_playerTransform), result.HpRecovered);
         }
 
         public void ShowEnemyAction(int enemyIndex, IntentType intent, int value)
         {
             if (intent == IntentType.Attack && _playerTransform != null)
-                _view.ShowDamagePopup(_playerTransform.position, value);
+                _view.ShowDamagePopup(GetAbovePosition(_playerTransform), value);
+        }
+
+        /// <summary>RectTransform 상단 바로 위. 카드 프레임 직상단에서 팝업 시작.</summary>
+        private const float POPUP_EXTRA_OFFSET = 5f;
+
+        private static Vector3 GetAbovePosition(Transform t)
+        {
+            if (t == null) return Vector3.zero;
+            RectTransform rt = t as RectTransform;
+            if (rt != null)
+            {
+                Vector3 pos = rt.position;
+                pos.y += rt.rect.height * rt.lossyScale.y * (1f - rt.pivot.y) + POPUP_EXTRA_OFFSET;
+                return pos;
+            }
+            return t.position;
         }
 
         public void ShowBattleWon()  => _view.ShowWinScreen();

@@ -97,10 +97,13 @@ namespace OUD.Unity.Battle.View
         private float _currentHpRatio = 1f;           // 실제 HP 비율 (애니메이션 목표)
 
         // 데미지 프리뷰 — 타겟팅 시 깎일 부분을 반투명 초록으로 표시
-        private const float PREVIEW_ALPHA = 0.35f;
+        private const float PREVIEW_ALPHA_MIN = 0.15f;
+        private const float PREVIEW_ALPHA_MAX = 0.45f;
+        private const float PREVIEW_PULSE_SPEED = 0.8f;   // 초당 펄스 사이클 수
         private Image _hpPreviewFill;
         private RectTransform _hpPreviewRect;
         private bool _isPreviewActive;
+        private Coroutine _previewPulseCoroutine;
 
         // 현재 ATK 캐시 — StrongAttack 의도가 들어올 때 임시로 강공격 데미지를 표시한 뒤
         // 다른 의도(Attack/Shield/Summon 등)로 바뀌면 원본 Atk로 복귀시키기 위해 보관.
@@ -158,7 +161,7 @@ namespace OUD.Unity.Battle.View
 
             _hpPreviewFill = previewGo.GetComponent<Image>();
             Color previewColor = _hpFill.color;
-            previewColor.a = PREVIEW_ALPHA;
+            previewColor.a = PREVIEW_ALPHA_MAX;
             _hpPreviewFill.color = previewColor;
 
             _hpPreviewRect = previewGo.GetComponent<RectTransform>();
@@ -215,6 +218,11 @@ namespace OUD.Unity.Battle.View
                 aMin.x = predictedRatio;
                 _hpPreviewRect.anchorMin = aMin;
                 SetHpBarRatio(_hpPreviewRect, _currentHpRatio);
+
+                // 깜빡이는 펄스 효과 시작
+                if (_previewPulseCoroutine != null) StopCoroutine(_previewPulseCoroutine);
+                if (isActiveAndEnabled)
+                    _previewPulseCoroutine = StartCoroutine(PulsePreviewBar());
             }
         }
 
@@ -224,12 +232,36 @@ namespace OUD.Unity.Battle.View
             if (!_isPreviewActive) return;
             _isPreviewActive = false;
 
+            // 펄스 코루틴 정지
+            if (_previewPulseCoroutine != null)
+            {
+                StopCoroutine(_previewPulseCoroutine);
+                _previewPulseCoroutine = null;
+            }
+
             // 초록 바 원래 HP 비율 복구
             SetHpBarRatio(_hpFillRect, _currentHpRatio);
 
             // 프리뷰 바 숨김
             if (_hpPreviewFill != null)
                 _hpPreviewFill.gameObject.SetActive(false);
+        }
+
+        /// <summary>프리뷰 바 알파를 부드럽게 오르내리며 깜빡이는 효과.</summary>
+        private IEnumerator PulsePreviewBar()
+        {
+            float t = 0f;
+            while (_hpPreviewFill != null)
+            {
+                t += Time.deltaTime * PREVIEW_PULSE_SPEED;
+                // sin 파형으로 부드러운 페이드 (0~1 → min~max)
+                float alpha = Mathf.Lerp(PREVIEW_ALPHA_MIN, PREVIEW_ALPHA_MAX,
+                    (Mathf.Sin(t * Mathf.PI * 2f) + 1f) * 0.5f);
+                Color c = _hpPreviewFill.color;
+                c.a = alpha;
+                _hpPreviewFill.color = c;
+                yield return null;
+            }
         }
 
         public void Setup(string name, Sprite sprite, float hpFill, string hpText)
@@ -463,6 +495,7 @@ namespace OUD.Unity.Battle.View
             if (_defPulseCoroutine    != null) { StopCoroutine(_defPulseCoroutine);    _defPulseCoroutine    = null; }
             if (_summonToastCoroutine != null) { StopCoroutine(_summonToastCoroutine); _summonToastCoroutine = null; }
             if (_hpDrainCoroutine     != null) { StopCoroutine(_hpDrainCoroutine);     _hpDrainCoroutine     = null; }
+            if (_previewPulseCoroutine != null) { StopCoroutine(_previewPulseCoroutine); _previewPulseCoroutine = null; }
             RestoreImageAlpha(_atkSwordImage);
             RestoreImageAlpha(_defShieldImage);
             SetSummonHighlight(false);

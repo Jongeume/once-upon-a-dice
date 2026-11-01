@@ -818,9 +818,11 @@ namespace OUD.Unity.Adapter
             _uiManager.ShowScreen(UIManager.BattleScreen.C_Targeting);
             _enemyPresenter.SetTargetSelectable(true);
 
+            // _battleEnemies(전체 목록)를 전달해야 인덱스가 EnemyPresenter와 일치.
+            // BattleState.AliveEnemies는 필터된 리스트라 인덱스 불일치 → 프리뷰 미표시 버그 발생.
             _targetSelectionPresenter.Begin(
                 _slotAssignmentPresenter.GetSlots(),
-                _slotAssignmentPresenter.GetAliveEnemies(),
+                _battleEnemies,
                 targetIndices => { },
                 _playerPresenter.Player);
         }
