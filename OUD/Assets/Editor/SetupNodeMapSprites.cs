@@ -18,7 +18,7 @@ public static class SetupNodeMapSprites
         Sprite combatSprite = LoadSprite("Monster_Node");
         Sprite bossSprite   = LoadSprite("Boss_Node");
         Sprite shopSprite   = LoadSprite("Store_Node");
-        Sprite eliteSprite  = LoadSprite("Eilte_Node");  // 원본 파일명 오타 그대로 사용
+        Sprite eliteSprite  = LoadSprite("Elite_Node");
         Sprite panelSprite  = LoadSprite("Map Panel");
 
         if (combatSprite == null || bossSprite == null || shopSprite == null || eliteSprite == null)
@@ -117,7 +117,23 @@ public static class SetupNodeMapSprites
         }
 
         EditorUtility.SetDirty(mapView);
-        Debug.Log($"[SetupNodeMapSprites] 완료! NodeIcon 생성: {created}개. 스프라이트 4종 + 패널 배경 할당됨.");
+
+        // ── 4. 기존 NodeIcon 앵커를 노드 전체 영역으로 확장 ─────────────────
+        int resized = 0;
+        foreach (RectTransform rt in Object.FindObjectsOfType<RectTransform>(true))
+        {
+            if (rt.name != "NodeIcon") continue;
+            Undo.RecordObject(rt, "Expand NodeIcon");
+            rt.anchorMin = Vector2.zero;
+            rt.anchorMax = Vector2.one;
+            rt.offsetMin = Vector2.zero;
+            rt.offsetMax = Vector2.zero;
+            EditorUtility.SetDirty(rt);
+            resized++;
+        }
+
+        UnityEditor.SceneManagement.EditorSceneManager.SaveOpenScenes();
+        Debug.Log($"[SetupNodeMapSprites] 완료! 생성:{created} 앵커조정:{resized}개.");
     }
 
     private static Sprite LoadSprite(string name)
