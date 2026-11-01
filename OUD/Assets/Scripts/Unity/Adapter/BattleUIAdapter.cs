@@ -757,6 +757,9 @@ namespace OUD.Unity.Adapter
 
         private void OnUseSkillButtonClicked()
         {
+            // 주사위 롤링 중에는 확정 불가
+            if (_dicePresenter != null && _dicePresenter.IsRolling) return;
+
             if (_turnManager == null)
             {
                 Debug.LogWarning("[BattleUIAdapter] _turnManager null — Initialize가 호출되지 않은 인스턴스입니다. 무시합니다.");

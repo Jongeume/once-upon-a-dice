@@ -104,6 +104,12 @@ namespace OUD.Unity.Battle.Presenter
         {
             if (_isRolling) return;
             if (_rerollsLeft <= 0) return;
+
+            // 응답 도착 전 중복 요청 차단: 즉시 롤링 상태로 전환 + UI 잠금
+            _isRolling = true;
+            _diceView.UpdateRerollInfo(_rerollsLeft, false);
+            _diceView.SetConfirmButtonActive(false);
+
             _onRerollRequested?.Invoke(_keepMask);
         }
 
