@@ -189,6 +189,8 @@ namespace OUD.Unity.Adapter
             var targetIndices = _targetSelectionPresenter.GetTargetIndices();
             if (targetIndices != null)
                 _slotAssignmentPresenter.Confirm(targetIndices);
+            // 슬롯 실행 + 적 턴 처리 후 Screen A로 복귀 (다음 턴은 Roll Dice 버튼으로 시작)
+            _uiManager.ShowScreen(UIManager.BattleScreen.A_BattleBasic);
         }
 
         // ── IBattleUI 구현 ────────────────────────────────────────────────────

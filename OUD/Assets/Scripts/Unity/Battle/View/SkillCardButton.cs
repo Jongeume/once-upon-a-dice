@@ -15,10 +15,28 @@ namespace OUD.Unity.Battle.View
         [SerializeField] private Image    _background;
 
         [Header("색상")]
-        [SerializeField] private Color _enabledColor  = new Color(0.09f, 0.06f, 0.04f, 0.9f);
-        [SerializeField] private Color _disabledColor = new Color(0.16f, 0.13f, 0.09f, 0.6f);
+        [SerializeField] private Color _enabledColor  = new Color(0.18f, 0.12f, 0.08f, 0.95f);
+        [SerializeField] private Color _disabledColor = new Color(0.10f, 0.08f, 0.06f, 0.45f);
+
+        [Header("외곽선")]
+        [SerializeField] private Color _enabledOutline  = new Color(0.95f, 0.78f, 0.18f, 1f);
+        [SerializeField] private Color _disabledOutline = new Color(0.30f, 0.25f, 0.18f, 0.5f);
 
         private string _skillId;
+        private Outline _outline;
+
+        private void Awake()
+        {
+            EnsureOutline();
+        }
+
+        private void EnsureOutline()
+        {
+            if (_outline != null) return;
+            _outline = GetComponent<Outline>();
+            if (_outline == null) _outline = gameObject.AddComponent<Outline>();
+            _outline.effectDistance = new Vector2(2.5f, -2.5f);
+        }
 
         public void Setup(SkillCardData card, Action<string> onClick)
         {
@@ -33,6 +51,12 @@ namespace OUD.Unity.Battle.View
         {
             if (_button)     _button.interactable = enabled;
             if (_background) _background.color    = enabled ? _enabledColor : _disabledColor;
+            EnsureOutline();
+            if (_outline)
+            {
+                _outline.effectColor = enabled ? _enabledOutline : _disabledOutline;
+                _outline.enabled     = true;
+            }
         }
     }
 }

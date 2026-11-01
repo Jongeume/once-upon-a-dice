@@ -30,6 +30,12 @@ namespace OUD.Unity.Battle.View
         [Header("타겟")]
         [SerializeField] private Button     _targetButton;
         [SerializeField] private Image      _targetHighlight;
+        [SerializeField] private Outline    _targetOutline;
+        [SerializeField] private GameObject _targetableHint;
+
+        [Header("타겟 색상")]
+        [SerializeField] private Color _selectableOutlineColor = new Color(0.95f, 0.78f, 0.18f, 1f);
+        [SerializeField] private Color _hoverOutlineColor      = new Color(1f,    0.45f, 0.20f, 1f);
 
         [Header("이펙트")]
         [SerializeField] private Animator   _animator;
@@ -38,9 +44,22 @@ namespace OUD.Unity.Battle.View
 
         public event Action OnClicked;
 
+        private bool _selectable;
+        private bool _highlighted;
+
         private void Awake()
         {
             if (_targetButton) _targetButton.onClick.AddListener(() => OnClicked?.Invoke());
+            EnsureOutline();
+            ApplyTargetVisual();
+        }
+
+        private void EnsureOutline()
+        {
+            if (_targetOutline != null) return;
+            _targetOutline = GetComponent<Outline>();
+            if (_targetOutline == null) _targetOutline = gameObject.AddComponent<Outline>();
+            _targetOutline.effectDistance = new Vector2(3f, -3f);
         }
 
         public void Setup(string name, Sprite sprite, float hpFill, string hpText)
@@ -78,12 +97,36 @@ namespace OUD.Unity.Battle.View
 
         public void SetTargetSelectable(bool selectable)
         {
+            _selectable = selectable;
             if (_targetButton) _targetButton.interactable = selectable;
+            if (_targetableHint) _targetableHint.SetActive(selectable);
+            ApplyTargetVisual();
         }
 
         public void SetTargetHighlight(bool highlighted)
         {
+            _highlighted = highlighted;
             if (_targetHighlight) _targetHighlight.enabled = highlighted;
+            ApplyTargetVisual();
+        }
+
+        private void ApplyTargetVisual()
+        {
+            if (_targetOutline == null) return;
+            if (_highlighted)
+            {
+                _targetOutline.enabled     = true;
+                _targetOutline.effectColor = _hoverOutlineColor;
+            }
+            else if (_selectable)
+            {
+                _targetOutline.enabled     = true;
+                _targetOutline.effectColor = _selectableOutlineColor;
+            }
+            else
+            {
+                _targetOutline.enabled = false;
+            }
         }
 
         public void PlayDeathEffect()

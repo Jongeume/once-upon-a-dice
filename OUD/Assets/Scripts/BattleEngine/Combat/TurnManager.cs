@@ -22,7 +22,8 @@ namespace OUD.BattleEngine.Combat
     ///   → RequestSlotAssignment 콜백 대기
     ///   → [Unity] ExecuteSlots()       ← 콜백으로 자동 호출
     ///   → ExecuteEnemyTurn()           ← 자동 호출
-    ///   → EndTurn() → StartPlayerTurn() ← 자동 호출
+    ///   → EndTurn()                    ← 자동 호출 (Phase=TurnEnd로만 전환, 다음 턴은 Roll Dice 버튼이 호출)
+    ///   → [Unity] StartPlayerTurn()    ← Roll Dice 버튼 클릭 시 호출
     /// </summary>
     public class TurnManager
     {
@@ -267,7 +268,7 @@ namespace OUD.BattleEngine.Combat
         public void EndTurn()
         {
             _state.Phase = BattlePhase.TurnEnd;
-            StartPlayerTurn();
+            // 다음 턴은 Unity Layer(Roll Dice 버튼)가 StartPlayerTurn()을 명시 호출 → Screen A에 머무름
         }
 
         // ── 내부 헬퍼 ─────────────────────────────────────────────────────────

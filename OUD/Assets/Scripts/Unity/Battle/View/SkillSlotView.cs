@@ -47,6 +47,8 @@ namespace OUD.Unity.Battle.View
                 int idx = i;
                 _slots[i].OnClicked += () => OnSlotClicked?.Invoke(idx);
             }
+            // 씬에 직접 입력된 텍스트(예: "Empty Slot") 대신 코드 일관 라벨로 강제 초기화
+            ClearAll();
         }
     }
 
