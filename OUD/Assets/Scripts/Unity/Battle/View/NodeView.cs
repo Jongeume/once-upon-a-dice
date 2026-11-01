@@ -34,6 +34,9 @@ namespace OUD.Unity.Battle.View
         [SerializeField] private Image   _frameImage;
         [SerializeField] private Outline _frameOutline;
 
+        [Header("노드 타입 아이콘")]
+        [SerializeField] private Image _iconImage;
+
         [Header("라벨 (중앙) — Combat='전투' / Boss='보스' / Locked='?'")]
         [SerializeField] private TMP_Text _labelText;
 
@@ -91,6 +94,17 @@ namespace OUD.Unity.Battle.View
         }
 
         // ── 외부 API ─────────────────────────────────────────────────────────
+
+        /// <summary>아이콘 스프라이트를 외부에서 주입. NodeMapView가 Bind 시 호출.</summary>
+        public void SetIconSprite(Sprite sprite)
+        {
+            if (_iconImage != null)
+            {
+                _iconImage.sprite = sprite;
+                _iconImage.enabled = sprite != null;
+                _iconImage.preserveAspect = true;
+            }
+        }
 
         /// <summary>
         /// 노드 데이터 주입. NodeId / Type 별 라벨 + 베이스 컬러 설정.
@@ -162,6 +176,7 @@ namespace OUD.Unity.Battle.View
                     SetClickable(false);
                     SetClearedOverlay(true);
                     SetLabelTextOverride(null);  // 원래 라벨 유지
+                    SetIconVisible(true);
                     break;
 
                 case NodeVisualState.Current:
@@ -170,6 +185,7 @@ namespace OUD.Unity.Battle.View
                     SetClickable(false);
                     SetClearedOverlay(true);
                     SetLabelTextOverride(null);
+                    SetIconVisible(true);
                     break;
 
                 case NodeVisualState.Available:
@@ -179,7 +195,9 @@ namespace OUD.Unity.Battle.View
                     SetClearedOverlay(false);
                     // Combat Available 노드는 "?"로 가려서 다음이 전투인지 노출 방지.
                     // Boss/Shop/Elite는 진행 계획상 라벨 유지.
-                    SetLabelTextOverride(_currentNodeType == NodeType.Combat ? LABEL_LOCKED : null);
+                    bool isCombatFog = _currentNodeType == NodeType.Combat;
+                    SetLabelTextOverride(isCombatFog ? LABEL_LOCKED : null);
+                    SetIconVisible(!isCombatFog);
                     break;
 
                 case NodeVisualState.Locked:
@@ -188,6 +206,7 @@ namespace OUD.Unity.Battle.View
                     SetClickable(false);
                     SetClearedOverlay(false);
                     SetLabelTextOverride(LABEL_LOCKED);  // ? 로 덮어쓰기
+                    SetIconVisible(false);
                     break;
             }
         }
@@ -201,6 +220,12 @@ namespace OUD.Unity.Battle.View
                 Color c = _frameImage.color;
                 c.a = alpha;
                 _frameImage.color = c;
+            }
+            if (_iconImage != null)
+            {
+                Color c = _iconImage.color;
+                c.a = alpha;
+                _iconImage.color = c;
             }
             if (_labelText != null)
             {
@@ -236,6 +261,11 @@ namespace OUD.Unity.Battle.View
         {
             if (_clearedOverlay == null) return;
             _clearedOverlay.gameObject.SetActive(show);
+        }
+
+        private void SetIconVisible(bool visible)
+        {
+            if (_iconImage != null) _iconImage.enabled = visible;
         }
 
         /// <summary>Locked 상태에서 라벨을 "?"로 덮어쓰기. null이면 SetNode에서 설정한 원본 유지.</summary>
