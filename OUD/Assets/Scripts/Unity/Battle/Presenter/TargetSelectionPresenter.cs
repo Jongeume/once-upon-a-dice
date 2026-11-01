@@ -1,0 +1,108 @@
+using System;
+using System.Collections.Generic;
+using OUD.BattleEngine.Combat;
+using OUD.BattleEngine.Core;
+using OUD.BattleEngine.Skill;
+using OUD.BattleEngine.Unit;
+using OUD.Unity.Battle;
+
+namespace OUD.Unity.Battle.Presenter
+{
+    /// <summary>
+    /// 화면 C — 슬롯별 타겟 지정 흐름.
+    /// 공격 기술 → 적 클릭 대기 / 수비 기술 → 자동 스킵.
+    /// 타겟 변경 허용. 모든 타겟 확정 시 턴 종료 버튼 활성화.
+    /// </summary>
+    public class TargetSelectionPresenter
+    {
+        private readonly ITargetSelectionView _view;
+
+        private SkillData[]   _slots;
+        private int[]         _targetIndices;
+        private int           _activeSlotIndex;
+        private List<MonsterInstance> _aliveEnemies;
+        private Action<int[]> _onAllTargetsConfirmed;
+
+        public TargetSelectionPresenter(ITargetSelectionView view) => _view = view;
+
+        public void Begin(
+            SkillData[]            slots,
+            List<MonsterInstance>  aliveEnemies,
+            Action<int[]>          onAllTargetsConfirmed)
+        {
+            _slots                 = slots;
+            _aliveEnemies          = aliveEnemies;
+            _onAllTargetsConfirmed = onAllTargetsConfirmed;
+            _targetIndices         = new int[slots.Length];
+            for (int i = 0; i < _targetIndices.Length; i++) _targetIndices[i] = -1;
+
+            _view.ClearTargetLinks();
+            _view.SetExecuteButtonActive(false);
+            AdvanceToNextAttackSlot(0);
+        }
+
+        /// <summary>적 클릭 시 View에서 호출.</summary>
+        public void OnEnemyClicked(int enemyIndex)
+        {
+            if (_activeSlotIndex < 0 || _activeSlotIndex >= _slots.Length) return;
+            if (_slots[_activeSlotIndex] == null) return;
+            if (_slots[_activeSlotIndex].Category != SkillCategory.Attack) return;
+
+            _targetIndices[_activeSlotIndex] = enemyIndex;
+            _view.ShowTargetLink(_activeSlotIndex, enemyIndex);
+
+            // 다음 미확정 공격 슬롯으로 이동
+            int next = FindNextUnconfirmedAttackSlot(_activeSlotIndex + 1);
+            if (next < 0)
+            {
+                // 모든 타겟 확정
+                _activeSlotIndex = -1;
+                _view.SetExecuteButtonActive(true);
+                _onAllTargetsConfirmed?.Invoke(_targetIndices);
+            }
+            else
+            {
+                AdvanceToNextAttackSlot(next);
+            }
+        }
+
+        /// <summary>슬롯 클릭 시 해당 슬롯으로 타겟 재선택.</summary>
+        public void OnSlotClicked(int slotIndex)
+        {
+            if (_slots[slotIndex] == null) return;
+            if (_slots[slotIndex].Category != SkillCategory.Attack) return;
+            _activeSlotIndex = slotIndex;
+            _view.HighlightSlot(slotIndex);
+            _view.SetExecuteButtonActive(false);
+        }
+
+        private void AdvanceToNextAttackSlot(int startFrom)
+        {
+            for (int i = startFrom; i < _slots.Length; i++)
+            {
+                if (_slots[i] == null) continue;
+                if (_slots[i].Category == SkillCategory.Attack)
+                {
+                    _activeSlotIndex = i;
+                    _view.HighlightSlot(i);
+                    return;
+                }
+            }
+            // 공격 슬롯 없음 → 즉시 확정
+            _activeSlotIndex = -1;
+            _view.SetExecuteButtonActive(true);
+            _onAllTargetsConfirmed?.Invoke(_targetIndices);
+        }
+
+        private int FindNextUnconfirmedAttackSlot(int startFrom)
+        {
+            for (int i = startFrom; i < _slots.Length; i++)
+            {
+                if (_slots[i] == null) continue;
+                if (_slots[i].Category == SkillCategory.Attack && _targetIndices[i] < 0)
+                    return i;
+            }
+            return -1;
+        }
+    }
+}

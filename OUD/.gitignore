@@ -135,3 +135,17 @@ credentials.xml
 # (선택) UnityPackage meta는 관리 권장
 # ==========================================
 # *.unitypackage.meta  ← 제거함 (meta는 추적 권장)
+
+
+# ==========================================
+# [Branch Isolation] docs 브랜치 자산 격리 (Hardened)
+# ==========================================
+# 1. 경로차단
+/Documents/**/*.txt
+/GDD/**/*.txt
+/MeetingNotes/**/*.txt
+
+# 2. Assets 외부의 md만 차단
+/Documents/**/*.md
+/GDD/**/*.md
+!/README.md
