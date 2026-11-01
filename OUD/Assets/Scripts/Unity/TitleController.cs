@@ -1,3 +1,4 @@
+using OUD.Unity.Common;
 using UnityEngine;
 using UnityEngine.SceneManagement;
 using UnityEngine.UI;
@@ -12,6 +13,11 @@ namespace OUD.Unity
         {
             if (_newGameButton != null)
                 _newGameButton.onClick.AddListener(OnNewGameClicked);
+        }
+
+        private void Start()
+        {
+            SoundManager.Instance?.PlayBGM();
         }
 
         private void OnNewGameClicked()

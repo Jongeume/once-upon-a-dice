@@ -1,0 +1,3055 @@
+fileFormatVersion: 2
+guid: dc8a9c99adaebc34c939e7eaeae64de0
+TextureImporter:
+  internalIDToNameTable:
+  - first:
+      213: -7863732066272055276
+    second: DiceSpread_0
+  - first:
+      213: 7996016582723669152
+    second: DiceSpread_1
+  - first:
+      213: -2955498797262567676
+    second: DiceSpread_2
+  - first:
+      213: 1846814515647423888
+    second: DiceSpread_3
+  - first:
+      213: -1468508401679501384
+    second: DiceSpread_4
+  - first:
+      213: 1464426929381637843
+    second: DiceSpread_5
+  - first:
+      213: 8406657514236700348
+    second: DiceSpread_6
+  - first:
+      213: -6534802010502748586
+    second: DiceSpread_7
+  - first:
+      213: -8359330148260683556
+    second: DiceSpread_8
+  - first:
+      213: -8976978669575568606
+    second: DiceSpread_9
+  - first:
+      213: -6016327010640385586
+    second: DiceSpread_10
+  - first:
+      213: -6774249788722335615
+    second: DiceSpread_11
+  - first:
+      213: -6138300883018578545
+    second: DiceSpread_12
+  - first:
+      213: 4811567365236698645
+    second: DiceSpread_13
+  - first:
+      213: 7140377028396865135
+    second: DiceSpread_14
+  - first:
+      213: -8283135574289246814
+    second: DiceSpread_15
+  - first:
+      213: 5430655517434960700
+    second: DiceSpread_16
+  - first:
+      213: -5450167002776220283
+    second: DiceSpread_17
+  - first:
+      213: 855462069215215910
+    second: DiceSpread_18
+  - first:
+      213: -6273621961365663393
+    second: DiceSpread_19
+  - first:
+      213: 8875410626331361777
+    second: DiceSpread_20
+  - first:
+      213: 7938219156995478091
+    second: DiceSpread_21
+  - first:
+      213: -8609437447595596570
+    second: DiceSpread_22
+  - first:
+      213: -2320286490170947336
+    second: DiceSpread_23
+  - first:
+      213: -541796651841565437
+    second: DiceSpread_24
+  - first:
+      213: -4420021605598217127
+    second: DiceSpread_25
+  - first:
+      213: -2673292987148891139
+    second: DiceSpread_26
+  - first:
+      213: 757384830223455019
+    second: DiceSpread_27
+  - first:
+      213: -2212691371907209238
+    second: DiceSpread_28
+  - first:
+      213: -403253889090726033
+    second: DiceSpread_29
+  - first:
+      213: 4038563970106096396
+    second: DiceSpread_30
+  - first:
+      213: 2635130941717875054
+    second: DiceSpread_31
+  - first:
+      213: 8445315242920655086
+    second: DiceSpread_32
+  - first:
+      213: 8430250451183987817
+    second: DiceSpread_33
+  - first:
+      213: 3027943760652393953
+    second: DiceSpread_34
+  - first:
+      213: -5829316343367890947
+    second: DiceSpread_35
+  - first:
+      213: 4854470718589733823
+    second: DiceSpread_36
+  - first:
+      213: -8354301627556059202
+    second: DiceSpread_37
+  - first:
+      213: 3077121064565610867
+    second: DiceSpread_38
+  - first:
+      213: 6022372265338030837
+    second: DiceSpread_39
+  - first:
+      213: -6935885574773201116
+    second: DiceSpread_40
+  - first:
+      213: -7799402962755391281
+    second: DiceSpread_41
+  - first:
+      213: -4457273487948381121
+    second: DiceSpread_42
+  - first:
+      213: 3089674443201708640
+    second: DiceSpread_43
+  - first:
+      213: -6461701994746254176
+    second: DiceSpread_44
+  - first:
+      213: 4456338419322048768
+    second: DiceSpread_45
+  - first:
+      213: -1661497353346521649
+    second: DiceSpread_46
+  - first:
+      213: -222029543481199247
+    second: DiceSpread_47
+  - first:
+      213: -4840851583658654826
+    second: DiceSpread_48
+  - first:
+      213: -6244576015696025354
+    second: DiceSpread_49
+  - first:
+      213: -6942109297040852182
+    second: DiceSpread_50
+  - first:
+      213: -4172658009591749474
+    second: DiceSpread_51
+  - first:
+      213: 7362533727053804337
+    second: DiceSpread_52
+  - first:
+      213: -2600123869350378298
+    second: DiceSpread_53
+  - first:
+      213: 4884144712331825359
+    second: DiceSpread_54
+  - first:
+      213: 8195159549988114900
+    second: DiceSpread_55
+  - first:
+      213: -6419079365480817266
+    second: DiceSpread_56
+  - first:
+      213: 5608759063353815249
+    second: DiceSpread_57
+  - first:
+      213: 3816715856716667670
+    second: DiceSpread_58
+  - first:
+      213: -727075563674022085
+    second: DiceSpread_59
+  - first:
+      213: 3803470699963438407
+    second: DiceSpread_60
+  - first:
+      213: -6687425771797605953
+    second: DiceSpread_61
+  - first:
+      213: -8319722423087461553
+    second: DiceSpread_62
+  - first:
+      213: 1993629111207979598
+    second: DiceSpread_63
+  - first:
+      213: 5178394726137331197
+    second: DiceSpread_64
+  - first:
+      213: 7425030366494866128
+    second: DiceSpread_65
+  - first:
+      213: -3164316626209914011
+    second: DiceSpread_66
+  - first:
+      213: -9105310999347098636
+    second: DiceSpread_67
+  - first:
+      213: -7059801829694415080
+    second: DiceSpread_68
+  - first:
+      213: 2618703168802707996
+    second: DiceSpread_69
+  - first:
+      213: 7150801649713842911
+    second: DiceSpread_70
+  - first:
+      213: 8275923653794261106
+    second: DiceSpread_71
+  - first:
+      213: 4689576829029400585
+    second: DiceSpread_72
+  - first:
+      213: -6449464461632441865
+    second: DiceSpread_73
+  - first:
+      213: 9025478293764250605
+    second: DiceSpread_74
+  - first:
+      213: 3992343013448737236
+    second: DiceSpread_75
+  - first:
+      213: 5382904936755233091
+    second: DiceSpread_76
+  - first:
+      213: 3739722980465661454
+    second: DiceSpread_77
+  - first:
+      213: 3030227939459889801
+    second: DiceSpread_78
+  - first:
+      213: -4406984659342786539
+    second: DiceSpread_79
+  - first:
+      213: -3029458476475932804
+    second: DiceSpread_80
+  - first:
+      213: 7142872530814975812
+    second: DiceSpread_81
+  - first:
+      213: 5465303279015512693
+    second: DiceSpread_82
+  - first:
+      213: 1485091898174768488
+    second: DiceSpread_83
+  - first:
+      213: -3528465205301961330
+    second: DiceSpread_84
+  - first:
+      213: 5446467530503486009
+    second: DiceSpread_85
+  - first:
+      213: 1487237323102578071
+    second: DiceSpread_86
+  - first:
+      213: -8211573219693661168
+    second: DiceSpread_87
+  - first:
+      213: -6746199804188911678
+    second: DiceSpread_88
+  - first:
+      213: 5501368730748503021
+    second: DiceSpread_89
+  - first:
+      213: 1831900520597364442
+    second: DiceSpread_90
+  - first:
+      213: 7907938548762734048
+    second: DiceSpread_91
+  - first:
+      213: -6824096320716524732
+    second: DiceSpread_92
+  - first:
+      213: -5772675140204529963
+    second: DiceSpread_93
+  - first:
+      213: 8765753110645312288
+    second: DiceSpread_94
+  - first:
+      213: -8172138745249732915
+    second: DiceSpread_95
+  - first:
+      213: -5146157519462388195
+    second: DiceSpread_96
+  - first:
+      213: 2722542038097138735
+    second: DiceSpread_97
+  - first:
+      213: -3399675688454229464
+    second: DiceSpread_98
+  - first:
+      213: -2028640051471194276
+    second: DiceSpread_99
+  - first:
+      213: 8154291471623921320
+    second: DiceSpread_100
+  - first:
+      213: 1071979867197726906
+    second: DiceSpread_101
+  - first:
+      213: -3681652204226243398
+    second: DiceSpread_102
+  - first:
+      213: 6081945750801958110
+    second: DiceSpread_103
+  - first:
+      213: 378041509760028372
+    second: DiceSpread_104
+  - first:
+      213: -5949139836260083285
+    second: DiceSpread_105
+  - first:
+      213: -4960472861832760914
+    second: DiceSpread_106
+  - first:
+      213: -3211355483031905897
+    second: DiceSpread_107
+  - first:
+      213: -3063379188841551685
+    second: DiceSpread_108
+  - first:
+      213: -6760395647085614617
+    second: DiceSpread_109
+  - first:
+      213: 2234442165054241213
+    second: DiceSpread_110
+  - first:
+      213: -8445137187062574199
+    second: DiceSpread_111
+  externalObjects: {}
+  serializedVersion: 13
+  mipmaps:
+    mipMapMode: 0
+    enableMipMap: 0
+    sRGBTexture: 1
+    linearTexture: 0
+    fadeOut: 0
+    borderMipMap: 0
+    mipMapsPreserveCoverage: 0
+    alphaTestReferenceValue: 0.5
+    mipMapFadeDistanceStart: 1
+    mipMapFadeDistanceEnd: 3
+  bumpmap:
+    convertToNormalMap: 0
+    externalNormalMap: 0
+    heightScale: 0.25
+    normalMapFilter: 0
+    flipGreenChannel: 0
+  isReadable: 0
+  streamingMipmaps: 0
+  streamingMipmapsPriority: 0
+  vTOnly: 0
+  ignoreMipmapLimit: 0
+  grayScaleToAlpha: 0
+  generateCubemap: 6
+  cubemapConvolution: 0
+  seamlessCubemap: 0
+  textureFormat: 1
+  maxTextureSize: 2048
+  textureSettings:
+    serializedVersion: 2
+    filterMode: 1
+    aniso: 1
+    mipBias: 0
+    wrapU: 1
+    wrapV: 1
+    wrapW: 1
+  nPOTScale: 0
+  lightmap: 0
+  compressionQuality: 50
+  spriteMode: 2
+  spriteExtrude: 1
+  spriteMeshType: 1
+  alignment: 0
+  spritePivot: {x: 0.5, y: 0.5}
+  spritePixelsToUnits: 100
+  spriteBorder: {x: 0, y: 0, z: 0, w: 0}
+  spriteGenerateFallbackPhysicsShape: 1
+  alphaUsage: 1
+  alphaIsTransparency: 1
+  spriteTessellationDetail: -1
+  textureType: 8
+  textureShape: 1
+  singleChannelComponent: 0
+  flipbookRows: 1
+  flipbookColumns: 1
+  maxTextureSizeSet: 0
+  compressionQualitySet: 0
+  textureFormatSet: 0
+  ignorePngGamma: 0
+  applyGammaDecoding: 0
+  swizzle: 50462976
+  cookieLightType: 0
+  platformSettings:
+  - serializedVersion: 4
+    buildTarget: DefaultTexturePlatform
+    maxTextureSize: 2048
+    resizeAlgorithm: 0
+    textureFormat: -1
+    textureCompression: 1
+    compressionQuality: 50
+    crunchedCompression: 0
+    allowsAlphaSplitting: 0
+    overridden: 0
+    ignorePlatformSupport: 0
+    androidETC2FallbackOverride: 0
+    forceMaximumCompressionQuality_BC6H_BC7: 0
+  - serializedVersion: 4
+    buildTarget: Standalone
+    maxTextureSize: 2048
+    resizeAlgorithm: 0
+    textureFormat: -1
+    textureCompression: 1
+    compressionQuality: 50
+    crunchedCompression: 0
+    allowsAlphaSplitting: 0
+    overridden: 0
+    ignorePlatformSupport: 0
+    androidETC2FallbackOverride: 0
+    forceMaximumCompressionQuality_BC6H_BC7: 0
+  - serializedVersion: 4
+    buildTarget: Android
+    maxTextureSize: 2048
+    resizeAlgorithm: 0
+    textureFormat: -1
+    textureCompression: 1
+    compressionQuality: 50
+    crunchedCompression: 0
+    allowsAlphaSplitting: 0
+    overridden: 0
+    ignorePlatformSupport: 0
+    androidETC2FallbackOverride: 0
+    forceMaximumCompressionQuality_BC6H_BC7: 0
+  - serializedVersion: 4
+    buildTarget: iOS
+    maxTextureSize: 2048
+    resizeAlgorithm: 0
+    textureFormat: -1
+    textureCompression: 1
+    compressionQuality: 50
+    crunchedCompression: 0
+    allowsAlphaSplitting: 0
+    overridden: 0
+    ignorePlatformSupport: 0
+    androidETC2FallbackOverride: 0
+    forceMaximumCompressionQuality_BC6H_BC7: 0
+  spriteSheet:
+    serializedVersion: 2
+    sprites:
+    - serializedVersion: 2
+      name: DiceSpread_0
+      rect:
+        serializedVersion: 2
+        x: 20
+        y: 831
+        width: 101
+        height: 88
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 410710d79596ed290800000000000000
+      internalID: -7863732066272055276
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: DiceSpread_1
+      rect:
+        serializedVersion: 2
+        x: 129
+        y: 831
+        width: 80
+        height: 88
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 0ac806f97be87fe60800000000000000
+      internalID: 7996016582723669152
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: DiceSpread_2
+      rect:
+        serializedVersion: 2
+        x: 225
+        y: 829
+        width: 91
+        height: 93
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 4070217b085fbf6d0800000000000000
+      internalID: -2955498797262567676
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: DiceSpread_3
+      rect:
+        serializedVersion: 2
+        x: 322
+        y: 830
+        width: 101
+        height: 90
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 0952333640431a910800000000000000
+      internalID: 1846814515647423888
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: DiceSpread_4
+      rect:
+        serializedVersion: 2
+        x: 430
+        y: 828
+        width: 85
+        height: 95
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 8b77730a36fce9be0800000000000000
+      internalID: -1468508401679501384
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: DiceSpread_5
+      rect:
+        serializedVersion: 2
+        x: 525
+        y: 830
+        width: 97
+        height: 89
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 3defe4d8880b25410800000000000000
+      internalID: 1464426929381637843
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: DiceSpread_6
+      rect:
+        serializedVersion: 2
+        x: 637
+        y: 830
+        width: 99
+        height: 90
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: cb6627408727aa470800000000000000
+      internalID: 8406657514236700348
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: DiceSpread_7
+      rect:
+        serializedVersion: 2
+        x: 743
+        y: 831
+        width: 70
+        height: 89
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 656a97eb138bf45a0800000000000000
+      internalID: -6534802010502748586
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: DiceSpread_8
+      rect:
+        serializedVersion: 2
+        x: 828
+        y: 830
+        width: 101
+        height: 90
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: cd065b01581bdfb80800000000000000
+      internalID: -8359330148260683556
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: DiceSpread_9
+      rect:
+        serializedVersion: 2
+        x: 935
+        y: 830
+        width: 96
+        height: 90
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 22380bb467d5b6380800000000000000
+      internalID: -8976978669575568606
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: DiceSpread_10
+      rect:
+        serializedVersion: 2
+        x: 1041
+        y: 830
+        width: 80
+        height: 90
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: ec9213ea576b18ca0800000000000000
+      internalID: -6016327010640385586
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: DiceSpread_11
+      rect:
+        serializedVersion: 2
+        x: 1135
+        y: 830
+        width: 101
+        height: 89
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 180b07b65b70df1a0800000000000000
+      internalID: -6774249788722335615
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: DiceSpread_12
+      rect:
+        serializedVersion: 2
+        x: 1245
+        y: 831
+        width: 91
+        height: 88
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: f8506377edf50daa0800000000000000
+      internalID: -6138300883018578545
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: DiceSpread_13
+      rect:
+        serializedVersion: 2
+        x: 1343
+        y: 830
+        width: 85
+        height: 89
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 51eabc1a60f16c240800000000000000
+      internalID: 4811567365236698645
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: DiceSpread_14
+      rect:
+        serializedVersion: 2
+        x: 1435
+        y: 830
+        width: 100
+        height: 89
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: f6654f37317b71360800000000000000
+      internalID: 7140377028396865135
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: DiceSpread_15
+      rect:
+        serializedVersion: 2
+        x: 1554
+        y: 827
+        width: 98
+        height: 94
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 2a59614c4146c0d80800000000000000
+      internalID: -8283135574289246814
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: DiceSpread_16
+      rect:
+        serializedVersion: 2
+        x: 25
+        y: 727
+        width: 91
+        height: 85
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: c3bd9369b609d5b40800000000000000
+      internalID: 5430655517434960700
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: DiceSpread_17
+      rect:
+        serializedVersion: 2
+        x: 123
+        y: 722
+        width: 88
+        height: 94
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 58dc7f8bcfd1d54b0800000000000000
+      internalID: -5450167002776220283
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: DiceSpread_18
+      rect:
+        serializedVersion: 2
+        x: 223
+        y: 720
+        width: 97
+        height: 97
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 621c46238363fdb00800000000000000
+      internalID: 855462069215215910
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: DiceSpread_19
+      rect:
+        serializedVersion: 2
+        x: 328
+        y: 721
+        width: 84
+        height: 96
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: f51d5b1b01e9fe8a0800000000000000
+      internalID: -6273621961365663393
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: DiceSpread_20
+      rect:
+        serializedVersion: 2
+        x: 431
+        y: 725
+        width: 72
+        height: 87
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 1f14532d0facb2b70800000000000000
+      internalID: 8875410626331361777
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: DiceSpread_21
+      rect:
+        serializedVersion: 2
+        x: 531
+        y: 728
+        width: 78
+        height: 81
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: b429ae9c3483a2e60800000000000000
+      internalID: 7938219156995478091
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: DiceSpread_22
+      rect:
+        serializedVersion: 2
+        x: 630
+        y: 727
+        width: 90
+        height: 83
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 6e46e149142258880800000000000000
+      internalID: -8609437447595596570
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: DiceSpread_23
+      rect:
+        serializedVersion: 2
+        x: 735
+        y: 725
+        width: 93
+        height: 87
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 8f809380bbfaccfd0800000000000000
+      internalID: -2320286490170947336
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: DiceSpread_24
+      rect:
+        serializedVersion: 2
+        x: 839
+        y: 722
+        width: 98
+        height: 93
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 30dcc72d0d62b78f0800000000000000
+      internalID: -541796651841565437
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: DiceSpread_25
+      rect:
+        serializedVersion: 2
+        x: 946
+        y: 723
+        width: 83
+        height: 91
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 95c34ca94cde8a2c0800000000000000
+      internalID: -4420021605598217127
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: DiceSpread_26
+      rect:
+        serializedVersion: 2
+        x: 1045
+        y: 721
+        width: 81
+        height: 96
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: dfb8270213e86ead0800000000000000
+      internalID: -2673292987148891139
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: DiceSpread_27
+      rect:
+        serializedVersion: 2
+        x: 1143
+        y: 719
+        width: 86
+        height: 99
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: b231db38d75c28a00800000000000000
+      internalID: 757384830223455019
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: DiceSpread_28
+      rect:
+        serializedVersion: 2
+        x: 1241
+        y: 719
+        width: 91
+        height: 99
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: ae726ebabe0fa41e0800000000000000
+      internalID: -2212691371907209238
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: DiceSpread_29
+      rect:
+        serializedVersion: 2
+        x: 1335
+        y: 719
+        width: 95
+        height: 99
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: f67d37279ba576af0800000000000000
+      internalID: -403253889090726033
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: DiceSpread_30
+      rect:
+        serializedVersion: 2
+        x: 1431
+        y: 719
+        width: 87
+        height: 99
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: c0b7dd8988cdb0830800000000000000
+      internalID: 4038563970106096396
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: DiceSpread_31
+      rect:
+        serializedVersion: 2
+        x: 1546
+        y: 719
+        width: 84
+        height: 99
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: e690cb541add19420800000000000000
+      internalID: 2635130941717875054
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: DiceSpread_32
+      rect:
+        serializedVersion: 2
+        x: 29
+        y: 617
+        width: 84
+        height: 80
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: ee83a7ed779c33570800000000000000
+      internalID: 8445315242920655086
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: DiceSpread_33
+      rect:
+        serializedVersion: 2
+        x: 122
+        y: 609
+        width: 89
+        height: 95
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 96ce566be144ef470800000000000000
+      internalID: 8430250451183987817
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: DiceSpread_34
+      rect:
+        serializedVersion: 2
+        x: 224
+        y: 608
+        width: 95
+        height: 95
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 1eddb8dbeca650a20800000000000000
+      internalID: 3027943760652393953
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: DiceSpread_35
+      rect:
+        serializedVersion: 2
+        x: 328
+        y: 608
+        width: 84
+        height: 96
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: df78d26bbab1a1fa0800000000000000
+      internalID: -5829316343367890947
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: DiceSpread_36
+      rect:
+        serializedVersion: 2
+        x: 432
+        y: 612
+        width: 70
+        height: 89
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: fbb8312066b8e5340800000000000000
+      internalID: 4854470718589733823
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: DiceSpread_37
+      rect:
+        serializedVersion: 2
+        x: 533
+        y: 617
+        width: 75
+        height: 79
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: eb7ad07ceee8f0c80800000000000000
+      internalID: -8354301627556059202
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: DiceSpread_38
+      rect:
+        serializedVersion: 2
+        x: 629
+        y: 616
+        width: 91
+        height: 80
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 3791e401e4124ba20800000000000000
+      internalID: 3077121064565610867
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: DiceSpread_39
+      rect:
+        serializedVersion: 2
+        x: 734
+        y: 611
+        width: 95
+        height: 91
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 5fa43acdaa3c39350800000000000000
+      internalID: 6022372265338030837
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: DiceSpread_40
+      rect:
+        serializedVersion: 2
+        x: 839
+        y: 609
+        width: 98
+        height: 94
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 42723e051d8cebf90800000000000000
+      internalID: -6935885574773201116
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: DiceSpread_41
+      rect:
+        serializedVersion: 2
+        x: 946
+        y: 611
+        width: 81
+        height: 91
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: fc0f5d01454f2c390800000000000000
+      internalID: -7799402962755391281
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: DiceSpread_42
+      rect:
+        serializedVersion: 2
+        x: 1046
+        y: 608
+        width: 79
+        height: 96
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: f34021cd0659422c0800000000000000
+      internalID: -4457273487948381121
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: DiceSpread_43
+      rect:
+        serializedVersion: 2
+        x: 1143
+        y: 606
+        width: 85
+        height: 99
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 06204aa498ab0ea20800000000000000
+      internalID: 3089674443201708640
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: DiceSpread_44
+      rect:
+        serializedVersion: 2
+        x: 1242
+        y: 606
+        width: 88
+        height: 99
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 0ac67b6754c6356a0800000000000000
+      internalID: -6461701994746254176
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: DiceSpread_45
+      rect:
+        serializedVersion: 2
+        x: 1335
+        y: 605
+        width: 95
+        height: 101
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 001dd928e2818dd30800000000000000
+      internalID: 4456338419322048768
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: DiceSpread_46
+      rect:
+        serializedVersion: 2
+        x: 1431
+        y: 606
+        width: 87
+        height: 98
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: fc5678ac5fc21f8e0800000000000000
+      internalID: -1661497353346521649
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: DiceSpread_47
+      rect:
+        serializedVersion: 2
+        x: 1546
+        y: 606
+        width: 83
+        height: 98
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 175392b7e413becf0800000000000000
+      internalID: -222029543481199247
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: DiceSpread_48
+      rect:
+        serializedVersion: 2
+        x: 29
+        y: 503
+        width: 83
+        height: 80
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 69383a1f127d1dcb0800000000000000
+      internalID: -4840851583658654826
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: DiceSpread_49
+      rect:
+        serializedVersion: 2
+        x: 124
+        y: 496
+        width: 86
+        height: 95
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 6f8a38be23fc659a0800000000000000
+      internalID: -6244576015696025354
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: DiceSpread_50
+      rect:
+        serializedVersion: 2
+        x: 225
+        y: 496
+        width: 93
+        height: 94
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: a2b71fd006ca8af90800000000000000
+      internalID: -6942109297040852182
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: DiceSpread_51
+      rect:
+        serializedVersion: 2
+        x: 327
+        y: 494
+        width: 86
+        height: 99
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: e946811e5adb716c0800000000000000
+      internalID: -4172658009591749474
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: DiceSpread_52
+      rect:
+        serializedVersion: 2
+        x: 432
+        y: 498
+        width: 70
+        height: 90
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 133ffd79a69fc2660800000000000000
+      internalID: 7362533727053804337
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: DiceSpread_53
+      rect:
+        serializedVersion: 2
+        x: 535
+        y: 503
+        width: 71
+        height: 79
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 6c44b5bed118aebd0800000000000000
+      internalID: -2600123869350378298
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: DiceSpread_54
+      rect:
+        serializedVersion: 2
+        x: 629
+        y: 503
+        width: 91
+        height: 81
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: fc014221db7f7c340800000000000000
+      internalID: 4884144712331825359
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: DiceSpread_55
+      rect:
+        serializedVersion: 2
+        x: 732
+        y: 496
+        width: 99
+        height: 95
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 4d111bed03e0bb170800000000000000
+      internalID: 8195159549988114900
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: DiceSpread_56
+      rect:
+        serializedVersion: 2
+        x: 838
+        y: 497
+        width: 99
+        height: 93
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: e8dd97ba359dae6a0800000000000000
+      internalID: -6419079365480817266
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: DiceSpread_57
+      rect:
+        serializedVersion: 2
+        x: 949
+        y: 498
+        width: 77
+        height: 91
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 1d0f4f1d6a056dd40800000000000000
+      internalID: 5608759063353815249
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: DiceSpread_58
+      rect:
+        serializedVersion: 2
+        x: 1046
+        y: 496
+        width: 78
+        height: 95
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 61b923099d2b7f430800000000000000
+      internalID: 3816715856716667670
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: DiceSpread_59
+      rect:
+        serializedVersion: 2
+        x: 1144
+        y: 494
+        width: 83
+        height: 98
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: b3fc75680a8e8e5f0800000000000000
+      internalID: -727075563674022085
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: DiceSpread_60
+      rect:
+        serializedVersion: 2
+        x: 1242
+        y: 493
+        width: 88
+        height: 100
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 7455de03374a8c430800000000000000
+      internalID: 3803470699963438407
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: DiceSpread_61
+      rect:
+        serializedVersion: 2
+        x: 1335
+        y: 492
+        width: 95
+        height: 102
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: fb1163a21bd7133a0800000000000000
+      internalID: -6687425771797605953
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: DiceSpread_62
+      rect:
+        serializedVersion: 2
+        x: 1430
+        y: 493
+        width: 89
+        height: 99
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: f4b050639886a8c80800000000000000
+      internalID: -8319722423087461553
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: DiceSpread_63
+      rect:
+        serializedVersion: 2
+        x: 1546
+        y: 493
+        width: 84
+        height: 99
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: e4aed6b2d1bcaab10800000000000000
+      internalID: 1993629111207979598
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: DiceSpread_64
+      rect:
+        serializedVersion: 2
+        x: 29
+        y: 395
+        width: 83
+        height: 80
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: dfdfb2e219a5dd740800000000000000
+      internalID: 5178394726137331197
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: DiceSpread_65
+      rect:
+        serializedVersion: 2
+        x: 124
+        y: 387
+        width: 86
+        height: 95
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 0da3a6167c10b0760800000000000000
+      internalID: 7425030366494866128
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: DiceSpread_66
+      rect:
+        serializedVersion: 2
+        x: 224
+        y: 386
+        width: 95
+        height: 97
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 56345e13bc61614d0800000000000000
+      internalID: -3164316626209914011
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: DiceSpread_67
+      rect:
+        serializedVersion: 2
+        x: 328
+        y: 386
+        width: 84
+        height: 98
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 4fb857a53ef63a180800000000000000
+      internalID: -9105310999347098636
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: DiceSpread_68
+      rect:
+        serializedVersion: 2
+        x: 432
+        y: 390
+        width: 70
+        height: 89
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 81f596ce3ab860e90800000000000000
+      internalID: -7059801829694415080
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: DiceSpread_69
+      rect:
+        serializedVersion: 2
+        x: 529
+        y: 395
+        width: 70
+        height: 80
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: c1adca458a0875420800000000000000
+      internalID: 2618703168802707996
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: DiceSpread_70
+      rect:
+        serializedVersion: 2
+        x: 628
+        y: 394
+        width: 92
+        height: 82
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: fda887eb630cc3360800000000000000
+      internalID: 7150801649713842911
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: DiceSpread_71
+      rect:
+        serializedVersion: 2
+        x: 732
+        y: 385
+        width: 97
+        height: 99
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 278e8a427bcf9d270800000000000000
+      internalID: 8275923653794261106
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: DiceSpread_72
+      rect:
+        serializedVersion: 2
+        x: 838
+        y: 388
+        width: 99
+        height: 93
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 90043319749b41140800000000000000
+      internalID: 4689576829029400585
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: DiceSpread_73
+      rect:
+        serializedVersion: 2
+        x: 950
+        y: 391
+        width: 74
+        height: 87
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 7f174ec2e36ee76a0800000000000000
+      internalID: -6449464461632441865
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: DiceSpread_74
+      rect:
+        serializedVersion: 2
+        x: 1046
+        y: 387
+        width: 78
+        height: 95
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: deb11db60b0f04d70800000000000000
+      internalID: 9025478293764250605
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: DiceSpread_75
+      rect:
+        serializedVersion: 2
+        x: 1144
+        y: 385
+        width: 83
+        height: 98
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 4d1ef1281d6a76730800000000000000
+      internalID: 3992343013448737236
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: DiceSpread_76
+      rect:
+        serializedVersion: 2
+        x: 1242
+        y: 384
+        width: 88
+        height: 100
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 3410ef6258be3ba40800000000000000
+      internalID: 5382904936755233091
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: DiceSpread_77
+      rect:
+        serializedVersion: 2
+        x: 1335
+        y: 383
+        width: 95
+        height: 102
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: e065501ac3a26e330800000000000000
+      internalID: 3739722980465661454
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: DiceSpread_78
+      rect:
+        serializedVersion: 2
+        x: 1431
+        y: 385
+        width: 87
+        height: 98
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 98a78ff81488d0a20800000000000000
+      internalID: 3030227939459889801
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: DiceSpread_79
+      rect:
+        serializedVersion: 2
+        x: 1547
+        y: 385
+        width: 82
+        height: 97
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 51007413dce37d2c0800000000000000
+      internalID: -4406984659342786539
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: DiceSpread_80
+      rect:
+        serializedVersion: 2
+        x: 29
+        y: 282
+        width: 84
+        height: 80
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: c7f1bdff09335f5d0800000000000000
+      internalID: -3029458476475932804
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: DiceSpread_81
+      rect:
+        serializedVersion: 2
+        x: 122
+        y: 275
+        width: 89
+        height: 94
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 44f3f13e8b4902360800000000000000
+      internalID: 7142872530814975812
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: DiceSpread_82
+      rect:
+        serializedVersion: 2
+        x: 224
+        y: 275
+        width: 95
+        height: 94
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 57a4f773068a8db40800000000000000
+      internalID: 5465303279015512693
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: DiceSpread_83
+      rect:
+        serializedVersion: 2
+        x: 327
+        y: 273
+        width: 86
+        height: 97
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 8658489863b1c9410800000000000000
+      internalID: 1485091898174768488
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: DiceSpread_84
+      rect:
+        serializedVersion: 2
+        x: 431
+        y: 277
+        width: 71
+        height: 89
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: e8d96a3279f580fc0800000000000000
+      internalID: -3528465205301961330
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: DiceSpread_85
+      rect:
+        serializedVersion: 2
+        x: 529
+        y: 282
+        width: 70
+        height: 81
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 93afb54cc5db59b40800000000000000
+      internalID: 5446467530503486009
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: DiceSpread_86
+      rect:
+        serializedVersion: 2
+        x: 630
+        y: 279
+        width: 90
+        height: 85
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 7956b34377ab3a410800000000000000
+      internalID: 1487237323102578071
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: DiceSpread_87
+      rect:
+        serializedVersion: 2
+        x: 732
+        y: 273
+        width: 99
+        height: 98
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 0147c09d9a1aa0e80800000000000000
+      internalID: -8211573219693661168
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: DiceSpread_88
+      rect:
+        serializedVersion: 2
+        x: 838
+        y: 275
+        width: 99
+        height: 94
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 2c7928f550fa062a0800000000000000
+      internalID: -6746199804188911678
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: DiceSpread_89
+      rect:
+        serializedVersion: 2
+        x: 948
+        y: 279
+        width: 78
+        height: 85
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: de3c4be86b9c85c40800000000000000
+      internalID: 5501368730748503021
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: DiceSpread_90
+      rect:
+        serializedVersion: 2
+        x: 1046
+        y: 275
+        width: 78
+        height: 94
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: ade1f0251d73c6910800000000000000
+      internalID: 1831900520597364442
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: DiceSpread_91
+      rect:
+        serializedVersion: 2
+        x: 1142
+        y: 272
+        width: 86
+        height: 99
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 0edee984634aebd60800000000000000
+      internalID: 7907938548762734048
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: DiceSpread_92
+      rect:
+        serializedVersion: 2
+        x: 1243
+        y: 273
+        width: 86
+        height: 98
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 44334aa4d80fb41a0800000000000000
+      internalID: -6824096320716524732
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: DiceSpread_93
+      rect:
+        serializedVersion: 2
+        x: 1334
+        y: 271
+        width: 97
+        height: 101
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 5d671608b8653efa0800000000000000
+      internalID: -5772675140204529963
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: DiceSpread_94
+      rect:
+        serializedVersion: 2
+        x: 1431
+        y: 273
+        width: 87
+        height: 96
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 02b0accd20636a970800000000000000
+      internalID: 8765753110645312288
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: DiceSpread_95
+      rect:
+        serializedVersion: 2
+        x: 1546
+        y: 275
+        width: 83
+        height: 92
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: dc6ee2aeb1bb69e80800000000000000
+      internalID: -8172138745249732915
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: DiceSpread_96
+      rect:
+        serializedVersion: 2
+        x: 28
+        y: 157
+        width: 86
+        height: 83
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: d1e2d36600d2598b0800000000000000
+      internalID: -5146157519462388195
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: DiceSpread_97
+      rect:
+        serializedVersion: 2
+        x: 122
+        y: 155
+        width: 89
+        height: 88
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: f2419da1f8968c520800000000000000
+      internalID: 2722542038097138735
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: DiceSpread_98
+      rect:
+        serializedVersion: 2
+        x: 224
+        y: 150
+        width: 95
+        height: 98
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 822772e39fce1d0d0800000000000000
+      internalID: -3399675688454229464
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: DiceSpread_99
+      rect:
+        serializedVersion: 2
+        x: 328
+        y: 149
+        width: 85
+        height: 99
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: c57ede21f92d8d3e0800000000000000
+      internalID: -2028640051471194276
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: DiceSpread_100
+      rect:
+        serializedVersion: 2
+        x: 432
+        y: 154
+        width: 70
+        height: 89
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 8ae1421e3ecd92170800000000000000
+      internalID: 8154291471623921320
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: DiceSpread_101
+      rect:
+        serializedVersion: 2
+        x: 536
+        y: 157
+        width: 68
+        height: 83
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: ab0e0b6720070ee00800000000000000
+      internalID: 1071979867197726906
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: DiceSpread_102
+      rect:
+        serializedVersion: 2
+        x: 630
+        y: 154
+        width: 89
+        height: 89
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: ab49f8493d428ecc0800000000000000
+      internalID: -3681652204226243398
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: DiceSpread_103
+      rect:
+        serializedVersion: 2
+        x: 731
+        y: 150
+        width: 100
+        height: 97
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: ed44fb3df69676450800000000000000
+      internalID: 6081945750801958110
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: DiceSpread_104
+      rect:
+        serializedVersion: 2
+        x: 838
+        y: 152
+        width: 99
+        height: 94
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 4de499b00c21f3500800000000000000
+      internalID: 378041509760028372
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: DiceSpread_105
+      rect:
+        serializedVersion: 2
+        x: 949
+        y: 156
+        width: 77
+        height: 86
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: ba9979cb6d8607da0800000000000000
+      internalID: -5949139836260083285
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: DiceSpread_106
+      rect:
+        serializedVersion: 2
+        x: 1046
+        y: 152
+        width: 79
+        height: 94
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: ea13e70c63cd82bb0800000000000000
+      internalID: -4960472861832760914
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: DiceSpread_107
+      rect:
+        serializedVersion: 2
+        x: 1143
+        y: 149
+        width: 85
+        height: 99
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 7995162e339fe63d0800000000000000
+      internalID: -3211355483031905897
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: DiceSpread_108
+      rect:
+        serializedVersion: 2
+        x: 1243
+        y: 151
+        width: 86
+        height: 95
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: bb866c4bbd0bc75d0800000000000000
+      internalID: -3063379188841551685
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: DiceSpread_109
+      rect:
+        serializedVersion: 2
+        x: 1335
+        y: 149
+        width: 95
+        height: 98
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 7e96d522aff3e22a0800000000000000
+      internalID: -6760395647085614617
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: DiceSpread_110
+      rect:
+        serializedVersion: 2
+        x: 1432
+        y: 153
+        width: 86
+        height: 90
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: db9763f7f45520f10800000000000000
+      internalID: 2234442165054241213
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: DiceSpread_111
+      rect:
+        serializedVersion: 2
+        x: 1546
+        y: 153
+        width: 84
+        height: 90
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 98391bdf878dcca80800000000000000
+      internalID: -8445137187062574199
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    outline: []
+    customData: 
+    physicsShape: []
+    bones: []
+    spriteID: 
+    internalID: 0
+    vertices: []
+    indices: 
+    edges: []
+    weights: []
+    secondaryTextures: []
+    spriteCustomMetadata:
+      entries: []
+    nameFileIdTable:
+      DiceSpread_0: -7863732066272055276
+      DiceSpread_1: 7996016582723669152
+      DiceSpread_10: -6016327010640385586
+      DiceSpread_100: 8154291471623921320
+      DiceSpread_101: 1071979867197726906
+      DiceSpread_102: -3681652204226243398
+      DiceSpread_103: 6081945750801958110
+      DiceSpread_104: 378041509760028372
+      DiceSpread_105: -5949139836260083285
+      DiceSpread_106: -4960472861832760914
+      DiceSpread_107: -3211355483031905897
+      DiceSpread_108: -3063379188841551685
+      DiceSpread_109: -6760395647085614617
+      DiceSpread_11: -6774249788722335615
+      DiceSpread_110: 2234442165054241213
+      DiceSpread_111: -8445137187062574199
+      DiceSpread_12: -6138300883018578545
+      DiceSpread_13: 4811567365236698645
+      DiceSpread_14: 7140377028396865135
+      DiceSpread_15: -8283135574289246814
+      DiceSpread_16: 5430655517434960700
+      DiceSpread_17: -5450167002776220283
+      DiceSpread_18: 855462069215215910
+      DiceSpread_19: -6273621961365663393
+      DiceSpread_2: -2955498797262567676
+      DiceSpread_20: 8875410626331361777
+      DiceSpread_21: 7938219156995478091
+      DiceSpread_22: -8609437447595596570
+      DiceSpread_23: -2320286490170947336
+      DiceSpread_24: -541796651841565437
+      DiceSpread_25: -4420021605598217127
+      DiceSpread_26: -2673292987148891139
+      DiceSpread_27: 757384830223455019
+      DiceSpread_28: -2212691371907209238
+      DiceSpread_29: -403253889090726033
+      DiceSpread_3: 1846814515647423888
+      DiceSpread_30: 4038563970106096396
+      DiceSpread_31: 2635130941717875054
+      DiceSpread_32: 8445315242920655086
+      DiceSpread_33: 8430250451183987817
+      DiceSpread_34: 3027943760652393953
+      DiceSpread_35: -5829316343367890947
+      DiceSpread_36: 4854470718589733823
+      DiceSpread_37: -8354301627556059202
+      DiceSpread_38: 3077121064565610867
+      DiceSpread_39: 6022372265338030837
+      DiceSpread_4: -1468508401679501384
+      DiceSpread_40: -6935885574773201116
+      DiceSpread_41: -7799402962755391281
+      DiceSpread_42: -4457273487948381121
+      DiceSpread_43: 3089674443201708640
+      DiceSpread_44: -6461701994746254176
+      DiceSpread_45: 4456338419322048768
+      DiceSpread_46: -1661497353346521649
+      DiceSpread_47: -222029543481199247
+      DiceSpread_48: -4840851583658654826
+      DiceSpread_49: -6244576015696025354
+      DiceSpread_5: 1464426929381637843
+      DiceSpread_50: -6942109297040852182
+      DiceSpread_51: -4172658009591749474
+      DiceSpread_52: 7362533727053804337
+      DiceSpread_53: -2600123869350378298
+      DiceSpread_54: 4884144712331825359
+      DiceSpread_55: 8195159549988114900
+      DiceSpread_56: -6419079365480817266
+      DiceSpread_57: 5608759063353815249
+      DiceSpread_58: 3816715856716667670
+      DiceSpread_59: -727075563674022085
+      DiceSpread_6: 8406657514236700348
+      DiceSpread_60: 3803470699963438407
+      DiceSpread_61: -6687425771797605953
+      DiceSpread_62: -8319722423087461553
+      DiceSpread_63: 1993629111207979598
+      DiceSpread_64: 5178394726137331197
+      DiceSpread_65: 7425030366494866128
+      DiceSpread_66: -3164316626209914011
+      DiceSpread_67: -9105310999347098636
+      DiceSpread_68: -7059801829694415080
+      DiceSpread_69: 2618703168802707996
+      DiceSpread_7: -6534802010502748586
+      DiceSpread_70: 7150801649713842911
+      DiceSpread_71: 8275923653794261106
+      DiceSpread_72: 4689576829029400585
+      DiceSpread_73: -6449464461632441865
+      DiceSpread_74: 9025478293764250605
+      DiceSpread_75: 3992343013448737236
+      DiceSpread_76: 5382904936755233091
+      DiceSpread_77: 3739722980465661454
+      DiceSpread_78: 3030227939459889801
+      DiceSpread_79: -4406984659342786539
+      DiceSpread_8: -8359330148260683556
+      DiceSpread_80: -3029458476475932804
+      DiceSpread_81: 7142872530814975812
+      DiceSpread_82: 5465303279015512693
+      DiceSpread_83: 1485091898174768488
+      DiceSpread_84: -3528465205301961330
+      DiceSpread_85: 5446467530503486009
+      DiceSpread_86: 1487237323102578071
+      DiceSpread_87: -8211573219693661168
+      DiceSpread_88: -6746199804188911678
+      DiceSpread_89: 5501368730748503021
+      DiceSpread_9: -8976978669575568606
+      DiceSpread_90: 1831900520597364442
+      DiceSpread_91: 7907938548762734048
+      DiceSpread_92: -6824096320716524732
+      DiceSpread_93: -5772675140204529963
+      DiceSpread_94: 8765753110645312288
+      DiceSpread_95: -8172138745249732915
+      DiceSpread_96: -5146157519462388195
+      DiceSpread_97: 2722542038097138735
+      DiceSpread_98: -3399675688454229464
+      DiceSpread_99: -2028640051471194276
+  mipmapLimitGroupName: 
+  pSDRemoveMatte: 0
+  userData: 
+  assetBundleName: 
+  assetBundleVariant: 

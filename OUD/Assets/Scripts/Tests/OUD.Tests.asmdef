@@ -3,6 +3,7 @@
     "rootNamespace": "OUD.Tests",
     "references": [
         "OUD.BattleEngine",
+        "OUD.Unity",
         "UnityEngine.TestRunner",
         "UnityEditor.TestRunner"
     ],
