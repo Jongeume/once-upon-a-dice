@@ -112,6 +112,11 @@ namespace OUD.Unity.Battle.View
         // 다른 의도(Attack/Shield/Summon 등)로 바뀌면 원본 Atk로 복귀시키기 위해 보관.
         private int _cachedAtk;
 
+        // 의도 캐시 — OnDisable 시 코루틴 정지로 의도 표시가 사라지므로 OnEnable 시 복원.
+        private IntentType _cachedIntent;
+        private int        _cachedIntentValue;
+        private bool       _hasIntent;
+
         public event Action OnClicked;
 
         private bool _selectable;
@@ -125,10 +130,17 @@ namespace OUD.Unity.Battle.View
             ApplyTargetVisual();
         }
 
+        private void OnEnable()
+        {
+            // 화면 전환(SetActive) 복귀 시 캐시된 의도 복원
+            if (_hasIntent)
+                UpdateIntent(_cachedIntent, _cachedIntentValue);
+        }
+
         private void OnDisable()
         {
-            // 비활성화 시 모든 의도 효과 정지 — 코루틴이 죽은 GO를 참조하지 않도록.
-            StopAllIntentEffects();
+            // 비활성화 시 코루틴만 정지 — 의도 상태는 캐시에 보존.
+            StopRunningCoroutines();
         }
 
         private void EnsureOutline()
@@ -343,8 +355,9 @@ namespace OUD.Unity.Battle.View
         /// </summary>
         public void UpdateIntent(IntentType intent, int value)
         {
-            // 구 구조 (참고):
-            // if (_intentText) _intentText.text = intent switch { ... };
+            _cachedIntent      = intent;
+            _cachedIntentValue = value;
+            _hasIntent         = true;
 
             switch (intent)
             {
@@ -437,11 +450,18 @@ namespace OUD.Unity.Battle.View
             }
         }
 
-        private void StopAllIntentEffects()
+        /// <summary>코루틴만 정지 — 의도 표시 상태는 유지. OnDisable에서 사용.</summary>
+        private void StopRunningCoroutines()
         {
             if (_summonToastCoroutine != null) { StopCoroutine(_summonToastCoroutine); _summonToastCoroutine = null; }
             if (_hpDrainCoroutine     != null) { StopCoroutine(_hpDrainCoroutine);     _hpDrainCoroutine     = null; }
             if (_previewPulseCoroutine != null) { StopCoroutine(_previewPulseCoroutine); _previewPulseCoroutine = null; }
+        }
+
+        /// <summary>모든 의도 효과 완전 정지 + 표시 해제. 사망 시 사용.</summary>
+        private void StopAllIntentEffects()
+        {
+            StopRunningCoroutines();
             // 의도 메달 양쪽 모두 비활성화 (기본 상태)
             SetAtkHighlight(false);
             SetDefHighlight(false);

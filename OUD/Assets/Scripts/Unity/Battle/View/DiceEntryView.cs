@@ -64,6 +64,13 @@ namespace OUD.Unity.Battle.View
         private int _assignedSlotIndex = -1;
         private RectTransform[] _allKeepSlots;
 
+        /// <summary>모든 슬롯 점유 상태 초기화. 턴/전투 시작 시 호출.</summary>
+        public static void ResetSlotOccupancy()
+        {
+            for (int i = 0; i < _slotOccupied.Length; i++)
+                _slotOccupied[i] = false;
+        }
+
         private bool    _kept;
         private Outline _outline;
         private Coroutine _rollCoroutine;

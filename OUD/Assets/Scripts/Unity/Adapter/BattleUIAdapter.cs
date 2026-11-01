@@ -352,6 +352,7 @@ namespace OUD.Unity.Adapter
 
         private void ShowLevelUpFromShop()
         {
+            _statChoicePending = false;   // 이전 가드 해제
             PlayerState player = _runManager.State.Player;
             if (_levelUpStatView != null)
             {
@@ -426,6 +427,7 @@ namespace OUD.Unity.Adapter
 
         private void ShowLevelUpStat(PostBattleFlow flow)
         {
+            _statChoicePending = false;   // 이전 턴 가드 해제
             PlayerState player = _playerPresenter.Player;
 
             if (_levelUpStatView != null)
@@ -442,8 +444,15 @@ namespace OUD.Unity.Adapter
             }
         }
 
+        private bool _statChoicePending;
+        private bool _skillChoicePending;
+
         private void HandleStatChosen(StatChoice choice)
         {
+            // 더블클릭 방지 — 첫 클릭만 처리
+            if (_statChoicePending) return;
+            _statChoicePending = true;
+
             PlayerState player = _playerPresenter.Player;
             _levelUpSystem.ApplyLevelUp(player, choice);
             _playerPresenter.SyncView();
@@ -462,6 +471,7 @@ namespace OUD.Unity.Adapter
 
         private void ShowLevelUpSkill(PostBattleFlow flow)
         {
+            _skillChoicePending = false;  // 이전 가드 해제
             PlayerState player = _playerPresenter.Player;
 
             if (_levelUpSkillView != null && player.Sp > 0)
@@ -478,6 +488,7 @@ namespace OUD.Unity.Adapter
 
         private void ShowLevelUpSkillFromShop()
         {
+            _skillChoicePending = false;  // 이전 가드 해제
             PlayerState player = _runManager.State.Player;
             if (_levelUpSkillView != null && player.Sp > 0)
             {
@@ -493,6 +504,10 @@ namespace OUD.Unity.Adapter
 
         private void HandleUnlockChosen(HandType hand)
         {
+            // 더블클릭 방지
+            if (_skillChoicePending) return;
+            _skillChoicePending = true;
+
             PlayerState player = _playerPresenter.Player;
             _skillPointSystem.Unlock(player, hand);
             if (_levelUpSkillView != null) _levelUpSkillView.Hide();
@@ -508,6 +523,10 @@ namespace OUD.Unity.Adapter
 
         private void HandleSkillSkipClicked()
         {
+            // 더블클릭 방지
+            if (_skillChoicePending) return;
+            _skillChoicePending = true;
+
             if (_levelUpSkillView != null) _levelUpSkillView.Hide();
 
             if (_pendingShopLevelUp)
@@ -718,7 +737,7 @@ namespace OUD.Unity.Adapter
             _slotAssignmentPresenter = new SlotAssignmentPresenter(
                 _slotAssignmentView,
                 _dicePresenter,
-                HandleUseSkillClicked);
+                OnUseSkillButtonClicked);
 
             _targetSelectionPresenter = new TargetSelectionPresenter(_targetSelectionView);
             _targetSelectionPresenter.SetEnemyPresenter(_enemyPresenter);
@@ -758,6 +777,7 @@ namespace OUD.Unity.Adapter
                     OnTutorialEvent?.Invoke("AllSlotsFilled");
             };
             _slotAssignmentView.OnRerollClicked    += _dicePresenter.RequestReroll;
+            _slotAssignmentView.OnSlotClicked      += _slotAssignmentPresenter.OnSlotClicked;
 
             _diceView.OnUseSkillClicked += OnUseSkillButtonClicked;
 

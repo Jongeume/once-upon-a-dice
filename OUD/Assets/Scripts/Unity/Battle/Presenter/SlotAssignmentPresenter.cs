@@ -77,7 +77,7 @@ namespace OUD.Unity.Battle.Presenter
             RebuildSkillList();
             int rerollsLeft = _dicePresenter?.RerollsLeft ?? 0;
             _view.SetRerollButtonActive(rerollsLeft > 0, rerollsLeft);
-            _view.SetUseSkillButtonActive(rerollsLeft == 0 || _filledCount >= SlotManager.MAX_SLOTS);
+            RefreshUseSkillButton();
         }
 
         public void OnSkillClicked(string skillId)
@@ -105,30 +105,59 @@ namespace OUD.Unity.Battle.Presenter
                 }
             }
 
-            bool slotsFull  = _filledCount >= SlotManager.MAX_SLOTS;
-            bool noRerolls  = _dicePresenter != null &&
-                              false; // DicePresenter의 rerollsLeft를 외부에서 전달받아 판단
             _dicePresenter?.RefreshConfirmButton(_filledCount);
 
-            if (slotsFull)
-            {
+            if (_filledCount >= SlotManager.MAX_SLOTS)
                 _view.SetRerollButtonActive(false, 0);
-                _view.SetUseSkillButtonActive(true);
-            }
+
+            RefreshUseSkillButton();
         }
 
-        /// <summary>리롤 소진 시 외부(DicePresenter)에서 호출. 기술 사용 버튼 활성화.</summary>
+        /// <summary>슬롯 터치 → 해당 슬롯 기술 취소.</summary>
+        public void OnSlotClicked(int slotIndex)
+        {
+            if (slotIndex < 0 || slotIndex >= SlotManager.MAX_SLOTS) return;
+            if (_slots[slotIndex] == null) return; // 빈 슬롯 무시
+
+            SkillData removed = _slots[slotIndex];
+            _slots[slotIndex] = null;
+            _filledCount--;
+            _usedHands.Remove(removed.Hand);
+
+            // 슬롯 UI 비우기
+            _view.ClearSlot(slotIndex);
+
+            // 같은 족보 스킬 다시 활성화 (사용 가능한 것만)
+            ReEnableSameHand(removed.Hand);
+
+            _dicePresenter?.RefreshConfirmButton(_filledCount);
+
+            // 리롤 버튼 복원 (리롤 남아있고 슬롯 꽉 차지 않은 경우)
+            int rerollsLeft = _dicePresenter?.RerollsLeft ?? 0;
+            if (rerollsLeft > 0 && _filledCount < SlotManager.MAX_SLOTS)
+                _view.SetRerollButtonActive(true, rerollsLeft);
+
+            RefreshUseSkillButton();
+        }
+
+        /// <summary>리롤 소진 시 외부(DicePresenter)에서 호출.</summary>
         public void OnRerollsExhausted()
         {
             _view.SetRerollButtonActive(false, 0);
-            _view.SetUseSkillButtonActive(true);
+            RefreshUseSkillButton();
         }
 
         public void OnRerollCountChanged(int rerollsLeft)
         {
             bool hasRerolls = rerollsLeft > 0;
             _view.SetRerollButtonActive(hasRerolls, rerollsLeft);
-            if (!hasRerolls) _view.SetUseSkillButtonActive(true);
+            RefreshUseSkillButton();
+        }
+
+        /// <summary>기술 1개 이상 슬롯 배치 시에만 "기술 사용" 버튼 표시, 아니면 "뒤로가기".</summary>
+        private void RefreshUseSkillButton()
+        {
+            _view.SetUseSkillButtonActive(_filledCount > 0);
         }
 
         /// <summary>✅ 기술 사용 버튼 클릭 → 콜백 호출 없이 화면 C로 전환 신호만 보냄.</summary>
@@ -190,6 +219,15 @@ namespace OUD.Unity.Battle.Presenter
             foreach (var s in source)
                 if (s.Hand == hand)
                     _view.SetSkillCardEnabled(s.Id, false);
+        }
+
+        private void ReEnableSameHand(HandType hand)
+        {
+            // 취소된 족보와 같은 hand의 스킬 중, 이번 턴 사용 가능한 것만 재활성화
+            var source = _allLearnedSkills ?? _usableSkills;
+            foreach (var s in source)
+                if (s.Hand == hand)
+                    _view.SetSkillCardEnabled(s.Id, _usableSkillIds.Contains(s.Id));
         }
 
         private SkillCardData ToCardData(SkillData s, bool enabled)

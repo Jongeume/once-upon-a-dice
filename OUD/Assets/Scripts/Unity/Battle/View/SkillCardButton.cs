@@ -52,14 +52,23 @@ namespace OUD.Unity.Battle.View
             {
                 _nameText.text = card.DisplayName;
                 _nameText.color = Color.white;
+                _nameText.enableAutoSizing = true;
+                _nameText.fontSizeMin = 14f;
+                _nameText.fontSizeMax = 24f;
+                _nameText.overflowMode = TextOverflowModes.Ellipsis;
             }
             if (_handText)
             {
                 _handText.text = $"({card.RequiredHand})";
                 _handText.alignment = TextAlignmentOptions.MidlineLeft;
                 _handText.color = Color.white;
+                _handText.enableAutoSizing = true;
+                _handText.fontSizeMin = 10f;
+                _handText.fontSizeMax = 16f;
+                _handText.overflowMode = TextOverflowModes.Ellipsis;
             }
             SetValueText(card.ValueText);
+            if (_valueText) _valueText.color = Color.white;
             SetEnabled(card.IsEnabled);
             if (_button) _button.onClick.AddListener(() => onClick?.Invoke(_skillId));
         }
@@ -89,7 +98,10 @@ namespace OUD.Unity.Battle.View
             _valueText.fontSize = _handText.fontSize;
             _valueText.color = _handText.color;
             _valueText.alignment = TextAlignmentOptions.MidlineRight;
-            _valueText.overflowMode = TextOverflowModes.Overflow;
+            _valueText.enableAutoSizing = true;
+            _valueText.fontSizeMin = 10f;
+            _valueText.fontSizeMax = 16f;
+            _valueText.overflowMode = TextOverflowModes.Ellipsis;
             _valueText.raycastTarget = false;
 
             var rt = _valueText.rectTransform;

@@ -36,6 +36,7 @@ namespace OUD.Unity.Battle.View
         public event System.Action<string> OnSkillCardClicked;
         public event System.Action         OnRerollClicked;
         public event System.Action         OnUseSkillClicked;
+        public event System.Action<int>    OnSlotClicked;
 
         public Transform SkillListAttackColumn  => _attackColumn;
         public Transform SkillListDefenseColumn => _defenseColumn;
@@ -52,6 +53,8 @@ namespace OUD.Unity.Battle.View
                     _rerollCanvasGroup = _rerollButton.gameObject.AddComponent<CanvasGroup>();
             }
             if (_useSkillButton) _useSkillButton.onClick.AddListener(() => OnUseSkillClicked?.Invoke());
+            if (_slotView != null)
+                _slotView.OnSlotClicked += idx => OnSlotClicked?.Invoke(idx);
         }
 
         public void ShowSkillList(List<SkillCardData> attackSkills, List<SkillCardData> defenseSkills)
@@ -75,6 +78,15 @@ namespace OUD.Unity.Battle.View
 
         public void ClearSlots() => _slotView?.ClearAll();
 
+        public void ClearSlot(int slotIndex)
+        {
+            if (_slotView != null && slotIndex >= 0)
+            {
+                // SkillSlotEntry.Clear()로 빈 슬롯 상태 복원
+                _slotView.ClearSlot(slotIndex);
+            }
+        }
+
         public void SetRerollButtonActive(bool active, int rerollsLeft)
         {
             if (_rerollButton)
@@ -89,7 +101,8 @@ namespace OUD.Unity.Battle.View
         public void SetUseSkillButtonActive(bool active)
         {
             if (_useSkillButton) _useSkillButton.gameObject.SetActive(active);
-            if (_backButton)     _backButton.gameObject.SetActive(!active);
+            // 뒤로가기는 항상 표시
+            if (_backButton) _backButton.gameObject.SetActive(true);
         }
 
         private void SpawnCards(List<SkillCardData> cards, Transform column)

@@ -58,6 +58,7 @@ namespace OUD.Unity.Battle
         void ShowSkillList(List<SkillCardData> attackSkills, List<SkillCardData> defenseSkills);
         void SetSkillCardEnabled(string skillId, bool enabled);
         void UpdateSlot(int slotIndex, SkillCardData skill);
+        void ClearSlot(int slotIndex);
         void ClearSlots();
         void SetRerollButtonActive(bool active, int rerollsLeft);
         void SetUseSkillButtonActive(bool active);
