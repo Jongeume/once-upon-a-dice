@@ -12,30 +12,42 @@ namespace OUD.Unity.Battle.View
         [SerializeField] private Button     _rerollButton;
         [SerializeField] private TMP_Text   _rerollCountText;
         [SerializeField] private Button     _useSkillButton;
+        [SerializeField] private Button     _backButton;
+
+        private CanvasGroup _rerollCanvasGroup;
 
         public event System.Action OnRerollClicked;
         public event System.Action OnUseSkillClicked;
 
+        private const float DISABLED_ALPHA = 0.4f;
+
         private void Awake()
         {
-            if (_rerollButton)    _rerollButton.onClick.AddListener(()   => OnRerollClicked?.Invoke());
-            if (_useSkillButton)  _useSkillButton.onClick.AddListener(() => OnUseSkillClicked?.Invoke());
+            if (_rerollButton)
+            {
+                _rerollButton.onClick.AddListener(() => OnRerollClicked?.Invoke());
+                _rerollCanvasGroup = _rerollButton.GetComponent<CanvasGroup>();
+                if (!_rerollCanvasGroup)
+                    _rerollCanvasGroup = _rerollButton.gameObject.AddComponent<CanvasGroup>();
+            }
+            if (_useSkillButton) _useSkillButton.onClick.AddListener(() => OnUseSkillClicked?.Invoke());
         }
 
         public void UpdateRerollInfo(int rerollsLeft, bool canReroll)
         {
             if (_rerollButton)
             {
-                _rerollButton.gameObject.SetActive(rerollsLeft > 0); // 리롤 남아있을 때만 표시
                 _rerollButton.interactable = canReroll;
+                if (_rerollCanvasGroup)
+                    _rerollCanvasGroup.alpha = rerollsLeft > 0 ? 1f : DISABLED_ALPHA;
             }
             if (_rerollCountText) _rerollCountText.text = $"{rerollsLeft}/3";
         }
 
         public void SetConfirmButtonActive(bool active)
         {
-            // 리롤 버튼 상태는 UpdateRerollInfo가 관리 — 여기선 UseSkill(확정) 버튼만 제어
             if (_useSkillButton) _useSkillButton.gameObject.SetActive(active);
+            if (_backButton)     _backButton.gameObject.SetActive(!active);
         }
 
         public void SetVisible(bool visible) => gameObject.SetActive(visible);

@@ -27,6 +27,9 @@ namespace OUD.Unity.Battle.View
         [SerializeField] private Button   _rerollButton;
         [SerializeField] private TMP_Text _rerollCountText;
         [SerializeField] private Button   _useSkillButton;
+        [SerializeField] private Button   _backButton;
+
+        private CanvasGroup _rerollCanvasGroup;
 
         private readonly Dictionary<string, SkillCardButton> _cardButtons = new();
 
@@ -34,9 +37,17 @@ namespace OUD.Unity.Battle.View
         public event System.Action         OnRerollClicked;
         public event System.Action         OnUseSkillClicked;
 
+        private const float DISABLED_ALPHA = 0.4f;
+
         private void Awake()
         {
-            if (_rerollButton)   _rerollButton.onClick.AddListener(()   => OnRerollClicked?.Invoke());
+            if (_rerollButton)
+            {
+                _rerollButton.onClick.AddListener(() => OnRerollClicked?.Invoke());
+                _rerollCanvasGroup = _rerollButton.GetComponent<CanvasGroup>();
+                if (!_rerollCanvasGroup)
+                    _rerollCanvasGroup = _rerollButton.gameObject.AddComponent<CanvasGroup>();
+            }
             if (_useSkillButton) _useSkillButton.onClick.AddListener(() => OnUseSkillClicked?.Invoke());
         }
 
@@ -63,13 +74,19 @@ namespace OUD.Unity.Battle.View
 
         public void SetRerollButtonActive(bool active, int rerollsLeft)
         {
-            if (_rerollButton)    _rerollButton.gameObject.SetActive(active);
+            if (_rerollButton)
+            {
+                _rerollButton.interactable = active;
+                if (_rerollCanvasGroup)
+                    _rerollCanvasGroup.alpha = active ? 1f : DISABLED_ALPHA;
+            }
             if (_rerollCountText) _rerollCountText.text = $"{rerollsLeft}/3";
         }
 
         public void SetUseSkillButtonActive(bool active)
         {
             if (_useSkillButton) _useSkillButton.gameObject.SetActive(active);
+            if (_backButton)     _backButton.gameObject.SetActive(!active);
         }
 
         private void SpawnCards(List<SkillCardData> cards, Transform column)
