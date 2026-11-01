@@ -30,6 +30,11 @@ namespace OUD.Unity.Battle.View
         [SerializeField] private GameObject _shieldGroup;
         [SerializeField] private TMP_Text   _shieldText;
 
+        [Header("실드 (HP 바 좌측)")]
+        [SerializeField] private GameObject _shieldDisplay;
+        [SerializeField] private Image      _shieldIcon;
+        [SerializeField] private TMP_Text   _shieldValueText;
+
         // === 구 구조 (UI 방향 변경 시 복원용, 결정 후 정리 예정) ===
         // [Header("공격력 (좌상단)")]
         // [SerializeField] private TMP_Text   _atkText;
@@ -308,8 +313,8 @@ namespace OUD.Unity.Battle.View
 
         public void UpdateShield(int shield, bool visible)
         {
-            if (_shieldGroup) _shieldGroup.SetActive(visible);
-            if (_shieldText)  _shieldText.text = shield.ToString();
+            if (_shieldDisplay) _shieldDisplay.SetActive(visible);
+            if (_shieldValueText) _shieldValueText.text = shield.ToString();
         }
 
         /// <summary>좌상단 공격력(현재 실효 ATK) 표시. 분노 등으로 ATK 변동 시 갱신.</summary>
