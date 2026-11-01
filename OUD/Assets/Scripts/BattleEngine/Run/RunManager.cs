@@ -1,7 +1,8 @@
 // RunManager.cs
 // 런 진행 흐름 오케스트레이션. RunState 보유 + EncounterTable에 적 구성 위임.
 // 전투 종료 후 다음 화면 분기(보상/레벨업/휴식)를 PostBattleFlow로 반환한다.
-// feature-spec F-11, user-flow §1
+// Phase D-1 (sprint MVP 데모): 3전투 자동 진행, 보스 제거.
+// feature-spec F-11 (sprint MVP 갱신), user-flow §1
 using System;
 using System.Collections.Generic;
 using OUD.BattleEngine.Unit;
@@ -9,10 +10,10 @@ using OUD.BattleEngine.Unit;
 namespace OUD.BattleEngine.Run
 {
     /// <summary>
-    /// 전투 종료 후 표시할 화면 분기 (user-flow §1):
-    ///   일반 전투: ShowReward=true, ShowLevelUp=조건부, ShowRest=true
-    ///   보스 전투: 모두 false (승리=클리어, 패배=재시작)
-    /// 호출 측은 true인 화면만 순서대로 표시: Reward → LevelUp → Rest.
+    /// 전투 종료 후 표시할 화면 분기:
+    ///   일반 노드(0,1): ShowReward=true, ShowLevelUp=조건부, ShowRest=true
+    ///   마지막 노드(2): ShowReward=true (XP/Gold 표시), ShowRest=false, ShowLevelUp=false
+    /// 호출 측은 true인 화면을 Reward → LevelUp → Rest 순서로 표시.
     /// </summary>
     public readonly struct PostBattleFlow
     {
@@ -35,10 +36,10 @@ namespace OUD.BattleEngine.Run
     /// </summary>
     public class RunManager
     {
-        // ── 레벨업 임계값 (game-design-v2.2 §4.1) ──────────────────────────────
-        // 노드 인덱스 1, 3, 5 (=전투 2, 4, 6) 종료 시점에 누적 XP 2/4/6 이상이면 레벨업.
-        private static readonly int[] LEVELUP_NODE_INDICES = { 1, 3, 5 };
-        private static readonly int[] XP_THRESHOLDS        = { 2, 4, 6 };
+        // ── 레벨업 임계값 (sprint MVP 데모: 3전투 압축) ─────────────────────────
+        // 노드 1 종료 시점에 누적 XP 2 이상이면 레벨업. 노드 2(마지막)는 레벨업 분기 없음.
+        private static readonly int[] LEVELUP_NODE_INDICES = { 1 };
+        private static readonly int[] XP_THRESHOLDS        = { 2 };
         private const int MAX_LEVEL = 3;
 
         private readonly EncounterTable _encounterTable;
@@ -74,22 +75,22 @@ namespace OUD.BattleEngine.Run
 
         /// <summary>
         /// 방금 끝난 전투의 후처리 화면 분기.
-        /// 보스 노드: 모두 false (런 종료 책임은 호출자).
-        /// 일반 노드: ShowReward=true, ShowRest=true, ShowLevelUp=레벨업 노드 + 임계값 도달 + 미만렙.
+        /// 마지막 노드: 보상만 표시 (XP/Gold). 휴식/레벨업 없음.
+        /// 일반 노드: 보상 + 휴식 + (레벨업 조건부).
         /// </summary>
         public PostBattleFlow GetPostBattleFlow()
         {
             EnsureStarted();
 
-            if (_state.IsBossNode)
-                return new PostBattleFlow(showReward: false, showLevelUp: false, showRest: false);
+            if (_state.IsLastNode)
+                return new PostBattleFlow(showReward: true, showLevelUp: false, showRest: false);
 
             bool levelUp = ShouldLevelUp(_state.CurrentNodeIndex, _state.Player.Xp, _state.Player.Level);
             return new PostBattleFlow(showReward: true, showLevelUp: levelUp, showRest: true);
         }
 
         /// <summary>
-        /// 다음 노드로 진행. 보스 노드 종료 시 IsRunComplete=true 전환.
+        /// 다음 노드로 진행. 마지막 노드 종료 시 IsRunComplete=true 전환.
         /// </summary>
         public void AdvanceNode()
         {
@@ -97,7 +98,7 @@ namespace OUD.BattleEngine.Run
             _state.Advance();
         }
 
-        /// <summary>현재 런이 보스 처치까지 완료된 상태인지.</summary>
+        /// <summary>현재 런이 마지막 노드까지 완료된 상태인지.</summary>
         public bool IsRunComplete()
         {
             return _state != null && _state.IsRunComplete;
@@ -107,7 +108,7 @@ namespace OUD.BattleEngine.Run
 
         /// <summary>
         /// 레벨업 가능 여부.
-        /// 조건: 노드가 레벨업 체크 시점(1/3/5) + 누적 XP가 임계값(2/4/6) 도달 + Level이 MAX 미만.
+        /// 조건: 노드가 레벨업 체크 시점(MVP에선 노드 1만) + 누적 XP가 임계값 도달 + Level이 MAX 미만.
         /// PlayerState.Level은 0=Lv1, 최대 3=Lv4.
         /// </summary>
         private static bool ShouldLevelUp(int nodeIndex, int totalXp, int currentLevel)

@@ -1,5 +1,5 @@
 // RunManagerTests.cs
-// feature-spec F-11 RunManager 흐름 테스트.
+// feature-spec F-11 RunManager 흐름 테스트 (sprint MVP — 3전투 압축, 보스 제거).
 using System;
 using System.Collections.Generic;
 using NUnit.Framework;
@@ -12,7 +12,6 @@ namespace OUD.Tests
     [TestFixture]
     public class RunManagerTests
     {
-        // ── Helper ───────────────────────────────────────────────────────────
         private class FixedRandom : IRandom
         {
             private readonly int _value;
@@ -66,7 +65,7 @@ namespace OUD.Tests
         {
             var sut = NewManager();
             sut.StartRun(NewPlayer());
-            for (int i = 0; i <= 6; i++) sut.AdvanceNode();
+            for (int i = 0; i < 3; i++) sut.AdvanceNode();
             Assert.IsTrue(sut.IsRunComplete());
 
             // 새 플레이어로 재시작
@@ -81,7 +80,7 @@ namespace OUD.Tests
         // ── GetNextBattle 위임 ───────────────────────────────────────────────
 
         [Test]
-        public void GetNextBattle_AtNode0_ReturnsEarlyEncounter()
+        public void GetNextBattle_AtNode0_ReturnsSlimeOnly()
         {
             var sut = NewManager();
             sut.StartRun(NewPlayer());
@@ -95,16 +94,17 @@ namespace OUD.Tests
         }
 
         [Test]
-        public void GetNextBattle_AtBossNode_ReturnsStoneGolem()
+        public void GetNextBattle_AtLastNode_NoStoneGolem()
         {
+            // sprint MVP: 보스 제거 — 마지막 노드도 일반 풀
             var sut = NewManager();
             sut.StartRun(NewPlayer());
-            for (int i = 0; i < 6; i++) sut.AdvanceNode();
+            for (int i = 0; i < 2; i++) sut.AdvanceNode(); // 마지막 노드(2)로
 
             List<MonsterData> result = sut.GetNextBattle();
 
-            Assert.AreEqual(1, result.Count);
-            Assert.AreEqual(MonsterDatabase.ID_STONE_GOLEM, result[0].Id);
+            foreach (var m in result)
+                Assert.AreNotEqual(MonsterDatabase.ID_STONE_GOLEM, m.Id);
         }
 
         // ── PostBattleFlow: 일반 노드 ────────────────────────────────────────
@@ -134,6 +134,8 @@ namespace OUD.Tests
             PostBattleFlow flow = sut.GetPostBattleFlow();
 
             Assert.IsTrue(flow.ShowLevelUp);
+            Assert.IsTrue(flow.ShowReward);
+            Assert.IsTrue(flow.ShowRest);
         }
 
         [Test]
@@ -150,62 +152,21 @@ namespace OUD.Tests
             Assert.IsFalse(flow.ShowLevelUp);
         }
 
+        // ── PostBattleFlow: 마지막 노드 (보스 분기 대체) ─────────────────────
+
         [Test]
-        public void GetPostBattleFlow_Node3_LevelUp_WhenXp4()
+        public void GetPostBattleFlow_LastNode_OnlyReward()
         {
+            // sprint MVP: 마지막 노드는 보상만 표시 (XP/Gold), 휴식/레벨업 없음
             var sut = NewManager();
             var player = NewPlayer();
-            player.AddXp(4);
+            player.AddXp(99);  // XP 많아도 마지막 노드는 레벨업 없음
             sut.StartRun(player);
-            for (int i = 0; i < 3; i++) sut.AdvanceNode(); // 노드 3
+            for (int i = 0; i < 2; i++) sut.AdvanceNode(); // 노드 2 (마지막)
 
             PostBattleFlow flow = sut.GetPostBattleFlow();
 
-            Assert.IsTrue(flow.ShowLevelUp);
-        }
-
-        [Test]
-        public void GetPostBattleFlow_Node5_LevelUp_WhenXp6()
-        {
-            var sut = NewManager();
-            var player = NewPlayer();
-            player.AddXp(6);
-            sut.StartRun(player);
-            for (int i = 0; i < 5; i++) sut.AdvanceNode(); // 노드 5
-
-            PostBattleFlow flow = sut.GetPostBattleFlow();
-
-            Assert.IsTrue(flow.ShowLevelUp);
-        }
-
-        [Test]
-        public void GetPostBattleFlow_Node2_NeverLevelUp_RegardlessOfXp()
-        {
-            var sut = NewManager();
-            var player = NewPlayer();
-            player.AddXp(99);
-            sut.StartRun(player);
-            for (int i = 0; i < 2; i++) sut.AdvanceNode(); // 노드 2 (체크 시점 아님)
-
-            PostBattleFlow flow = sut.GetPostBattleFlow();
-
-            Assert.IsFalse(flow.ShowLevelUp);
-        }
-
-        // ── PostBattleFlow: 보스 노드 ────────────────────────────────────────
-
-        [Test]
-        public void GetPostBattleFlow_BossNode_AllFalse()
-        {
-            var sut = NewManager();
-            var player = NewPlayer();
-            player.AddXp(99);
-            sut.StartRun(player);
-            for (int i = 0; i < 6; i++) sut.AdvanceNode(); // 노드 6 (보스)
-
-            PostBattleFlow flow = sut.GetPostBattleFlow();
-
-            Assert.IsFalse(flow.ShowReward);
+            Assert.IsTrue(flow.ShowReward);
             Assert.IsFalse(flow.ShowRest);
             Assert.IsFalse(flow.ShowLevelUp);
         }
@@ -220,11 +181,11 @@ namespace OUD.Tests
         }
 
         [Test]
-        public void IsRunComplete_AfterBossAdvance_True()
+        public void IsRunComplete_AfterLastAdvance_True()
         {
             var sut = NewManager();
             sut.StartRun(NewPlayer());
-            for (int i = 0; i <= 6; i++) sut.AdvanceNode(); // 보스 노드 통과
+            for (int i = 0; i < 3; i++) sut.AdvanceNode(); // 마지막 노드 통과
 
             Assert.IsTrue(sut.IsRunComplete());
         }
