@@ -135,6 +135,9 @@ namespace OUD.Unity.Adapter
             // 적 클릭 (화면 C)
             _enemyPresenter.OnEnemyClicked += _targetSelectionPresenter.OnEnemyClicked;
 
+            // 슬롯 클릭 (화면 C) — 슬롯 선택 후 적 클릭으로 타겟 변경
+            _targetSelectionView.OnSlotClicked += _targetSelectionPresenter.OnSlotClicked;
+
             // 턴 종료 버튼
             _targetSelectionView.OnExecuteClicked += HandleExecuteClicked;
         }
@@ -194,6 +197,11 @@ namespace OUD.Unity.Adapter
         {
             _playerPresenter.Init(player);
             _enemyPresenter.Init(enemies);
+            // 적 Entry 생성 후 BattleLogPresenter에 올바른 Transform 배열 전달
+            _battleLogPresenter = new BattleLogPresenter(
+                _battleLogView,
+                _playerView.transform,
+                BuildEnemyTransforms());
             _uiManager.ShowScreen(UIManager.BattleScreen.A_BattleBasic);
         }
 

@@ -15,6 +15,7 @@ namespace OUD.Unity.Battle
 
     public interface IEnemyEntryView
     {
+        event System.Action OnClicked;
         void Setup(string name, UnityEngine.Sprite sprite, float hpFill, string hpText);
         void UpdateHp(float fillAmount, string hpText);
         void UpdateShield(int shield, bool visible);
@@ -49,11 +50,13 @@ namespace OUD.Unity.Battle
 
     public interface ITargetSelectionView
     {
+        event System.Action<int> OnSlotClicked;
         void ShowSlots(SkillCardData[] slotCards);
         void HighlightSlot(int slotIndex);
         void ShowTargetLink(int slotIndex, int enemyIndex);
         void ClearTargetLinks();
         void SetExecuteButtonActive(bool active);
+        void SetSlotClickable(bool clickable);
     }
 
     public interface IBattleLogView

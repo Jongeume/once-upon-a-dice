@@ -39,6 +39,7 @@ namespace OUD.Unity.Battle.Presenter
             _view.ShowSlots(ToSlotCards(slots));
             _view.ClearTargetLinks();
             _view.SetExecuteButtonActive(false);
+            _view.SetSlotClickable(true);
             AdvanceToNextAttackSlot(0);
         }
 

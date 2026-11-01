@@ -72,7 +72,7 @@ public static class BuildUI_Part2
 
         var sltGO = GO("Title", slp.transform);
         Anchor(RT(sltGO), 0, 0.88f, 1, 1, 6, 0, -6, -4);
-        Txt(sltGO, "📋 기술 목록", 18, cGold);
+        Txt(sltGO, "기술 목록", 18, cGold);
 
         // 공격/수비 헤더
         var hdrGO = GO("ColumnHeaders", slp.transform);
@@ -216,7 +216,7 @@ public static class BuildUI_Part2
         Img(bbGO, new Color(0.35f, 0.25f, 0.08f));
         Btn(bbGO);
         var bbTxt = GO("Text", bbGO.transform); Fill(RT(bbTxt));
-        Txt(bbTxt, "↩ 뒤로가기", 16, cParch);
+        Txt(bbTxt, "뒤로가기", 16, cParch);
 
         // 리롤 (버튼B)
         var rbGO = GO("RerollButton", ab.transform);
@@ -224,7 +224,7 @@ public static class BuildUI_Part2
         Img(rbGO, cGold);
         Btn(rbGO);
         var rbTxt = GO("Text", rbGO.transform); Fill(RT(rbTxt));
-        Txt(rbTxt, "🔄 리롤 2/2", 16, Hex("#0c0804"));
+        Txt(rbTxt, "리롤 2/2", 16, Hex("#0c0804"));
 
         // 기술사용 (버튼B 전환, 비활성)
         var ubGO = GO("UseSkillButton", ab.transform, false);
@@ -232,7 +232,7 @@ public static class BuildUI_Part2
         Img(ubGO, cDef);
         Btn(ubGO);
         var ubTxt = GO("Text", ubGO.transform); Fill(RT(ubTxt));
-        Txt(ubTxt, "✅ 기술 사용", 16, Color.white);
+        Txt(ubTxt, "기술 사용", 16, Color.white);
 
         // ── OverlayPanel ─────────────────────────────────────────────────
         var op = GO("OverlayPanel", canvasGO.transform);
@@ -249,7 +249,7 @@ public static class BuildUI_Part2
         Img(ws, new Color(0, 0, 0, 0.82f));
         var wsTxt = GO("WinText", ws.transform);
         Anchor(RT(wsTxt), 0.15f, 0.35f, 0.85f, 0.65f);
-        Txt(wsTxt, "⚔  전투 승리  ⚔", 60, cGold);
+        Txt(wsTxt, "전투 승리", 60, cGold);
 
         // LoseScreen (비활성)
         var ls = GO("LoseScreen", op.transform, false);
@@ -257,7 +257,7 @@ public static class BuildUI_Part2
         Img(ls, new Color(0, 0, 0, 0.85f));
         var lsTxt = GO("LoseText", ls.transform);
         Anchor(RT(lsTxt), 0.15f, 0.35f, 0.85f, 0.65f);
-        Txt(lsTxt, "💀  전투 패배", 60, cAtk);
+        Txt(lsTxt, "전투 패배", 60, cAtk);
 
         // ── UIManager GO ─────────────────────────────────────────────────
         var mgrGO = new GameObject("BattleManager");
