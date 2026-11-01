@@ -25,7 +25,27 @@ namespace OUD.Unity.Common
 
         private BattleScreen _current = BattleScreen.A_BattleBasic;
 
+        /// <summary>현재 전투 배경 스프라이트. SetBattleBackground()로 변경.</summary>
+        private Sprite _activeBattleBackground;
+
         public BattleScreen Current => _current;
+
+        private void Awake()
+        {
+            _activeBattleBackground = _battleBackground;
+        }
+
+        /// <summary>전투 배경 스프라이트를 교체한다. 이후 ShowScreen 호출 시 이 스프라이트가 사용된다.</summary>
+        public void SetBattleBackground(Sprite sprite)
+        {
+            _activeBattleBackground = sprite != null ? sprite : _battleBackground;
+            // 현재 상점이 아닌 화면이면 즉시 반영
+            if (_canvasBackground != null && _current != BattleScreen.D_Shop)
+            {
+                _canvasBackground.sprite = _activeBattleBackground;
+                _canvasBackground.color  = Color.white;
+            }
+        }
 
         public void ShowScreen(BattleScreen screen)
         {
@@ -42,9 +62,9 @@ namespace OUD.Unity.Common
             // (End Turn은 TargetSelectionPresenter가 interactable로 활성/비활성 토글)
             if (_rollDiceButton != null)
                 _rollDiceButton.SetActive(screen == BattleScreen.A_BattleBasic);
-            // 배경: 상점 화면이면 상점 배경, 그 외엔 전투 배경으로 교체
+            // 배경: 상점 화면이면 상점 배경, 그 외엔 현재 활성 전투 배경
             if (_canvasBackground != null)
-                _canvasBackground.sprite = (screen == BattleScreen.D_Shop) ? _shopBackground : _battleBackground;
+                _canvasBackground.sprite = (screen == BattleScreen.D_Shop) ? _shopBackground : _activeBattleBackground;
         }
     }
 }
