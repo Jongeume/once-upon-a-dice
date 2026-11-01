@@ -86,12 +86,10 @@ namespace OUD.Unity.Battle.View
 
         private static readonly int _deathHash = Animator.StringToHash("Death");
 
-        // 인텐트 강조 펄스 — 검/방패 스프라이트 alpha 깜빡임 (1초 주기, 0.3↔1.0)
-        // 외곽선 펄스에서 변경됨: 아이콘 자체 가시성 변화가 의도 알림으로 더 직관적
+        // 의도 표시: 공격 시 검 아이콘만 표시 / 방어 시 방패 아이콘만 표시 (비활성 쪽 숨김)
+        // Summon 토스트 펄스용 상수
         private const float PULSE_PERIOD    = 1.0f;
         private const float PULSE_MIN_ALPHA = 0.3f;
-        private Coroutine _atkPulseCoroutine;
-        private Coroutine _defPulseCoroutine;
 
         private Coroutine _summonToastCoroutine;
 
@@ -284,7 +282,11 @@ namespace OUD.Unity.Battle.View
 
             float previousRatio = _currentHpRatio;
             _currentHpRatio = Mathf.Clamp01(fillAmount);
-            if (_hpText) _hpText.text = hpText;
+            if (_hpText)
+            {
+                _hpText.text      = hpText;
+                _hpText.alignment = TextAlignmentOptions.Center;
+            }
 
             // 초록 바 애니메이션: 데미지 시 서서히 감소, 힐/초기화 시 즉시 반영
             if (_currentHpRatio < previousRatio)
@@ -390,78 +392,19 @@ namespace OUD.Unity.Battle.View
             if (_atkValueText) _atkValueText.text = _cachedAtk.ToString();
         }
 
+        /// <summary>공격 의도: 검 아이콘 + 수치 표시/숨김 (메달 프레임은 항상 표시).</summary>
         private void SetAtkHighlight(bool active)
         {
-            if (_atkSwordImage == null) return;
-            if (active && isActiveAndEnabled)
-            {
-                if (_atkPulseCoroutine == null)
-                    _atkPulseCoroutine = StartCoroutine(PulseImageAlpha(_atkSwordImage));
-            }
-            else
-            {
-                if (_atkPulseCoroutine != null) { StopCoroutine(_atkPulseCoroutine); _atkPulseCoroutine = null; }
-                RestoreImageAlpha(_atkSwordImage);
-            }
+            if (_atkValueText != null)   _atkValueText.gameObject.SetActive(active);
+            if (_atkSwordImage != null)  _atkSwordImage.gameObject.SetActive(active);
         }
 
+        /// <summary>방어 의도: 방패 아이콘 + 수치 표시/숨김 (메달 프레임은 항상 표시).</summary>
         private void SetDefHighlight(bool active)
         {
-            if (_defShieldImage == null) return;
-            if (active && isActiveAndEnabled)
-            {
-                if (_defPulseCoroutine == null)
-                    _defPulseCoroutine = StartCoroutine(PulseImageAlpha(_defShieldImage));
-            }
-            else
-            {
-                if (_defPulseCoroutine != null) { StopCoroutine(_defPulseCoroutine); _defPulseCoroutine = null; }
-                RestoreImageAlpha(_defShieldImage);
-            }
+            if (_defValueText != null)    _defValueText.gameObject.SetActive(active);
+            if (_defShieldImage != null)  _defShieldImage.gameObject.SetActive(active);
         }
-
-        /// <summary>
-        /// 아이콘 스프라이트(검/방패) 알파를 코사인 파동으로 PULSE_MIN_ALPHA↔1.0 깜빡임.
-        /// 원본 RGB는 보존(예: ATK 검의 빨강색 그대로 유지).
-        /// </summary>
-        private IEnumerator PulseImageAlpha(Image image)
-        {
-            if (image == null) yield break;
-            Color baseColor = image.color;     // RGB 원본 캡처 (펄스 시작 시점 기준)
-            float t = 0f;
-            while (image != null)
-            {
-                t += Time.deltaTime / PULSE_PERIOD;
-                float wave  = 0.5f - 0.5f * Mathf.Cos(t * Mathf.PI * 2f);
-                float alpha = Mathf.Lerp(PULSE_MIN_ALPHA, 1f, wave);
-                image.color = new Color(baseColor.r, baseColor.g, baseColor.b, alpha);
-                yield return null;
-            }
-        }
-
-        /// <summary>펄스 중단 시 알파 1.0으로 복원.</summary>
-        private void RestoreImageAlpha(Image image)
-        {
-            if (image == null) return;
-            Color c = image.color;
-            image.color = new Color(c.r, c.g, c.b, 1f);
-        }
-
-        // (구) 외곽선 펄스 — 아이콘 알파 펄스로 대체됨, 복원 시 참고용 보존
-        // private IEnumerator PulseOutline(Outline outline)
-        // {
-        //     outline.enabled = true;
-        //     Color baseColor = _intentHighlightColor;
-        //     float t = 0f;
-        //     while (outline != null && outline.enabled)
-        //     {
-        //         t += Time.deltaTime / PULSE_PERIOD;
-        //         float wave  = 0.5f - 0.5f * Mathf.Cos(t * Mathf.PI * 2f);
-        //         float alpha = Mathf.Lerp(PULSE_MIN_ALPHA, 1f, wave);
-        //         outline.effectColor = new Color(baseColor.r, baseColor.g, baseColor.b, alpha);
-        //         yield return null;
-        //     }
-        // }
 
         private void SetSummonHighlight(bool active)
         {
@@ -496,13 +439,12 @@ namespace OUD.Unity.Battle.View
 
         private void StopAllIntentEffects()
         {
-            if (_atkPulseCoroutine    != null) { StopCoroutine(_atkPulseCoroutine);    _atkPulseCoroutine    = null; }
-            if (_defPulseCoroutine    != null) { StopCoroutine(_defPulseCoroutine);    _defPulseCoroutine    = null; }
             if (_summonToastCoroutine != null) { StopCoroutine(_summonToastCoroutine); _summonToastCoroutine = null; }
             if (_hpDrainCoroutine     != null) { StopCoroutine(_hpDrainCoroutine);     _hpDrainCoroutine     = null; }
             if (_previewPulseCoroutine != null) { StopCoroutine(_previewPulseCoroutine); _previewPulseCoroutine = null; }
-            RestoreImageAlpha(_atkSwordImage);
-            RestoreImageAlpha(_defShieldImage);
+            // 의도 메달 양쪽 모두 비활성화 (기본 상태)
+            SetAtkHighlight(false);
+            SetDefHighlight(false);
             SetSummonHighlight(false);
         }
 
