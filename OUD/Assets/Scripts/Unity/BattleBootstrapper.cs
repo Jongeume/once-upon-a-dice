@@ -57,7 +57,7 @@ namespace OUD.Unity
             _random         = new UnityRandom();
             _rewardSystem   = new RewardSystem(_random);
             _encounterTable = new EncounterTable(_random);
-            _runManager     = new RunManager(_encounterTable);
+            _runManager     = new RunManager(_encounterTable, _random);
 
             // 새 PlayerState로 런 시작 (Phase D-1: 패배 재시작 미구현)
             PlayerState player = new PlayerState(new PlayerStats(maxHp: 60, atk: 6, def: 5));

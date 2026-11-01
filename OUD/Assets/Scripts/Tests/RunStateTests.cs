@@ -1,5 +1,5 @@
 // RunStateTests.cs
-// feature-spec F-11 RunState 동작 테스트 (sprint MVP — 3전투, 보스 제거).
+// feature-spec F-11 RunState 동작 테스트 (Phase D-2 — 노드맵 도입, MoveTo/MarkComplete 분리).
 using NUnit.Framework;
 using OUD.BattleEngine.Core;
 using OUD.BattleEngine.Run;
@@ -21,6 +21,7 @@ namespace OUD.Tests
             var sut = new RunState(NewPlayer());
 
             Assert.AreEqual(0,  sut.CurrentNodeIndex);
+            Assert.AreEqual(RunMap.START_NODE_ID, sut.CurrentNodeId);
             Assert.IsFalse(sut.IsLastNode);
             Assert.IsFalse(sut.IsRunComplete);
         }
@@ -28,51 +29,78 @@ namespace OUD.Tests
         [Test]
         public void TotalNodes_Is3()
         {
+            // layer 수 (1-2-1 구조 = 3 layer)
             Assert.AreEqual(3, RunState.TOTAL_NODES);
             Assert.AreEqual(2, RunState.LAST_NODE);
         }
 
-        // ── Advance ──────────────────────────────────────────────────────────
+        // ── MoveTo ───────────────────────────────────────────────────────────
 
         [Test]
-        public void Advance_FromNode0_GoesToNode1()
+        public void MoveTo_FromLayer0ToLayer1_UpdatesIndexAndId()
         {
             var sut = new RunState(NewPlayer());
 
-            sut.Advance();
+            sut.MoveTo(nodeId: 1, layer: 1);
 
             Assert.AreEqual(1, sut.CurrentNodeIndex);
+            Assert.AreEqual(1, sut.CurrentNodeId);
+            Assert.IsFalse(sut.IsLastNode);
             Assert.IsFalse(sut.IsRunComplete);
         }
 
         [Test]
-        public void Advance_AcrossAll3Nodes_EndsAtLastComplete()
+        public void MoveTo_ToLastLayer_IsLastNodeTrue()
         {
             var sut = new RunState(NewPlayer());
 
-            // 0 → 1 → 2 (마지막)
-            sut.Advance();
-            sut.Advance();
-            Assert.AreEqual(2, sut.CurrentNodeIndex);
+            sut.MoveTo(nodeId: 3, layer: RunState.LAST_NODE);
+
+            Assert.AreEqual(RunState.LAST_NODE, sut.CurrentNodeIndex);
+            Assert.AreEqual(3, sut.CurrentNodeId);
             Assert.IsTrue(sut.IsLastNode);
             Assert.IsFalse(sut.IsRunComplete);
+        }
 
-            // 마지막 노드 종료
-            sut.Advance();
+        [Test]
+        public void MoveTo_ToBranchNode2_RecordsColumnNodeId()
+        {
+            // 1-2-1 구조에서 layer 1의 두 분기 노드 (id=1, id=2)
+            var sut = new RunState(NewPlayer());
+
+            sut.MoveTo(nodeId: 2, layer: 1);
+
+            Assert.AreEqual(1, sut.CurrentNodeIndex);
+            Assert.AreEqual(2, sut.CurrentNodeId);
+        }
+
+        // ── MarkComplete ─────────────────────────────────────────────────────
+
+        [Test]
+        public void MarkComplete_SetsIsRunComplete()
+        {
+            var sut = new RunState(NewPlayer());
+            sut.MoveTo(3, RunState.LAST_NODE);
+
+            sut.MarkComplete();
+
             Assert.IsTrue(sut.IsRunComplete);
         }
 
         [Test]
-        public void Advance_AfterRunComplete_DoesNothing()
+        public void MoveTo_AfterMarkComplete_DoesNothing()
         {
             var sut = new RunState(NewPlayer());
-            for (int i = 0; i < 3; i++) sut.Advance(); // 마지막까지 완료
+            sut.MoveTo(3, RunState.LAST_NODE);
+            sut.MarkComplete();
 
-            int idxBefore = sut.CurrentNodeIndex;
-            sut.Advance();
+            int idBefore    = sut.CurrentNodeId;
+            int layerBefore = sut.CurrentNodeIndex;
+            sut.MoveTo(99, 0);
 
             Assert.IsTrue(sut.IsRunComplete);
-            Assert.AreEqual(idxBefore, sut.CurrentNodeIndex);
+            Assert.AreEqual(idBefore,    sut.CurrentNodeId);
+            Assert.AreEqual(layerBefore, sut.CurrentNodeIndex);
         }
 
         // ── Reset ────────────────────────────────────────────────────────────
@@ -81,7 +109,8 @@ namespace OUD.Tests
         public void Reset_RestoresInitialState_WithNewPlayer()
         {
             var sut = new RunState(NewPlayer());
-            for (int i = 0; i < 3; i++) sut.Advance();
+            sut.MoveTo(3, RunState.LAST_NODE);
+            sut.MarkComplete();
             Assert.IsTrue(sut.IsRunComplete);
 
             var newPlayer = NewPlayer();
@@ -89,6 +118,7 @@ namespace OUD.Tests
 
             Assert.AreSame(newPlayer, sut.Player);
             Assert.AreEqual(0, sut.CurrentNodeIndex);
+            Assert.AreEqual(RunMap.START_NODE_ID, sut.CurrentNodeId);
             Assert.IsFalse(sut.IsRunComplete);
             Assert.IsFalse(sut.IsLastNode);
         }
